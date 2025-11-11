@@ -1,26 +1,26 @@
-# Data Flows: Interaction Patterns and Sequences
+# Flussi di Dati: Pattern di Interazione e Sequenze
 
-## Overview
+## Panoramica
 
 Questo documento descrive come i dati fluiscono attraverso l'architettura durante diverse operazioni, mostrando le interazioni tra componenti e le trasformazioni dei dati.
 
-## 1. Complete Task Execution Flow
+## 1. Flusso Completo di Esecuzione dei Task
 
-### 1.1 End-to-End Data Flow
+### 1.1 Flusso di Dati End-to-End
 
-**Full journey da user request a final result**:
+**Percorso completo dalla richiesta utente al risultato finale**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│               COMPLETE TASK EXECUTION DATA FLOW                │
+│          FLUSSO DATI ESECUZIONE TASK COMPLETA                  │
 │                                                                │
-│  USER                                                          │
+│  UTENTE                                                        │
 │    │                                                           │
-│    │ Task: "Add JWT authentication to API"                    │
+│    │ Task: "Aggiungi autenticazione JWT all'API"              │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │ 1. API GATEWAY                                           │ │
-│  │    Input: Natural language task                          │ │
+│  │    Input: Task in linguaggio naturale                    │ │
 │  │    Output: TaskRequest {                                 │ │
 │  │      task_id: "T-12345",                                 │ │
 │  │      user_id: "U-789",                                   │ │
@@ -31,12 +31,12 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ 2. SAFETY VERIFIER (Input Validation)                   │ │
+│  │ 2. SAFETY VERIFIER (Validazione Input)                  │ │
 │  │    Input: TaskRequest                                    │ │
-│  │    Process:                                              │ │
-│  │      • Injection detection                               │ │
-│  │      • Schema validation                                 │ │
-│  │      • Content filtering                                 │ │
+│  │    Processo:                                             │ │
+│  │      • Rilevamento injection                             │ │
+│  │      • Validazione schema                                │ │
+│  │      • Filtraggio contenuti                              │ │
 │  │    Output: ValidationResult {                            │ │
 │  │      valid: true,                                        │ │
 │  │      sanitized_input: "...",                             │ │
@@ -45,12 +45,12 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ 3. RESOURCE MANAGER (Budget Check)                      │ │
-│  │    Input: TaskRequest + User Budget                      │ │
-│  │    Process:                                              │ │
-│  │      • Check remaining budget                            │ │
-│  │      • Estimate task cost                                │ │
-│  │      • Allocate resources                                │ │
+│  │ 3. RESOURCE MANAGER (Controllo Budget)                  │ │
+│  │    Input: TaskRequest + Budget Utente                    │ │
+│  │    Processo:                                             │ │
+│  │      • Controlla budget rimanente                        │ │
+│  │      • Stima costo task                                  │ │
+│  │      • Alloca risorse                                    │ │
 │  │    Output: ResourceAllocation {                          │ │
 │  │      approved: true,                                     │ │
 │  │      allocated_budget: $1.00,                            │ │
@@ -60,16 +60,16 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ 4. GOAL ANALYSIS MODULE                                  │ │
-│  │    Input: Sanitized task + Context                       │ │
-│  │    Process:                                              │ │
-│  │      • Semantic parsing                                  │ │
-│  │      • Goal extraction                                   │ │
-│  │      • Constraint identification                         │ │
-│  │      • Context retrieval from Episodic Memory            │ │
-│  │      • Complexity classification                         │ │
+│  │ 4. MODULO ANALISI GOAL                                   │ │
+│  │    Input: Task sanitizzato + Contesto                    │ │
+│  │    Processo:                                             │ │
+│  │      • Parsing semantico                                 │ │
+│  │      • Estrazione goal                                   │ │
+│  │      • Identificazione vincoli                           │ │
+│  │      • Recupero contesto da Memoria Episodica            │ │
+│  │      • Classificazione complessità                       │ │
 │  │    Output: GoalStructure {                               │ │
-│  │      primary_goal: "Implement JWT authentication",       │ │
+│  │      primary_goal: "Implementa autenticazione JWT",      │ │
 │  │      sub_goals: [...],                                   │ │
 │  │      constraints: ["backward compatible", ...],          │ │
 │  │      complexity: "MODERATE",                             │ │
@@ -79,20 +79,20 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ 5. PLANNING ENGINE                                       │ │
+│  │ 5. MOTORE DI PIANIFICAZIONE                              │ │
 │  │    Input: GoalStructure                                  │ │
-│  │    Process:                                              │ │
-│  │      • Query Pattern Cache for applicable patterns       │ │
-│  │      • Hierarchical task decomposition (HTN)             │ │
-│  │      • Dependency analysis                               │ │
-│  │      • Resource estimation                               │ │
-│  │      • Plan optimization                                 │ │
-│  │      • Contingency planning                              │ │
+│  │    Processo:                                             │ │
+│  │      • Query Pattern Cache per pattern applicabili       │ │
+│  │      • Decomposizione gerarchica task (HTN)              │ │
+│  │      • Analisi dipendenze                                │ │
+│  │      • Stima risorse                                     │ │
+│  │      • Ottimizzazione piano                              │ │
+│  │      • Pianificazione contingenze                        │ │
 │  │    Output: ExecutionPlan {                               │ │
 │  │      tasks: [                                            │ │
-│  │        {id: "S1", desc: "Research JWT libs", ...},       │ │
-│  │        {id: "S2", desc: "Design flow", ...},             │ │
-│  │        {id: "S3", desc: "Implement", ...},               │ │
+│  │        {id: "S1", desc: "Ricerca lib JWT", ...},         │ │
+│  │        {id: "S2", desc: "Design flusso", ...},           │ │
+│  │        {id: "S3", desc: "Implementa", ...},              │ │
 │  │        ...                                               │ │
 │  │      ],                                                  │ │
 │  │      dependencies: DAG,                                  │ │
@@ -104,46 +104,46 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ 6. EXECUTION ENGINE (Loop over tasks)                    │ │
-│  │    FOR each task IN execution_order:                     │ │
+│  │ 6. MOTORE DI ESECUZIONE (Loop sui task)                 │ │
+│  │    FOR ogni task IN execution_order:                     │ │
 │  │      ↓                                                    │ │
 │  │    ┌──────────────────────────────────────────────────┐  │ │
 │  │    │ 6a. MODEL ROUTER                                 │  │ │
-│  │    │   Input: Task complexity, context size           │  │ │
-│  │    │   Output: Selected model (e.g., "claude-sonnet") │  │ │
+│  │    │   Input: Complessità task, dimensione contesto  │  │ │
+│  │    │   Output: Modello selezionato (es. "claude-sonnet")││ │
 │  │    └────────────────────┬─────────────────────────────┘  │ │
 │  │                         ↓                                  │ │
 │  │    ┌──────────────────────────────────────────────────┐  │ │
 │  │    │ 6b. TOOL REGISTRY                                │  │ │
-│  │    │   Input: Required capability                     │  │ │
-│  │    │   Output: Selected tool(s)                       │  │ │
+│  │    │   Input: Capacità richiesta                      │  │ │
+│  │    │   Output: Tool selezionati                       │  │ │
 │  │    └────────────────────┬─────────────────────────────┘  │ │
 │  │                         ↓                                  │ │
 │  │    ┌──────────────────────────────────────────────────┐  │ │
-│  │    │ 6c. SAFETY VERIFIER (Action Authorization)       │  │ │
-│  │    │   Input: Proposed action                         │  │ │
-│  │    │   Output: Authorization decision                 │  │ │
+│  │    │ 6c. SAFETY VERIFIER (Autorizzazione Azione)     │  │ │
+│  │    │   Input: Azione proposta                         │  │ │
+│  │    │   Output: Decisione autorizzazione              │  │ │
 │  │    └────────────────────┬─────────────────────────────┘  │ │
 │  │                         ↓                                  │ │
 │  │    ┌──────────────────────────────────────────────────┐  │ │
-│  │    │ 6d. EXECUTE (LLM + Tools)                        │  │ │
-│  │    │   • LLM inference                                │  │ │
-│  │    │   • Tool invocation                              │  │ │
-│  │    │   • Result capture                               │  │ │
+│  │    │ 6d. ESEGUI (LLM + Tool)                          │  │ │
+│  │    │   • Inferenza LLM                                │  │ │
+│  │    │   • Invocazione tool                             │  │ │
+│  │    │   • Cattura risultato                            │  │ │
 │  │    └────────────────────┬─────────────────────────────┘  │ │
 │  │                         ↓                                  │ │
 │  │    ┌──────────────────────────────────────────────────┐  │ │
-│  │    │ 6e. SAFETY VERIFIER (Output Validation)          │  │ │
-│  │    │   Input: Task output                             │  │ │
-│  │    │   Output: Validation result                      │  │ │
+│  │    │ 6e. SAFETY VERIFIER (Validazione Output)        │  │ │
+│  │    │   Input: Output task                             │  │ │
+│  │    │   Output: Risultato validazione                  │  │ │
 │  │    └────────────────────┬─────────────────────────────┘  │ │
 │  │                         ↓                                  │ │
 │  │    ┌──────────────────────────────────────────────────┐  │ │
-│  │    │ 6f. WORKING MEMORY (Store result)                │  │ │
-│  │    │   Store intermediate result for next task        │  │ │
+│  │    │ 6f. WORKING MEMORY (Memorizza risultato)        │  │ │
+│  │    │   Memorizza risultato intermedio per prossimo task│ │ │
 │  │    └────────────────────┬─────────────────────────────┘  │ │
 │  │                         ↓                                  │ │
-│  │    END LOOP                                               │ │
+│  │    FINE LOOP                                              │ │
 │  │                                                            │ │
 │  │    Output: ExecutionResult {                              │ │
 │  │      status: "SUCCESS",                                   │ │
@@ -153,92 +153,92 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ 7. REFLECTION MODULE (Async)                             │ │
-│  │    Input: ExecutionResult + Full trace                   │ │
-│  │    Process:                                              │ │
-│  │      • Episode analysis                                  │ │
-│  │      • Pattern extraction                                │ │
-│  │      • Performance analysis                              │ │
-│  │      • Knowledge distillation                            │ │
+│  │ 7. MODULO RIFLESSIONE (Async)                           │ │
+│  │    Input: ExecutionResult + Trace completa               │ │
+│  │    Processo:                                             │ │
+│  │      • Analisi episodio                                  │ │
+│  │      • Estrazione pattern                                │ │
+│  │      • Analisi performance                               │ │
+│  │      • Distillazione conoscenza                          │ │
 │  │    Output: ReflectionInsights {                          │ │
 │  │      new_patterns: [...],                                │ │
 │  │      performance_insights: {...},                        │ │
 │  │      recommendations: [...]                              │ │
 │  │    }                                                     │ │
-│  │    Side Effects:                                         │ │
-│  │      • Store episode in Episodic Memory                  │ │
-│  │      • Update Pattern Cache                              │ │
+│  │    Effetti Collaterali:                                  │ │
+│  │      • Memorizza episodio in Memoria Episodica           │ │
+│  │      • Aggiorna Pattern Cache                            │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ 8. RESOURCE MANAGER (Record actual usage)               │ │
-│  │    Update budgets with actual cost                       │ │
+│  │ 8. RESOURCE MANAGER (Registra uso effettivo)            │ │
+│  │    Aggiorna budget con costo effettivo                   │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ 9. OBSERVABILITY SYSTEM (Logging & Metrics)              │ │
-│  │    • Log complete execution trace                        │ │
-│  │    • Update metrics (success rate, latency, cost)        │ │
-│  │    • Store distributed trace                             │ │
+│  │ 9. SISTEMA OSSERVABILITÀ (Logging & Metriche)           │ │
+│  │    • Log trace esecuzione completa                       │ │
+│  │    • Aggiorna metriche (tasso successo, latenza, costo)  │ │
+│  │    • Memorizza trace distribuita                         │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  USER                                                          │
+│  UTENTE                                                        │
 │    ← FinalResult {                                            │
 │        success: true,                                         │
-│        output: "JWT authentication implemented",              │
+│        output: "Autenticazione JWT implementata",             │
 │        cost: $0.19,                                           │
 │        duration: 265s                                         │
 │      }                                                        │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 1.2 Data Transformations
+### 1.2 Trasformazioni dei Dati
 
-**Key transformations attraverso il flow**:
+**Trasformazioni chiave attraverso il flusso**:
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│              DATA TRANSFORMATION STAGES                  │
+│           STADI DI TRASFORMAZIONE DATI                   │
 │                                                          │
-│  Stage 1: NATURAL LANGUAGE                               │
-│  "Add JWT authentication to API"                         │
-│    ↓ (Goal Analysis)                                     │
+│  Stadio 1: LINGUAGGIO NATURALE                           │
+│  "Aggiungi autenticazione JWT all'API"                   │
+│    ↓ (Analisi Goal)                                      │
 │                                                          │
-│  Stage 2: STRUCTURED GOAL                                │
+│  Stadio 2: GOAL STRUTTURATO                              │
 │  GoalStructure {                                         │
 │    primary_goal: {...},                                  │
 │    constraints: [...],                                   │
 │    complexity: "MODERATE"                                │
 │  }                                                       │
-│    ↓ (Planning)                                          │
+│    ↓ (Pianificazione)                                    │
 │                                                          │
-│  Stage 3: EXECUTION PLAN                                 │
+│  Stadio 3: PIANO DI ESECUZIONE                           │
 │  ExecutionPlan {                                         │
 │    tasks: [T1, T2, ...],                                 │
 │    dependencies: DAG,                                    │
 │    execution_order: [[T1], [T2, T3], ...]               │
 │  }                                                       │
-│    ↓ (Execution)                                         │
+│    ↓ (Esecuzione)                                        │
 │                                                          │
-│  Stage 4: INTERMEDIATE RESULTS                           │
+│  Stadio 4: RISULTATI INTERMEDI                           │
 │  {                                                       │
-│    T1_output: "PyJWT chosen",                            │
-│    T2_output: "Design doc created",                      │
-│    T3_output: "Code implemented",                        │
+│    T1_output: "PyJWT scelto",                            │
+│    T2_output: "Doc design creato",                       │
+│    T3_output: "Codice implementato",                     │
 │    ...                                                   │
 │  }                                                       │
-│    ↓ (Aggregation)                                       │
+│    ↓ (Aggregazione)                                      │
 │                                                          │
-│  Stage 5: FINAL OUTPUT                                   │
+│  Stadio 5: OUTPUT FINALE                                 │
 │  ExecutionResult {                                       │
 │    status: "SUCCESS",                                    │
-│    primary_output: "Authentication system with JWT",     │
-│    artifacts: [code_files, tests, docs],                 │
+│    primary_output: "Sistema autenticazione con JWT",     │
+│    artifacts: [file_codice, test, docs],                 │
 │    metadata: {duration, cost, ...}                       │
 │  }                                                       │
-│    ↓ (Reflection - Async)                                │
+│    ↓ (Riflessione - Async)                               │
 │                                                          │
-│  Stage 6: LEARNING ARTIFACTS                             │
+│  Stadio 6: ARTEFATTI DI APPRENDIMENTO                    │
 │  ReflectionInsights {                                    │
 │    new_patterns: ["JWT-implementation-pattern"],         │
 │    performance_insights: {...},                          │
@@ -247,149 +247,151 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 └──────────────────────────────────────────────────────────┘
 ```
 
-## 2. Memory System Interactions
+## 2. Interazioni con il Sistema di Memoria
 
-### 2.1 Memory Read Patterns
+### 2.1 Pattern di Lettura Memoria
 
-**Pattern: Retrieve Context for Planning**
+**Pattern: Recupero Contesto per Pianificazione**
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│            MEMORY RETRIEVAL FOR PLANNING                       │
+│         RECUPERO MEMORIA PER PIANIFICAZIONE                    │
 │                                                                │
-│  Planning Engine needs context                                 │
+│  Il Motore di Pianificazione necessita di contesto             │
 │    │                                                           │
-│    ├──→ Query EPISODIC MEMORY                                  │
-│    │    Input: Current task description embedding             │
-│    │    Process:                                              │
-│    │      • Vector similarity search                           │
-│    │      • Filter by relevance score > 0.7                    │
-│    │      • Rank by recency and success                        │
-│    │    Output: Top-5 similar episodes [E1, E2, E3, E4, E5]   │
-│    │      Each contains:                                      │
-│    │        - Task description                                │
-│    │        - Strategy used                                   │
-│    │        - Outcome                                         │
-│    │        - Key learnings                                   │
-│    │    Latency: ~80ms                                        │
+│    ├──→ Query MEMORIA EPISODICA                                │
+│    │    Input: Embedding descrizione task corrente            │
+│    │    Processo:                                             │
+│    │      • Ricerca similarità vettoriale                     │
+│    │      • Filtra per punteggio rilevanza > 0.7              │
+│    │      • Classifica per recenza e successo                 │
+│    │    Output: Top-5 episodi simili [E1, E2, E3, E4, E5]     │
+│    │      Ognuno contiene:                                    │
+│    │        - Descrizione task                                │
+│    │        - Strategia usata                                 │
+│    │        - Risultato                                       │
+│    │        - Apprendimenti chiave                            │
+│    │    Latenza: ~80ms                                        │
 │    │                                                           │
 │    ├──→ Query PATTERN CACHE                                    │
-│    │    Input: Task features {domain: "auth", type: "impl"}   │
-│    │    Process:                                              │
-│    │      • Feature-based lookup                              │
-│    │      • Filter applicable patterns                        │
-│    │      • Rank by confidence                                │
-│    │    Output: Top-3 patterns [P1, P2, P3]                   │
-│    │      Each contains:                                      │
-│    │        - Pattern template                                │
-│    │        - Application guidance                            │
-│    │        - Expected benefits                               │
-│    │    Latency: ~20ms (cached)                               │
+│    │    Input: Feature task {domain: "auth", type: "impl"}    │
+│    │    Processo:                                             │
+│    │      • Lookup basato su feature                          │
+│    │      • Filtra pattern applicabili                        │
+│    │      • Classifica per confidenza                         │
+│    │    Output: Top-3 pattern [P1, P2, P3]                    │
+│    │      Ognuno contiene:                                    │
+│    │        - Template pattern                                │
+│    │        - Guida applicazione                              │
+│    │        - Benefici attesi                                 │
+│    │    Latenza: ~20ms (cached)                               │
 │    │                                                           │
-│    └──→ Load into WORKING MEMORY                               │
-│         Combined context: {episodes: [...], patterns: [...]}  │
-│         Used by Planning Engine for informed decisions        │
+│    └──→ Carica in WORKING MEMORY                               │
+│         Contesto combinato: {episodes: [...], patterns: [...]} │
+│         Usato dal Motore di Pianificazione per decisioni       │
+│         informate                                              │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.2 Memory Write Patterns
+### 2.2 Pattern di Scrittura Memoria
 
-**Pattern: Store Episode After Completion**
+**Pattern: Memorizzazione Episodio Dopo Completamento**
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│              EPISODE STORAGE FLOW                              │
+│            FLUSSO MEMORIZZAZIONE EPISODIO                      │
 │                                                                │
-│  Task completed → Reflection begins                            │
+│  Task completato → Inizia riflessione                          │
 │    │                                                           │
-│    ├──→ Construct Episode Object                               │
-│    │    From: ExecutionResult + Trace + Context               │
-│    │    Output: Complete Episode structure                    │
+│    ├──→ Costruisci Oggetto Episodio                            │
+│    │    Da: ExecutionResult + Trace + Contesto                │
+│    │    Output: Struttura Episodio completa                   │
 │    │                                                           │
-│    ├──→ Generate Embeddings                                    │
-│    │    • Task description → embedding (768-dim vector)        │
-│    │    • Full episode → embedding                            │
-│    │    • Outcome → embedding                                 │
-│    │    Using: Embedding model (e.g., text-embedding-3)       │
+│    ├──→ Genera Embedding                                       │
+│    │    • Descrizione task → embedding (vettore 768-dim)      │
+│    │    • Episodio completo → embedding                       │
+│    │    • Risultato → embedding                               │
+│    │    Usando: Modello embedding (es. text-embedding-3)      │
 │    │                                                           │
-│    ├──→ Store in EPISODIC MEMORY                               │
-│    │    Parallel writes:                                      │
+│    ├──→ Memorizza in MEMORIA EPISODICA                         │
+│    │    Scritture parallele:                                  │
 │    │      • Vector DB ← embeddings + episode_id               │
-│    │      • Document DB ← full episode document               │
-│    │      • Object Storage ← large artifacts (if any)         │
-│    │    Transaction: Atomic (all or nothing)                  │
-│    │    Latency: ~150ms                                       │
+│    │      • Document DB ← documento episodio completo         │
+│    │      • Object Storage ← artefatti grandi (se presenti)   │
+│    │    Transazione: Atomica (tutto o niente)                 │
+│    │    Latenza: ~150ms                                       │
 │    │                                                           │
-│    └──→ Update Indices                                         │
-│         • Add to search indices                               │
-│         • Update statistics (episode count, avg success, etc) │
-│         • Invalidate relevant caches                          │
+│    └──→ Aggiorna Indici                                        │
+│         • Aggiungi a indici di ricerca                         │
+│         • Aggiorna statistiche (conteggio episodi, successo    │
+│           medio, ecc)                                          │
+│         • Invalida cache rilevanti                             │
 │                                                                │
-│  Episode now available for future retrievals                   │
+│  Episodio ora disponibile per futuri recuperi                  │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.3 Pattern Cache Update
+### 2.3 Aggiornamento Pattern Cache
 
-**Pattern: Update Pattern from Reflection**
+**Pattern: Aggiornamento Pattern da Riflessione**
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│               PATTERN CACHE UPDATE FLOW                        │
+│            FLUSSO AGGIORNAMENTO PATTERN CACHE                  │
 │                                                                │
-│  Reflection discovers new pattern                              │
+│  La Riflessione scopre nuovo pattern                           │
 │    │                                                           │
-│    ├──→ Check if pattern already exists                        │
-│    │    Query Pattern Cache by similarity                     │
-│    │    IF exists: Update evidence                            │
-│    │    IF not: Create new candidate pattern                  │
+│    ├──→ Controlla se pattern esiste già                        │
+│    │    Query Pattern Cache per similarità                    │
+│    │    SE esiste: Aggiorna evidenza                          │
+│    │    SE non esiste: Crea nuovo pattern candidato           │
 │    │                                                           │
-│    ├──→ IF NEW PATTERN:                                        │
+│    ├──→ SE NUOVO PATTERN:                                      │
 │    │    │                                                     │
-│    │    ├─→ Create Pattern Object                             │
+│    │    ├─→ Crea Oggetto Pattern                              │
 │    │    │   Status: CANDIDATE                                 │
-│    │    │   Evidence: [current episode]                       │
-│    │    │   Confidence: Low (single episode)                  │
+│    │    │   Evidence: [episodio corrente]                     │
+│    │    │   Confidence: Bassa (singolo episodio)              │
 │    │    │                                                     │
-│    │    └─→ Store in Pattern Cache                            │
-│    │        Monitor for additional evidence                   │
+│    │    └─→ Memorizza in Pattern Cache                        │
+│    │        Monitora per ulteriore evidenza                   │
 │    │                                                           │
-│    └──→ IF EXISTING PATTERN:                                   │
+│    └──→ SE PATTERN ESISTENTE:                                  │
 │         │                                                     │
-│         ├─→ Add Episode to Evidence                           │
+│         ├─→ Aggiungi Episodio all'Evidenza                    │
 │         │   pattern.evidence.supporting_episodes.append(...)  │
 │         │                                                     │
-│         ├─→ Recompute Statistics                              │
-│         │   • Success rate                                    │
-│         │   • Statistical significance                        │
-│         │   • Confidence score                                │
+│         ├─→ Ricalcola Statistiche                             │
+│         │   • Tasso di successo                               │
+│         │   • Significatività statistica                      │
+│         │   • Punteggio confidenza                            │
 │         │                                                     │
-│         ├─→ Check for Promotion                               │
-│         │   IF confidence > threshold AND significance < 0.05:│
+│         ├─→ Controlla per Promozione                          │
+│         │   SE confidenza > soglia AND significatività < 0.05:│
 │         │     pattern.status = "VALIDATED"                    │
 │         │                                                     │
-│         └─→ Update in Cache                                   │
-│             Persist changes                                   │
+│         └─→ Aggiorna in Cache                                 │
+│             Persisti modifiche                                │
 │                                                                │
-│  Pattern now has more evidence, possibly validated             │
+│  Pattern ora ha più evidenza, possibilmente validato           │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## 3. Model Router Interactions
+## 3. Interazioni con Model Router
 
-### 3.1 Model Selection Flow
+### 3.1 Flusso di Selezione Modello
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                  MODEL SELECTION FLOW                          │
+│                FLUSSO SELEZIONE MODELLO                        │
 │                                                                │
-│  Execution Engine: Need LLM for subtask                        │
+│  Motore di Esecuzione: Necessita LLM per subtask               │
 │    │                                                           │
-│    ├──→ Prepare Request to Model Router                        │
+│    ├──→ Prepara Richiesta al Model Router                      │
 │    │    ModelRequest {                                        │
 │    │      task_description: "...",                            │
 │    │      complexity: "MODERATE",                             │
-│    │      context_size: 12K tokens,                           │
+│    │      context_size: 12K token,                            │
 │    │      requires_creativity: false,                         │
 │    │      budget_remaining: $0.50                             │
 │    │    }                                                     │
@@ -398,47 +400,47 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │ MODEL ROUTER                                             │ │
 │  │                                                          │ │
-│  │  1. Complexity Classification                            │ │
-│  │     Score task → complexity_level = MODERATE             │ │
+│  │  1. Classificazione Complessità                          │ │
+│  │     Punteggio task → complexity_level = MODERATE         │ │
 │  │                                                          │ │
-│  │  2. Context Window Check                                 │ │
-│  │     12K tokens → Fits in Tier 2 (up to 128K)            │ │
+│  │  2. Controllo Finestra Contesto                          │ │
+│  │     12K token → Si adatta a Tier 2 (fino a 128K)        │ │
 │  │                                                          │ │
-│  │  3. Apply Routing Policy                                 │ │
-│  │     IF complexity == MODERATE:                           │ │
-│  │       Default → Tier 2 (Medium model)                    │ │
+│  │  3. Applica Policy di Routing                            │ │
+│  │     SE complessità == MODERATE:                          │ │
+│  │       Default → Tier 2 (Modello medio)                   │ │
 │  │                                                          │ │
-│  │  4. Cost Check                                           │ │
-│  │     Estimated cost: $0.08                                │ │
-│  │     Budget remaining: $0.50                              │ │
-│  │     ✓ Approved                                           │ │
+│  │  4. Controllo Costi                                      │ │
+│  │     Costo stimato: $0.08                                 │ │
+│  │     Budget rimanente: $0.50                              │ │
+│  │     ✓ Approvato                                          │ │
 │  │                                                          │ │
-│  │  5. Model Selection                                      │ │
-│  │     Selected: "claude-sonnet-3.5"                        │ │
-│  │     Fallback chain: ["gpt-4o-mini", "gpt-4-turbo"]      │ │
+│  │  5. Selezione Modello                                    │ │
+│  │     Selezionato: "claude-sonnet-3.5"                     │ │
+│  │     Catena fallback: ["gpt-4o-mini", "gpt-4-turbo"]     │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ MODEL INVOCATION LAYER                                   │ │
+│  │ LIVELLO INVOCAZIONE MODELLO                              │ │
 │  │                                                          │ │
-│  │  1. Load Balance                                         │ │
-│  │     Select instance: claude-sonnet-instance-3            │ │
+│  │  1. Bilanciamento Carico                                 │ │
+│  │     Seleziona istanza: claude-sonnet-instance-3          │ │
 │  │                                                          │ │
-│  │  2. API Call                                             │ │
+│  │  2. Chiamata API                                         │ │
 │  │     POST /v1/chat/completions                            │ │
 │  │     Body: {model, messages, max_tokens, ...}             │ │
 │  │                                                          │ │
-│  │  3. Response Handling                                    │ │
-│  │     Parse response                                       │ │
-│  │     Extract: text, tokens_used, finish_reason            │ │
+│  │  3. Gestione Risposta                                    │ │
+│  │     Analizza risposta                                    │ │
+│  │     Estrai: text, tokens_used, finish_reason             │ │
 │  │                                                          │ │
-│  │  4. Fallback (if error)                                  │ │
-│  │     IF error: Try next model in fallback chain           │ │
+│  │  4. Fallback (se errore)                                 │ │
+│  │     SE errore: Prova prossimo modello in catena fallback │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Return to Execution Engine                                    │
+│  Ritorna al Motore di Esecuzione                               │
 │    ModelResponse {                                            │
 │      text: "...",                                             │
 │      model_used: "claude-sonnet-3.5",                         │
@@ -449,17 +451,17 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 3.2 Model Performance Tracking
+### 3.2 Tracciamento Performance Modello
 
-**Data flow for continuous improvement**:
+**Flusso di dati per miglioramento continuo**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│            MODEL PERFORMANCE TRACKING FLOW                     │
+│         FLUSSO TRACCIAMENTO PERFORMANCE MODELLO                │
 │                                                                │
-│  Every model invocation →                                      │
+│  Ogni invocazione modello →                                    │
 │    │                                                           │
-│    ├──→ Record Metrics                                         │
+│    ├──→ Registra Metriche                                      │
 │    │    {                                                     │
 │    │      model_id: "claude-sonnet-3.5",                      │
 │    │      task_type: "code_generation",                       │
@@ -468,138 +470,140 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │    │      cost: $0.082,                                       │
 │    │      tokens: {in: 12234, out: 1456},                     │
 │    │      success: true,                                      │
-│    │      quality_score: 0.89  // From verification          │
+│    │      quality_score: 0.89  // Da verifica                │
 │    │    }                                                     │
 │    │                                                           │
-│    ├──→ Aggregate into Time-Series DB                          │
-│    │    • 1-minute buckets for real-time monitoring           │
-│    │    • 1-hour buckets for trending                         │
-│    │    • Daily aggregates for reporting                      │
+│    ├──→ Aggrega in Time-Series DB                              │
+│    │    • Bucket di 1 minuto per monitoraggio real-time       │
+│    │    • Bucket di 1 ora per trend                           │
+│    │    • Aggregati giornalieri per report                    │
 │    │                                                           │
-│    ├──→ Update Model Statistics                                │
+│    ├──→ Aggiorna Statistiche Modello                           │
 │    │    model_stats["claude-sonnet-3.5"] {                    │
-│    │      avg_latency: 4.5s (rolling average),               │
+│    │      avg_latency: 4.5s (media mobile),                   │
 │    │      avg_cost: $0.085,                                   │
 │    │      success_rate: 94.2%,                                │
 │    │      quality_score: 0.87,                                │
 │    │      total_invocations: 15,432                           │
 │    │    }                                                     │
 │    │                                                           │
-│    └──→ Trigger Analysis (Weekly)                              │
-│         • Compare models performance                          │
-│         • Identify optimization opportunities                 │
-│         • Adjust routing weights if needed                    │
-│         • Generate recommendations                            │
+│    └──→ Attiva Analisi (Settimanale)                           │
+│         • Confronta performance modelli                       │
+│         • Identifica opportunità di ottimizzazione            │
+│         • Aggiusta pesi di routing se necessario              │
+│         • Genera raccomandazioni                              │
 │                                                                │
-│  Example Output:                                               │
-│    "Model claude-sonnet-3.5 shows 15% higher success rate     │
-│     than gpt-4o-mini for code generation tasks. Recommend     │
-│     increasing routing weight for this model."                │
+│  Output Esempio:                                               │
+│    "Il modello claude-sonnet-3.5 mostra un tasso di successo  │
+│     superiore del 15% rispetto a gpt-4o-mini per task di      │
+│     generazione codice. Si raccomanda di aumentare il peso di │
+│     routing per questo modello."                              │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## 4. Safety Verification Flows
+## 4. Flussi di Verifica Sicurezza
 
-### 4.1 Input Validation Flow
+### 4.1 Flusso di Validazione Input
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                INPUT VALIDATION FLOW                           │
+│              FLUSSO VALIDAZIONE INPUT                          │
 │                                                                │
-│  User Input: "Delete all files in /important/data"             │
+│  Input Utente: "Elimina tutti i file in /important/data"      │
 │    │                                                           │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ SAFETY VERIFIER - INPUT VALIDATOR                        │ │
+│  │ SAFETY VERIFIER - VALIDATORE INPUT                       │ │
 │  │                                                          │ │
-│  │  Layer 1: Schema Validation                              │ │
-│  │    ✓ Input is valid string                               │ │
-│  │    ✓ Length within limits                                │ │
+│  │  Livello 1: Validazione Schema                           │ │
+│  │    ✓ Input è stringa valida                              │ │
+│  │    ✓ Lunghezza entro limiti                              │ │
 │  │                                                          │ │
-│  │  Layer 2: Injection Detection                            │ │
-│  │    Run: CHECK_COMMAND_INJECTION(input)                   │ │
-│  │    Detected: Potential dangerous command "delete"        │ │
-│  │    Score: 0.85 (high risk)                               │ │
+│  │  Livello 2: Rilevamento Injection                        │ │
+│  │    Esegui: CHECK_COMMAND_INJECTION(input)                │ │
+│  │    Rilevato: Potenziale comando pericoloso "elimina"     │ │
+│  │    Punteggio: 0.85 (alto rischio)                        │ │
 │  │                                                          │ │
-│  │  Layer 3: Content Policy                                 │ │
-│  │    Check: Request involves destructive operation         │ │
-│  │    Path: /important/data (sensitive location)            │ │
-│  │    Flag: Requires explicit approval                      │ │
+│  │  Livello 3: Policy Contenuti                             │ │
+│  │    Controllo: Richiesta coinvolge operazione distruttiva │ │
+│  │    Percorso: /important/data (posizione sensibile)       │ │
+│  │    Flag: Richiede approvazione esplicita                 │ │
 │  │                                                          │ │
-│  │  Decision: REQUIRES_HUMAN_APPROVAL                       │ │
+│  │  Decisione: RICHIEDE_APPROVAZIONE_UMANA                  │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ APPROVAL REQUEST TO USER                                 │ │
+│  │ RICHIESTA APPROVAZIONE A UTENTE                          │ │
 │  │                                                          │ │
-│  │  "This action will delete files in /important/data.      │ │
-│  │   This is a destructive operation.                       │ │
-│  │   Do you want to proceed?"                               │ │
+│  │  "Questa azione eliminerà file in /important/data.       │ │
+│  │   Si tratta di un'operazione distruttiva.                │ │
+│  │   Vuoi procedere?"                                       │ │
 │  │                                                          │ │
-│  │   [Approve] [Deny] [Modify Request]                      │ │
+│  │   [Approva] [Nega] [Modifica Richiesta]                  │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  IF APPROVED:                                                  │
-│    Proceed with goal analysis                                 │
-│    Log approval in audit trail                                │
+│  SE APPROVATO:                                                 │
+│    Procedi con analisi goal                                   │
+│    Registra approvazione in audit trail                       │
 │                                                                │
-│  IF DENIED:                                                    │
-│    Return error to user                                       │
-│    Log denial                                                 │
-│    Suggest safer alternatives                                 │
+│  SE NEGATO:                                                    │
+│    Ritorna errore a utente                                    │
+│    Registra negazione                                         │
+│    Suggerisci alternative più sicure                          │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.2 Action Authorization Flow
+### 4.2 Flusso di Autorizzazione Azione
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│              ACTION AUTHORIZATION FLOW                         │
+│            FLUSSO AUTORIZZAZIONE AZIONE                        │
 │                                                                │
-│  Execution Engine wants to: write_file("/app/config.json", data)│
+│  Il Motore di Esecuzione vuole: write_file("/app/config.json",│
+│  data)                                                         │
 │    │                                                           │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ SAFETY VERIFIER - ACTION AUTHORIZER                      │ │
+│  │ SAFETY VERIFIER - AUTORIZZATORE AZIONE                   │ │
 │  │                                                          │ │
-│  │  Step 1: Permission Check                                │ │
-│  │    Required: FILE_WRITE permission                       │ │
-│  │    User has: [FILE_READ, FILE_WRITE, WEB_FETCH]         │ │
-│  │    ✓ Permission granted                                  │ │
+│  │  Passo 1: Controllo Permessi                             │ │
+│  │    Richiesto: permesso FILE_WRITE                        │ │
+│  │    Utente ha: [FILE_READ, FILE_WRITE, WEB_FETCH]        │ │
+│  │    ✓ Permesso concesso                                   │ │
 │  │                                                          │ │
-│  │  Step 2: Path Validation                                 │ │
-│  │    Requested path: "/app/config.json"                    │ │
-│  │    Check whitelist: /app/** (allowed)                    │ │
-│  │    Check blacklist: /etc/**, /sys/** (not matched)       │ │
-│  │    ✓ Path allowed                                        │ │
+│  │  Passo 2: Validazione Percorso                           │ │
+│  │    Percorso richiesto: "/app/config.json"                │ │
+│  │    Controlla whitelist: /app/** (consentito)             │ │
+│  │    Controlla blacklist: /etc/**, /sys/** (non corrisp.)  │ │
+│  │    ✓ Percorso consentito                                 │ │
 │  │                                                          │ │
-│  │  Step 3: Tool Safety Check                               │ │
+│  │  Passo 3: Controllo Sicurezza Tool                       │ │
 │  │    Tool: write_file                                      │ │
-│  │    Dangerous: false                                      │ │
-│  │    Reversible: true (can restore from backup)            │ │
-│  │    Side effects: [FILE_MODIFICATION]                     │ │
-│  │    ✓ Tool safe for use                                   │ │
+│  │    Pericoloso: false                                     │ │
+│  │    Reversibile: true (può ripristinare da backup)        │ │
+│  │    Effetti collaterali: [FILE_MODIFICATION]              │ │
+│  │    ✓ Tool sicuro per uso                                 │ │
 │  │                                                          │ │
-│  │  Step 4: Rate Limit Check                                │ │
-│  │    Current rate: 5 file writes in last minute            │ │
-│  │    Limit: 20 writes/minute                               │ │
-│  │    ✓ Under limit                                         │ │
+│  │  Passo 4: Controllo Rate Limit                           │ │
+│  │    Tasso corrente: 5 scritture file nell'ultimo minuto   │ │
+│  │    Limite: 20 scritture/minuto                           │ │
+│  │    ✓ Sotto il limite                                     │ │
 │  │                                                          │ │
-│  │  Step 5: Resource Budget Check                           │ │
-│  │    Estimated cost: $0.001                                │ │
-│  │    Budget remaining: $0.25                               │ │
+│  │  Passo 5: Controllo Budget Risorse                       │ │
+│  │    Costo stimato: $0.001                                 │ │
+│  │    Budget rimanente: $0.25                               │ │
 │  │    ✓ Budget OK                                           │ │
 │  │                                                          │ │
-│  │  Decision: APPROVED                                      │ │
+│  │  Decisione: APPROVATO                                    │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ TOOL REGISTRY - EXECUTE                                  │ │
-│  │   Execute: write_file("/app/config.json", data)          │ │
-│  │   Result: Success                                        │ │
+│  │ TOOL REGISTRY - ESEGUI                                   │ │
+│  │   Esegui: write_file("/app/config.json", data)           │ │
+│  │   Risultato: Successo                                    │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
@@ -611,120 +615,120 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  │     executed: true,                                      │ │
 │  │     result: "success"                                    │ │
 │  │   }                                                      │ │
-│  └──────────────────────────────────────────────────────────┘ │
+│  │  └──────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.3 Output Validation Flow
+### 4.3 Flusso di Validazione Output
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│               OUTPUT VALIDATION FLOW                           │
+│             FLUSSO VALIDAZIONE OUTPUT                          │
 │                                                                │
-│  Task completed, output generated:                             │
-│    Code: (Python function for JWT encoding)                    │
+│  Task completato, output generato:                             │
+│    Codice: (Funzione Python per encoding JWT)                  │
 │    │                                                           │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ SAFETY VERIFIER - OUTPUT VALIDATOR                       │ │
+│  │ SAFETY VERIFIER - VALIDATORE OUTPUT                      │ │
 │  │                                                          │ │
-│  │  Check 1: Schema Validation                              │ │
-│  │    Expected: Python code (string)                        │ │
-│  │    Actual: String containing Python code                 │ │
-│  │    ✓ Schema valid                                        │ │
+│  │  Controllo 1: Validazione Schema                         │ │
+│  │    Atteso: Codice Python (stringa)                       │ │
+│  │    Effettivo: Stringa contenente codice Python           │ │
+│  │    ✓ Schema valido                                       │ │
 │  │                                                          │ │
-│  │  Check 2: Syntax Validation                              │ │
-│  │    Parse with Python AST parser                          │ │
-│  │    Result: Valid Python syntax                           │ │
-│  │    ✓ Syntax valid                                        │ │
+│  │  Controllo 2: Validazione Sintassi                       │ │
+│  │    Analizza con parser AST Python                        │ │
+│  │    Risultato: Sintassi Python valida                     │ │
+│  │    ✓ Sintassi valida                                     │ │
 │  │                                                          │ │
-│  │  Check 3: Security Scan                                  │ │
-│  │    Scan for dangerous patterns:                          │ │
-│  │      • eval() → Not found ✓                              │ │
-│  │      • exec() → Not found ✓                              │ │
-│  │      • __import__() → Not found ✓                        │ │
-│  │      • os.system() → Not found ✓                         │ │
-│  │    ✓ No security issues                                  │ │
+│  │  Controllo 3: Scansione Sicurezza                        │ │
+│  │    Scansione per pattern pericolosi:                     │ │
+│  │      • eval() → Non trovato ✓                            │ │
+│  │      • exec() → Non trovato ✓                            │ │
+│  │      • __import__() → Non trovato ✓                      │ │
+│  │      • os.system() → Non trovato ✓                       │ │
+│  │    ✓ Nessun problema di sicurezza                        │ │
 │  │                                                          │ │
-│  │  Check 4: Secret Detection                               │ │
-│  │    Scan for secret patterns:                             │ │
-│  │      • API keys → Not found ✓                            │ │
-│  │      • Passwords → Not found ✓                           │ │
-│  │      • Private keys → Not found ✓                        │ │
-│  │    ✓ No secrets leaked                                   │ │
+│  │  Controllo 4: Rilevamento Segreti                        │ │
+│  │    Scansione per pattern segreti:                        │ │
+│  │      • Chiavi API → Non trovato ✓                        │ │
+│  │      • Password → Non trovato ✓                          │ │
+│  │      • Chiavi private → Non trovato ✓                    │ │
+│  │    ✓ Nessun segreto trapelato                            │ │
 │  │                                                          │ │
-│  │  Check 5: Quality Thresholds                             │ │
-│  │    Assess code quality:                                  │ │
-│  │      • Has docstring: ✗ (warning)                        │ │
-│  │      • Has type hints: ✓                                 │ │
-│  │      • Error handling: ✓                                 │ │
-│  │    Overall quality: 0.85 (above threshold 0.7)          │ │
-│  │    ✓ Quality acceptable                                  │ │
+│  │  Controllo 5: Soglie Qualità                             │ │
+│  │    Valuta qualità codice:                                │ │
+│  │      • Ha docstring: ✗ (avviso)                          │ │
+│  │      • Ha type hints: ✓                                  │ │
+│  │      • Gestione errori: ✓                                │ │
+│  │    Qualità complessiva: 0.85 (sopra soglia 0.7)         │ │
+│  │    ✓ Qualità accettabile                                 │ │
 │  │                                                          │ │
-│  │  Decision: APPROVED (with 1 warning)                     │ │
+│  │  Decisione: APPROVATO (con 1 avviso)                     │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Return to Execution Engine:                                   │
+│  Ritorna al Motore di Esecuzione:                              │
 │    ValidationResult {                                         │
 │      approved: true,                                          │
-│      warnings: ["Missing docstring"],                         │
-│      validated_output: (original output)                      │
+│      warnings: ["Docstring mancante"],                        │
+│      validated_output: (output originale)                     │
 │    }                                                          │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## 5. Error Handling Flows
+## 5. Flussi di Gestione Errori
 
-### 5.1 Error Detection and Recovery
+### 5.1 Rilevamento Errori e Recovery
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│          ERROR DETECTION AND RECOVERY FLOW                     │
+│        FLUSSO RILEVAMENTO ERRORI E RECOVERY                    │
 │                                                                │
-│  Execution: tool_invocation("web_search", query="...")         │
+│  Esecuzione: tool_invocation("web_search", query="...")        │
 │    │                                                           │
-│    ├──→ Tool execution fails                                   │
-│    │    Error: TimeoutError("Request timed out after 30s")    │
+│    ├──→ Esecuzione tool fallisce                               │
+│    │    Errore: TimeoutError("Richiesta scaduta dopo 30s")    │
 │    │                                                           │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ ERROR HANDLER - CLASSIFIER                               │ │
+│  │ ERROR HANDLER - CLASSIFICATORE                           │ │
 │  │                                                          │ │
-│  │  Analyze Error:                                          │ │
-│  │    Type: TimeoutError                                    │ │
-│  │    Component: Tool (web_search)                          │ │
-│  │    Category: TRANSIENT (network issue)                   │ │
-│  │    Severity: MEDIUM                                      │ │
-│  │    Recoverable: YES (retry likely to work)               │ │
-│  │                                                          │ │
-│  └────────────────────────┬─────────────────────────────────┘ │
-│                           ↓                                    │
-│  ┌──────────────────────────────────────────────────────────┐ │
-│  │ ERROR HANDLER - RECOVERY ENGINE                          │ │
-│  │                                                          │ │
-│  │  Select Strategy: RETRY with exponential backoff         │ │
-│  │                                                          │ │
-│  │  Attempt 1: Immediate retry                              │ │
-│  │    → FAIL (timeout again)                                │ │
-│  │    Wait: 2s                                              │ │
-│  │                                                          │ │
-│  │  Attempt 2: Retry after 2s                               │ │
-│  │    → FAIL (timeout again)                                │ │
-│  │    Wait: 4s                                              │ │
-│  │                                                          │ │
-│  │  Attempt 3: Retry after 4s                               │ │
-│  │    → SUCCESS!                                            │ │
-│  │    Result: Search results returned                       │ │
-│  │                                                          │ │
-│  │  Recovery: SUCCESSFUL                                    │ │
+│  │  Analizza Errore:                                        │ │
+│  │    Tipo: TimeoutError                                    │ │
+│  │    Componente: Tool (web_search)                         │ │
+│  │    Categoria: TRANSIENT (problema rete)                  │ │
+│  │    Gravità: MEDIA                                        │ │
+│  │    Recuperabile: SI (è probabile che retry funzioni)     │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ OBSERVABILITY SYSTEM - LOGGING                           │ │
+│  │ ERROR HANDLER - MOTORE DI RECOVERY                       │ │
 │  │                                                          │ │
-│  │  Log Entry {                                             │ │
+│  │  Seleziona Strategia: RETRY con backoff esponenziale     │ │
+│  │                                                          │ │
+│  │  Tentativo 1: Retry immediato                            │ │
+│  │    → FALLITO (timeout di nuovo)                          │ │
+│  │    Attesa: 2s                                            │ │
+│  │                                                          │ │
+│  │  Tentativo 2: Retry dopo 2s                              │ │
+│  │    → FALLITO (timeout di nuovo)                          │ │
+│  │    Attesa: 4s                                            │ │
+│  │                                                          │ │
+│  │  Tentativo 3: Retry dopo 4s                              │ │
+│  │    → SUCCESSO!                                           │ │
+│  │    Risultato: Risultati ricerca restituiti               │ │
+│  │                                                          │ │
+│  │  Recovery: RIUSCITO                                      │ │
+│  │                                                          │ │
+│  └────────────────────────┬─────────────────────────────────┘ │
+│                           ↓                                    │
+│  ┌──────────────────────────────────────────────────────────┐ │
+│  │ SISTEMA OSSERVABILITÀ - LOGGING                          │ │
+│  │                                                          │ │
+│  │  Voce Log {                                              │ │
 │  │    level: "WARNING",                                     │ │
 │  │    event: "tool_timeout_recovered",                      │ │
 │  │    tool: "web_search",                                   │ │
@@ -735,141 +739,142 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Return to Execution Engine:                                   │
+│  Ritorna al Motore di Esecuzione:                              │
 │    RecoveryResult {                                           │
 │      success: true,                                           │
-│      output: (search results),                                │
+│      output: (risultati ricerca),                             │
 │      recovery_applied: "retry_with_backoff",                  │
 │      attempts_needed: 3,                                      │
 │      delay_incurred: 6s                                       │
 │    }                                                          │
 │                                                                │
-│  Task continues with successful result                         │
+│  Il task continua con risultato riuscito                       │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 5.2 Error Escalation Flow
+### 5.2 Flusso di Escalation Errori
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                ERROR ESCALATION FLOW                           │
+│              FLUSSO ESCALATION ERRORI                          │
 │                                                                │
-│  Multiple tool failures → Recovery not working                 │
+│  Fallimenti multipli tool → Recovery non funziona              │
 │    │                                                           │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ ERROR HANDLER - ESCALATION MANAGER                       │ │
+│  │ ERROR HANDLER - GESTORE ESCALATION                       │ │
 │  │                                                          │ │
-│  │  Assess Situation:                                       │ │
-│  │    • 3 consecutive tool failures                         │ │
-│  │    • All recovery attempts exhausted                     │ │
-│  │    • Task cannot proceed                                 │ │
-│  │    • Severity: HIGH                                      │ │
+│  │  Valuta Situazione:                                      │ │
+│  │    • 3 fallimenti tool consecutivi                       │ │
+│  │    • Tutti i tentativi di recovery esauriti              │ │
+│  │    • Il task non può procedere                           │ │
+│  │    • Gravità: ALTA                                       │ │
 │  │                                                          │ │
-│  │  Decision: ESCALATE to user                              │ │
+│  │  Decisione: ESCALA a utente                              │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ CREATE INCIDENT                                          │ │
+│  │ CREA INCIDENT                                            │ │
 │  │                                                          │ │
 │  │  Incident {                                              │ │
 │  │    id: "INC-123",                                        │ │
 │  │    type: "TASK_FAILURE",                                 │ │
 │  │    severity: "HIGH",                                     │ │
 │  │    task_id: "T-12345",                                   │ │
-│  │    error_summary: "Multiple tool failures",              │ │
+│  │    error_summary: "Fallimenti multipli tool",            │ │
 │  │    recovery_attempts: [...]                              │ │
 │  │  }                                                       │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ NOTIFY USER                                              │ │
+│  │ NOTIFICA UTENTE                                          │ │
 │  │                                                          │ │
-│  │  Message to User:                                        │ │
-│  │  "Task 'Add JWT authentication' encountered an error     │ │
-│  │   and could not be completed automatically.              │ │
+│  │  Messaggio all'Utente:                                   │ │
+│  │  "Il task 'Aggiungi autenticazione JWT' ha incontrato   │ │
+│  │   un errore e non ha potuto essere completato            │ │
+│  │   automaticamente.                                       │ │
 │  │                                                          │ │
-│  │   Error: Multiple attempts to search documentation       │ │
-│  │   failed due to network timeouts.                        │ │
+│  │   Errore: Tentativi multipli di ricerca documentazione   │ │
+│  │   falliti a causa di timeout di rete.                    │ │
 │  │                                                          │ │
-│  │   Options:                                               │ │
-│  │   1. Retry task (may fail again)                         │ │
-│  │   2. Skip documentation search step                      │ │
-│  │   3. Provide manual input for this step                  │ │
-│  │   4. Cancel task                                         │ │
+│  │   Opzioni:                                               │ │
+│  │   1. Riprova task (potrebbe fallire di nuovo)            │ │
+│  │   2. Salta step ricerca documentazione                   │ │
+│  │   3. Fornisci input manuale per questo step              │ │
+│  │   4. Annulla task                                        │ │
 │  │                                                          │ │
-│  │   Incident ID: INC-123"                                  │ │
+│  │   ID Incident: INC-123"                                  │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ ALERT ENGINEERING (if critical)                          │ │
+│  │ ALLERTA ENGINEERING (se critico)                         │ │
 │  │                                                          │ │
-│  │  IF severity == CRITICAL:                                │ │
-│  │    Send alert to on-call engineer                        │ │
-│  │    Include: incident details, system state, logs         │ │
+│  │  SE gravità == CRITICAL:                                 │ │
+│  │    Invia allerta a ingegnere di guardia                  │ │
+│  │    Include: dettagli incident, stato sistema, log        │ │
 │  │                                                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Wait for user decision or engineering intervention            │
+│  Attendi decisione utente o intervento engineering             │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## 6. Observability Data Flows
+## 6. Flussi di Dati di Osservabilità
 
-### 6.1 Logging Flow
+### 6.1 Flusso di Logging
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    LOGGING DATA FLOW                           │
+│                 FLUSSO DATI DI LOGGING                         │
 │                                                                │
-│  Every component generates log entries →                       │
+│  Ogni componente genera voci di log →                          │
 │    │                                                           │
-│    ├──→ LOG_INFO("Task started", {task_id: "T-123", ...})     │
-│    ├──→ LOG_DEBUG("Context retrieved", {...})                 │
-│    ├──→ LOG_WARNING("Fallback used", {...})                   │
-│    ├──→ LOG_ERROR("Operation failed", {...})                  │
+│    ├──→ LOG_INFO("Task iniziato", {task_id: "T-123", ...})    │
+│    ├──→ LOG_DEBUG("Contesto recuperato", {...})               │
+│    ├──→ LOG_WARNING("Fallback usato", {...})                  │
+│    ├──→ LOG_ERROR("Operazione fallita", {...})                │
 │    │                                                           │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ LOG AGGREGATOR                                           │ │
-│  │  • Collect from all sources                              │ │
-│  │  • Add correlation_id (trace_id, task_id)                │ │
-│  │  • Enrich with context (host, component, timestamp)      │ │
-│  │  • Buffer (100 entries or 5s, whichever first)           │ │
+│  │ AGGREGATORE LOG                                          │ │
+│  │  • Raccoglie da tutte le fonti                           │ │
+│  │  • Aggiunge correlation_id (trace_id, task_id)           │ │
+│  │  • Arricchisce con contesto (host, componente, timestamp)│ │
+│  │  • Buffer (100 voci o 5s, qualunque arrivi prima)        │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ BATCH WRITE TO STORAGE                                   │ │
-│  │  • Elasticsearch (if self-hosted)                        │ │
-│  │  • CloudWatch Logs (if AWS)                              │ │
-│  │  • Retention: 30 days hot, 1 year archive                │ │
+│  │ SCRITTURA BATCH A STORAGE                                │ │
+│  │  • Elasticsearch (se self-hosted)                        │ │
+│  │  • CloudWatch Logs (se AWS)                              │ │
+│  │  • Ritenzione: 30 giorni hot, 1 anno archivio            │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ INDEX FOR SEARCH                                         │ │
-│  │  • Full-text index on message                            │ │
-│  │  • Field indices on: level, component, user_id, task_id │ │
-│  │  • Time-based partitioning for efficiency               │ │
+│  │ INDICIZZAZIONE PER RICERCA                               │ │
+│  │  • Indice full-text su messaggio                         │ │
+│  │  • Indici campo su: level, component, user_id, task_id   │ │
+│  │  • Partizionamento basato su tempo per efficienza        │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Available for:                                                │
-│    • Real-time search (Kibana, CloudWatch Insights)           │
-│    • Debugging (trace all events for specific task)           │
-│    • Analytics (error rate trends, performance analysis)      │
+│  Disponibile per:                                              │
+│    • Ricerca real-time (Kibana, CloudWatch Insights)          │
+│    • Debugging (traccia tutti gli eventi per task specifico)  │
+│    • Analytics (trend tasso errori, analisi performance)      │
 │    • Compliance (audit trail)                                 │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 6.2 Metrics Flow
+### 6.2 Flusso di Metriche
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                   METRICS DATA FLOW                            │
+│                 FLUSSO DATI DI METRICHE                        │
 │                                                                │
-│  Component operations generate metrics →                       │
+│  Operazioni componenti generano metriche →                     │
 │    │                                                           │
 │    ├──→ COUNTER("tasks_started", labels={user_id, type})      │
 │    ├──→ HISTOGRAM("task_duration_seconds", value=245.3)       │
@@ -878,104 +883,107 @@ Questo documento descrive come i dati fluiscono attraverso l'architettura durant
 │    │                                                           │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ METRICS COLLECTOR                                        │ │
-│  │  • In-memory aggregation (1-minute window)               │ │
-│  │  • Compute statistics: count, sum, min, max, percentiles │ │
+│  │ COLLETTORE METRICHE                                      │ │
+│  │  • Aggregazione in memoria (finestra 1 minuto)           │ │
+│  │  • Calcola statistiche: count, sum, min, max, percentili │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ WRITE TO TIME-SERIES DB                                  │ │
+│  │ SCRITTURA A TIME-SERIES DB                               │ │
 │  │  • Prometheus (self-hosted)                              │ │
 │  │  • CloudWatch Metrics (AWS)                              │ │
-│  │  • InfluxDB (alternative)                                │ │
-│  │  • Every 1 minute for detailed metrics                   │ │
-│  │  • Downsampled to 5min, 1hr, 1day for long-term         │ │
+│  │  • InfluxDB (alternativa)                                │ │
+│  │  • Ogni 1 minuto per metriche dettagliate                │ │
+│  │  • Downsampled a 5min, 1ora, 1giorno per lungo termine  │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ VISUALIZATION & ALERTING                                 │ │
-│  │  • Grafana dashboards (real-time)                        │ │
-│  │  • Alert rules evaluation (every 1min)                   │ │
-│  │  • Anomaly detection (ML-based, optional)                │ │
+│  │ VISUALIZZAZIONE & ALERTING                               │ │
+│  │  • Dashboard Grafana (real-time)                         │ │
+│  │  • Valutazione regole alert (ogni 1min)                  │ │
+│  │  • Rilevamento anomalie (basato su ML, opzionale)        │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ ALERT ROUTING (if threshold breached)                    │ │
-│  │  • PagerDuty (critical alerts)                           │ │
-│  │  • Slack (warnings)                                      │ │
+│  │ ROUTING ALERT (se soglia superata)                       │ │
+│  │  • PagerDuty (alert critici)                             │ │
+│  │  • Slack (avvisi)                                        │ │
 │  │  • Email (info)                                          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  Used for:                                                     │
-│    • Real-time monitoring (system health)                     │
-│    • Performance optimization (identify bottlenecks)           │
-│    • Capacity planning (predict resource needs)               │
-│    • SLA tracking (success rate, latency targets)             │
+│  Usato per:                                                    │
+│    • Monitoraggio real-time (salute sistema)                  │
+│    • Ottimizzazione performance (identifica colli di bottiglia)│
+│    • Pianificazione capacità (prevede necessità risorse)      │
+│    • Tracciamento SLA (tasso successo, target latenza)        │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 6.3 Tracing Flow
+### 6.3 Flusso di Tracing
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                  DISTRIBUTED TRACING FLOW                      │
+│                FLUSSO TRACING DISTRIBUITO                      │
 │                                                                │
-│  Request arrives → trace_id generated                          │
+│  Arriva richiesta → trace_id generato                          │
 │    │                                                           │
-│    ├──→ Root Span created                                      │
+│    ├──→ Span Root creato                                       │
 │    │    trace_id: "abc-123"                                   │
 │    │    span_id: "span-1"                                     │
 │    │    operation: "handle_task"                              │
 │    │                                                           │
-│    └──→ As request flows through system:                       │
+│    └──→ Man mano che la richiesta fluisce attraverso sistema: │
 │         │                                                     │
-│         ├─→ Goal Analysis creates child span                  │
+│         ├─→ Analisi Goal crea span figlio                     │
 │         │   span_id: "span-2", parent: "span-1"              │
 │         │                                                     │
-│         ├─→ Planning creates child span                       │
+│         ├─→ Pianificazione crea span figlio                   │
 │         │   span_id: "span-3", parent: "span-1"              │
 │         │   │                                                │
-│         │   ├─→ Pattern Cache query creates span             │
+│         │   ├─→ Query Pattern Cache crea span                │
 │         │   │   span_id: "span-4", parent: "span-3"          │
 │         │   │                                                │
-│         │   └─→ Memory query creates span                    │
+│         │   └─→ Query memoria crea span                      │
 │         │       span_id: "span-5", parent: "span-3"          │
 │         │                                                     │
-│         └─→ Execution creates multiple spans                  │
-│             (one per subtask)                                │
-│             span_id: "span-6..N", parent: various           │
+│         └─→ Esecuzione crea span multipli                     │
+│             (uno per subtask)                                │
+│             span_id: "span-6..N", parent: vari               │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ SPAN COLLECTION                                          │ │
-│  │  • Each span sent to collector when complete             │ │
-│  │  • Includes: timing, tags, events, status                │ │
-│  │  • Batched for efficiency                                │ │
+│  │ COLLEZIONE SPAN                                          │ │
+│  │  • Ogni span inviato a collector quando completato       │ │
+│  │  • Include: timing, tag, eventi, stato                   │ │
+│  │  • In batch per efficienza                               │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ TRACE STORAGE                                            │ │
+│  │ STORAGE TRACE                                            │ │
 │  │  • Jaeger (open source)                                  │ │
-│  │  • AWS X-Ray (managed)                                   │ │
-│  │  • Store: span data + relationships                      │ │
-│  │  • Retention: 7 days full detail, 30 days sampled        │ │
+│  │  • AWS X-Ray (gestito)                                   │ │
+│  │  • Memorizza: dati span + relazioni                      │ │
+│  │  • Ritenzione: 7 giorni dettaglio completo, 30 giorni    │ │
+│  │    campionato                                            │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ TRACE VISUALIZATION                                      │ │
-│  │  • Waterfall view of spans                               │ │
-│  │  • Gantt chart showing parallelism                       │ │
-│  │  • Critical path highlighting                            │ │
-│  │  • Flamegraph for CPU profiling                          │ │
+│  │ VISUALIZZAZIONE TRACE                                    │ │
+│  │  • Vista waterfall degli span                            │ │
+│  │  • Diagramma Gantt che mostra parallelismo               │ │
+│  │  • Evidenziazione percorso critico                       │ │
+│  │  • Flamegraph per profiling CPU                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Available for:                                                │
-│    • Debugging slow requests (where is time spent?)           │
-│    • Understanding dependencies (what calls what?)            │
-│    • Finding bottlenecks (which operations are slow?)         │
-│    • Optimizing parallelism (what could run in parallel?)     │
+│  Disponibile per:                                              │
+│    • Debug richieste lente (dove viene speso il tempo?)       │
+│    • Comprensione dipendenze (cosa chiama cosa?)              │
+│    • Individuazione colli di bottiglia (quali operazioni sono │
+│      lente?)                                                  │
+│    • Ottimizzazione parallelismo (cosa potrebbe girare in     │
+│      parallelo?)                                              │
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-**Next**: [08-deployment.md](08-deployment.md) → Deployment models, scaling strategies, operational considerations
+**Prossimo**: [08-deployment.md](08-deployment.md) → Modelli di deployment, strategie di scaling, considerazioni operative

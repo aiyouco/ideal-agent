@@ -1,6 +1,6 @@
-# Capability Layer: Tools, Models, and Safety
+# Capability Layer: Strumenti, Modelli e Sicurezza
 
-## Overview
+## Panoramica
 
 Il Capability Layer fornisce le interfacce concrete attraverso cui l'agente interagisce col mondo: strumenti per azioni esterne, modelli per reasoning, e sistemi di sicurezza per bounded emergence. È il layer che traduce intenzioni high-level in azioni concrete sicure.
 
@@ -10,83 +10,85 @@ Il Capability Layer fornisce le interfacce concrete attraverso cui l'agente inte
 │                                                               │
 │  ┌─────────────────────────────────────────────────────────┐ │
 │  │  TOOL REGISTRY                                          │ │
-│  │  • Tool discovery and registration                      │ │
-│  │  • Capability matching                                  │ │
-│  │  • Tool binding and invocation                          │ │
-│  │  • Permission management                                │ │
-│  │  Purpose: Enable agent to use external capabilities     │ │
+│  │  • Scoperta e registrazione degli strumenti            │ │
+│  │  • Matching delle capability                           │ │
+│  │  • Binding e invocazione degli strumenti               │ │
+│  │  • Gestione dei permessi                               │ │
+│  │  Scopo: Consentire all'agente di usare capability      │ │
+│  │         esterne                                         │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                          ↕                                    │
 │  ┌─────────────────────────────────────────────────────────┐ │
 │  │  MODEL ROUTER                                           │ │
-│  │  • Model selection based on task                        │ │
-│  │  • Cost/quality optimization                            │ │
-│  │  • Load balancing and fallback                          │ │
-│  │  • Context window management                            │ │
-│  │  Purpose: Optimize LLM usage for efficiency             │ │
+│  │  • Selezione del modello in base al task               │ │
+│  │  • Ottimizzazione costo/qualità                        │ │
+│  │  • Bilanciamento del carico e fallback                 │ │
+│  │  • Gestione della finestra di contesto                 │ │
+│  │  Scopo: Ottimizzare l'uso degli LLM per efficienza     │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                          ↕                                    │
 │  ┌─────────────────────────────────────────────────────────┐ │
 │  │  SAFETY VERIFIER                                        │ │
-│  │  • Input validation and sanitization                    │ │
-│  │  • Output verification                                  │ │
-│  │  • Action authorization                                 │ │
-│  │  • Bounded emergence enforcement                        │ │
-│  │  Purpose: Ensure agent operates within safe bounds      │ │
+│  │  • Validazione e sanitizzazione degli input            │ │
+│  │  • Verifica degli output                               │ │
+│  │  • Autorizzazione delle azioni                         │ │
+│  │  • Applicazione del bounded emergence                  │ │
+│  │  Scopo: Assicurare che l'agente operi entro limiti     │ │
+│  │         sicuri                                          │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                                                               │
-│  Interaction Flow:                                            │
-│  1. Execution Engine needs to perform action                  │
-│  2. Safety Verifier validates request                         │
-│  3. Model Router selects appropriate LLM if needed            │
-│  4. Tool Registry provides and executes tool                  │
-│  5. Safety Verifier validates result before returning         │
+│  Flusso di Interazione:                                       │
+│  1. Execution Engine deve eseguire un'azione                  │
+│  2. Safety Verifier valida la richiesta                       │
+│  3. Model Router seleziona l'LLM appropriato se necessario    │
+│  4. Tool Registry fornisce ed esegue lo strumento             │
+│  5. Safety Verifier valida il risultato prima di restituirlo │
 └───────────────────────────────────────────────────────────────┘
 ```
 
 ## 1. Tool Registry
 
-### 1.1 Purpose & Responsibilities
+### 1.1 Scopo e Responsabilità
 
-**Core Function**: Gestire catalogo di capabilities esterne (tools) disponibili all'agente e mediare loro utilizzo.
+**Funzione Centrale**: Gestire catalogo di capabilities esterne (tools) disponibili all'agente e mediare loro utilizzo.
 
-**Characteristics**:
-- **Extensible**: Nuovi tool facilmente aggiungibili
-- **Discoverable**: Agent può trovare tool per capability richiesta
-- **Secure**: Permission-based access control
-- **Versioned**: Supporto multiple versioni di stesso tool
+**Caratteristiche**:
+- **Estensibile**: Nuovi tool facilmente aggiungibili
+- **Scopribile**: Agent può trovare tool per capability richiesta
+- **Sicuro**: Permission-based access control
+- **Versionato**: Supporto multiple versioni di stesso tool
 
-**Responsibilities**:
-1. **Tool Registration**: Registrare nuovi tool con metadata
-2. **Discovery**: Trovare tool che soddisfano requirements
+**Responsabilità**:
+1. **Registrazione Tool**: Registrare nuovi tool con metadata
+2. **Scoperta**: Trovare tool che soddisfano requirements
 3. **Capability Matching**: Match task needs → available tools
-4. **Invocation**: Eseguire tool calls in modo sicuro
-5. **Result Handling**: Parse e validate tool outputs
-6. **Error Handling**: Gestire tool failures gracefully
+4. **Invocazione**: Eseguire tool calls in modo sicuro
+5. **Gestione Risultati**: Parse e validate tool outputs
+6. **Gestione Errori**: Gestire tool failures gracefully
 
-### 1.2 Tool Specification Schema
+### 1.2 Schema di Specifica Tool
 
-**Complete Tool Definition**:
+**Definizione Completa di un Tool**:
 ```
 Tool {
-  // Identification
+  // Identificazione
   tool_id: string (UUID),
-  name: string,  // Human-readable name
-  version: string,  // Semantic versioning (e.g., "2.1.0")
+  name: string,  // Nome leggibile
+  version: string,  // Versionamento semantico (es. "2.1.0")
 
-  // Description
+  // Descrizione
   description: string,
   detailed_description: string,
   category: ToolCategory,  // "file_ops", "web", "compute", etc.
 
-  // Capabilities
-  capabilities: [string],  // Semantic tags: ["read_file", "text_file"]
+  // Capability
+  capabilities: [string],  // Tag semantici: ["read_file", "text_file"]
 
-  // Interface
-  input_schema: JSONSchema,  // What parameters tool accepts
-  output_schema: JSONSchema,  // What tool returns
+  // Interfaccia
+  input_schema: JSONSchema,  // Parametri accettati dallo strumento
+  output_schema: JSONSchema,  // Cosa restituisce lo strumento
 
-  // Examples
+  // Esempi
   examples: [
     {
       description: string,
@@ -95,44 +97,44 @@ Tool {
     }
   ],
 
-  // Execution
+  // Esecuzione
   invocation: {
     type: "FUNCTION" | "HTTP_API" | "CLI" | "PLUGIN",
 
-    // For FUNCTION type
+    // Per tipo FUNCTION
     function_ref: string | callable,
 
-    // For HTTP_API type
+    // Per tipo HTTP_API
     endpoint: string,
     method: "GET" | "POST" | "PUT" | "DELETE",
     auth: AuthConfig,
 
-    // For CLI type
+    // Per tipo CLI
     command_template: string,
 
-    // For PLUGIN type
+    // Per tipo PLUGIN
     plugin_loader: string
   },
 
-  // Safety & Permissions
+  // Sicurezza & Permessi
   safety: {
     permission_required: Permission,
-    dangerous: boolean,  // Requires extra validation
-    side_effects: [SideEffect],  // What it changes
-    reversible: boolean,  // Can action be undone
-    idempotent: boolean,  // Safe to retry
+    dangerous: boolean,  // Richiede validazione extra
+    side_effects: [SideEffect],  // Cosa modifica
+    reversible: boolean,  // L'azione può essere annullata
+    idempotent: boolean,  // Sicuro riprovare
     rate_limit: RateLimit
   },
 
-  // Performance
+  // Prestazioni
   performance: {
-    typical_latency: float,  // Seconds
-    timeout: float,  // Max execution time
-    cost: float | null,  // Per invocation, if applicable
+    typical_latency: float,  // Secondi
+    timeout: float,  // Tempo massimo di esecuzione
+    cost: float | null,  // Per invocazione, se applicabile
     resource_intensive: boolean
   },
 
-  // Dependencies
+  // Dipendenze
   dependencies: {
     required_tools: [tool_id],
     required_permissions: [Permission],
@@ -151,7 +153,7 @@ Tool {
     tags: [string]
   },
 
-  // Lifecycle
+  // Ciclo di vita
   lifecycle: {
     status: "ACTIVE" | "DEPRECATED" | "DISABLED",
     deprecated_by: tool_id | null,
@@ -161,7 +163,7 @@ Tool {
 }
 ```
 
-### 1.3 Tool Registry Architecture
+### 1.3 Architettura del Tool Registry
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
@@ -169,209 +171,209 @@ Tool {
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  TOOL CATALOG (Storage)                                  │ │
-│  │  • Database of registered tools                          │ │
-│  │  • Tool metadata and schemas                             │ │
-│  │  • Version management                                    │ │
-│  │  Technology: PostgreSQL + Redis cache                    │ │
+│  │  • Database dei tool registrati                          │ │
+│  │  • Metadata e schemi dei tool                            │ │
+│  │  • Gestione delle versioni                               │ │
+│  │  Tecnologia: PostgreSQL + cache Redis                    │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  CAPABILITY INDEX (Discovery)                            │ │
-│  │  • Inverted index: capability → tools                    │ │
-│  │  • Semantic search over tool descriptions                │ │
-│  │  • Fast lookup by capability tags                        │ │
-│  │  Example: "read_file" → [tool_1, tool_2, tool_3]         │ │
+│  │  • Indice invertito: capability → tools                  │ │
+│  │  • Ricerca semantica sulle descrizioni dei tool          │ │
+│  │  • Lookup veloce per tag di capability                   │ │
+│  │  Esempio: "read_file" → [tool_1, tool_2, tool_3]         │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  TOOL EXECUTOR (Invocation)                              │ │
-│  │  • Handles different invocation types                    │ │
-│  │  • Input validation against schema                       │ │
-│  │  • Execution sandboxing                                  │ │
-│  │  • Output parsing and validation                         │ │
-│  │  • Timeout and error handling                            │ │
+│  │  • Gestisce diversi tipi di invocazione                  │ │
+│  │  • Validazione input rispetto allo schema                │ │
+│  │  • Sandboxing dell'esecuzione                            │ │
+│  │  • Parsing e validazione dell'output                     │ │
+│  │  • Gestione timeout ed errori                            │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  PERMISSION MANAGER                                      │ │
-│  │  • Permission checking                                   │ │
+│  │  • Verifica dei permessi                                 │ │
 │  │  • Audit logging                                         │ │
-│  │  • Rate limiting enforcement                             │ │
-│  │  • Human approval gates for dangerous operations         │ │
+│  │  • Applicazione del rate limiting                        │ │
+│  │  • Gate di approvazione umana per operazioni pericolose  │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 1.4 Tool Discovery and Matching
+### 1.4 Scoperta e Matching dei Tool
 
-**Discovery Algorithm**:
+**Algoritmo di Scoperta**:
 ```
-Function DISCOVER_TOOLS(requirement, context):
+Funzione DISCOVER_TOOLS(requirement, context):
 
-  # STEP 1: Parse requirement
-  # Requirement might be natural language or structured
+  # STEP 1: Parse del requirement
+  # Il Requirement potrebbe essere linguaggio naturale o strutturato
 
-  IF requirement.is_structured:
-    # Structured: {capability: "read_file", constraints: {...}}
+  SE requirement.is_structured:
+    # Strutturato: {capability: "read_file", constraints: {...}}
     capabilities_needed = requirement.capabilities
     constraints = requirement.constraints
-  ELSE:
-    # Natural language: "I need to read a JSON file"
-    # Use LLM to extract capabilities
+  ALTRIMENTI:
+    # Linguaggio naturale: "Ho bisogno di leggere un file JSON"
+    # Usa LLM per estrarre le capability
     capabilities_needed = LLM.extract_capabilities(requirement.text)
     constraints = LLM.extract_constraints(requirement.text)
 
-  # STEP 2: Query by capabilities
+  # STEP 2: Query per capability
   candidate_tools = []
 
-  FOR capability IN capabilities_needed:
-    # Query capability index
+  PER OGNI capability IN capabilities_needed:
+    # Query sull'indice delle capability
     tools_with_capability = INDEX.query(capability)
     candidate_tools.extend(tools_with_capability)
 
-  # Remove duplicates
+  # Rimuovi duplicati
   candidate_tools = UNIQUE(candidate_tools)
 
-  # STEP 3: Filter by constraints
+  # STEP 3: Filtra per vincoli
   filtered_tools = []
 
-  FOR tool IN candidate_tools:
-    # Check if tool meets all constraints
-    IF MATCHES_CONSTRAINTS(tool, constraints, context):
+  PER OGNI tool IN candidate_tools:
+    # Verifica se il tool soddisfa tutti i vincoli
+    SE MATCHES_CONSTRAINTS(tool, constraints, context):
       filtered_tools.append(tool)
 
-  # STEP 4: Rank by suitability
+  # STEP 4: Ordina per idoneità
   ranked_tools = RANK_TOOLS(filtered_tools, requirement, context)
 
-  # STEP 5: Return top matches
-  RETURN ranked_tools[:5]
+  # STEP 5: Restituisci i migliori match
+  RESTITUISCI ranked_tools[:5]
 
-Function MATCHES_CONSTRAINTS(tool, constraints, context):
-  # Permission check
-  IF tool.safety.permission_required NOT IN context.available_permissions:
-    RETURN False
+Funzione MATCHES_CONSTRAINTS(tool, constraints, context):
+  # Verifica permessi
+  SE tool.safety.permission_required NON IN context.available_permissions:
+    RESTITUISCI False
 
-  # Environment check
-  IF NOT environment_compatible(tool, context.environment):
-    RETURN False
+  # Verifica ambiente
+  SE NON environment_compatible(tool, context.environment):
+    RESTITUISCI False
 
-  # Performance constraint
-  IF constraints.max_latency AND tool.performance.typical_latency > constraints.max_latency:
-    RETURN False
+  # Vincolo di prestazioni
+  SE constraints.max_latency AND tool.performance.typical_latency > constraints.max_latency:
+    RESTITUISCI False
 
-  # Cost constraint
-  IF constraints.max_cost AND tool.performance.cost > constraints.max_cost:
-    RETURN False
+  # Vincolo di costo
+  SE constraints.max_cost AND tool.performance.cost > constraints.max_cost:
+    RESTITUISCI False
 
-  # Safety constraint
-  IF constraints.safe_only AND tool.safety.dangerous:
-    RETURN False
+  # Vincolo di sicurezza
+  SE constraints.safe_only AND tool.safety.dangerous:
+    RESTITUISCI False
 
-  RETURN True
+  RESTITUISCI True
 
-Function RANK_TOOLS(tools, requirement, context):
+Funzione RANK_TOOLS(tools, requirement, context):
   scored = []
 
-  FOR tool IN tools:
+  PER OGNI tool IN tools:
     score = 0
 
-    # Capability match quality (primary)
+    # Qualità del match delle capability (primario)
     match_quality = COMPUTE_CAPABILITY_MATCH(
       tool.capabilities,
       requirement.capabilities_needed
     )
     score += 0.4 * match_quality
 
-    # Usage frequency (popular tools preferred)
+    # Frequenza d'uso (tool popolari preferiti)
     usage_factor = LOG(1 + tool.usage_count) / 10
     score += 0.2 * MIN(usage_factor, 1.0)
 
-    # Performance score (faster is better)
+    # Score di prestazioni (più veloce è meglio)
     latency_score = 1 / (1 + tool.performance.typical_latency)
     score += 0.15 * latency_score
 
-    # Cost score (cheaper is better)
-    IF tool.performance.cost:
+    # Score di costo (più economico è meglio)
+    SE tool.performance.cost:
       cost_score = 1 / (1 + tool.performance.cost * 10)
       score += 0.15 * cost_score
-    ELSE:
-      score += 0.15  # Free tools get full cost score
+    ALTRIMENTI:
+      score += 0.15  # Tool gratuiti ottengono score pieno
 
-    # Safety score (safer is better)
-    safety_score = 1.0 if not tool.safety.dangerous else 0.5
+    # Score di sicurezza (più sicuro è meglio)
+    safety_score = 1.0 se non tool.safety.dangerous altrimenti 0.5
     score += 0.1 * safety_score
 
     scored.append((tool, score))
 
-  RETURN SORT_BY_SCORE(scored, descending=True)
+  RESTITUISCI SORT_BY_SCORE(scored, descending=True)
 ```
 
-### 1.5 Tool Invocation
+### 1.5 Invocazione dei Tool
 
-**Secure Invocation Flow**:
+**Flusso di Invocazione Sicuro**:
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                   TOOL INVOCATION PIPELINE                     │
+│                   PIPELINE DI INVOCAZIONE TOOL                 │
 │                                                                │
-│  User Request: Execute tool X with parameters Y                │
+│  Richiesta Utente: Eseguire tool X con parametri Y            │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  1. PERMISSION CHECK                                     │ │
-│  │  • Verify caller has required permission                 │ │
-│  │  • Check rate limits not exceeded                        │ │
-│  │  • Log request for audit                                 │ │
-│  │  IF FAIL: REJECT with error                              │ │
+│  │  1. VERIFICA PERMESSI                                    │ │
+│  │  • Verifica che il chiamante abbia il permesso richiesto │ │
+│  │  • Verifica che i rate limit non siano superati          │ │
+│  │  • Registra la richiesta per l'audit                     │ │
+│  │  SE FALLISCE: RIFIUTA con errore                         │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
-│                           ↓ PASS                               │
+│                           ↓ PASSA                              │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  2. INPUT VALIDATION                                     │ │
-│  │  • Validate against tool.input_schema                    │ │
+│  │  2. VALIDAZIONE INPUT                                    │ │
+│  │  • Valida rispetto a tool.input_schema                   │ │
 │  │  • Type checking                                         │ │
-│  │  • Range/constraint verification                         │ │
-│  │  • Injection attack detection                            │ │
-│  │  IF FAIL: REJECT with validation errors                  │ │
+│  │  • Verifica range/vincoli                                │ │
+│  │  • Rilevamento attacchi injection                        │ │
+│  │  SE FALLISCE: RIFIUTA con errori di validazione          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
-│                           ↓ PASS                               │
+│                           ↓ PASSA                              │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  3. SAFETY VERIFICATION (if dangerous tool)              │ │
-│  │  • Check action against safety bounds                    │ │
-│  │  • Simulate/dry-run if possible                          │ │
-│  │  • Request human approval if needed                      │ │
-│  │  IF FAIL: REJECT with safety violation                   │ │
+│  │  3. VERIFICA SICUREZZA (se tool pericoloso)              │ │
+│  │  • Verifica azione rispetto ai bounds di sicurezza       │ │
+│  │  • Simula/dry-run se possibile                           │ │
+│  │  • Richiede approvazione umana se necessario             │ │
+│  │  SE FALLISCE: RIFIUTA con violazione sicurezza           │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
-│                           ↓ PASS                               │
+│                           ↓ PASSA                              │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  4. EXECUTION                                            │ │
-│  │  • Prepare execution environment                         │ │
-│  │  • Set timeout                                           │ │
-│  │  • Invoke tool based on invocation type:                │ │
-│  │    - FUNCTION: Call directly                             │ │
-│  │    - HTTP_API: Make HTTP request                         │ │
-│  │    - CLI: Execute shell command                          │ │
-│  │    - PLUGIN: Load and invoke plugin                      │ │
-│  │  • Capture output and errors                             │ │
-│  │  IF TIMEOUT: Abort and return timeout error              │ │
-│  │  IF ERROR: Capture error details                         │ │
+│  │  4. ESECUZIONE                                           │ │
+│  │  • Prepara ambiente di esecuzione                        │ │
+│  │  • Imposta timeout                                       │ │
+│  │  • Invoca tool in base al tipo di invocazione:           │ │
+│  │    - FUNCTION: Chiama direttamente                       │ │
+│  │    - HTTP_API: Effettua richiesta HTTP                   │ │
+│  │    - CLI: Esegue comando shell                           │ │
+│  │    - PLUGIN: Carica e invoca plugin                      │ │
+│  │  • Cattura output ed errori                              │ │
+│  │  SE TIMEOUT: Interrompi e restituisci errore timeout     │ │
+│  │  SE ERRORE: Cattura dettagli errore                      │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  5. OUTPUT PROCESSING                                    │ │
-│  │  • Parse tool output                                     │ │
-│  │  • Validate against tool.output_schema                   │ │
-│  │  • Extract structured data                               │ │
-│  │  • Handle errors gracefully                              │ │
-│  │  IF parse error: Wrap in error response                  │ │
+│  │  5. ELABORAZIONE OUTPUT                                  │ │
+│  │  • Parsa l'output del tool                               │ │
+│  │  • Valida rispetto a tool.output_schema                  │ │
+│  │  • Estrae dati strutturati                               │ │
+│  │  • Gestisce gli errori con garbo                         │ │
+│  │  SE errore parsing: Incapsula in risposta errore         │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  6. POST-INVOCATION                                      │ │
-│  │  • Log execution (tool, params, result, duration)        │ │
-│  │  • Update tool usage statistics                          │ │
-│  │  • Update rate limit counters                            │ │
-│  │  • Store in working memory if needed                     │ │
+│  │  6. POST-INVOCAZIONE                                     │ │
+│  │  • Registra esecuzione (tool, params, result, duration)  │ │
+│  │  • Aggiorna statistiche d'uso del tool                   │ │
+│  │  • Aggiorna contatori rate limit                         │ │
+│  │  • Memorizza in working memory se necessario             │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Return ToolResult {                                           │
+│  Restituisci ToolResult {                                      │
 │    success: boolean,                                           │
 │    output: {...} | null,                                       │
 │    error: Error | null,                                        │
@@ -380,276 +382,279 @@ Function RANK_TOOLS(tools, requirement, context):
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 1.6 Built-in Tool Categories
+### 1.6 Categorie di Tool Built-in
 
-**Essential Tools** (sempre disponibili):
+**Strumenti Essenziali** (sempre disponibili):
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                  CORE TOOL CATEGORIES                    │
+│               CATEGORIE DI TOOL PRINCIPALI               │
 │                                                          │
-│  1. FILE OPERATIONS                                      │
-│     • read_file: Read file contents                     │
-│     • write_file: Write/overwrite file                  │
-│     • append_file: Append to file                       │
-│     • delete_file: Delete file                          │
-│     • list_directory: List files in directory           │
-│     • file_info: Get file metadata                      │
+│  1. OPERAZIONI FILE                                      │
+│     • read_file: Legge contenuto file                   │
+│     • write_file: Scrive/sovrascrive file               │
+│     • append_file: Appende a file                       │
+│     • delete_file: Elimina file                         │
+│     • list_directory: Elenca file nella directory       │
+│     • file_info: Ottiene metadata del file              │
 │                                                          │
-│  2. CODE OPERATIONS                                      │
-│     • parse_code: Parse code into AST                   │
-│     • format_code: Auto-format code                     │
-│     • lint_code: Run linter                             │
-│     • run_tests: Execute test suite                     │
-│     • static_analysis: Analyze code quality             │
+│  2. OPERAZIONI CODICE                                    │
+│     • parse_code: Parsa codice in AST                   │
+│     • format_code: Formatta automaticamente codice      │
+│     • lint_code: Esegue linter                          │
+│     • run_tests: Esegue suite di test                   │
+│     • static_analysis: Analizza qualità del codice      │
 │                                                          │
-│  3. WEB OPERATIONS                                       │
-│     • http_get: HTTP GET request                        │
-│     • http_post: HTTP POST request                      │
-│     • fetch_webpage: Fetch and parse HTML               │
-│     • web_search: Search web                            │
+│  3. OPERAZIONI WEB                                       │
+│     • http_get: Richiesta HTTP GET                      │
+│     • http_post: Richiesta HTTP POST                    │
+│     • fetch_webpage: Recupera e parsa HTML              │
+│     • web_search: Cerca sul web                         │
 │                                                          │
-│  4. DATA OPERATIONS                                      │
-│     • parse_json: Parse JSON string                     │
-│     • parse_yaml: Parse YAML                            │
-│     • parse_xml: Parse XML                              │
-│     • query_database: SQL query                         │
-│     • transform_data: Data transformation               │
+│  4. OPERAZIONI DATI                                      │
+│     • parse_json: Parsa stringa JSON                    │
+│     • parse_yaml: Parsa YAML                            │
+│     • parse_xml: Parsa XML                              │
+│     • query_database: Query SQL                         │
+│     • transform_data: Trasformazione dati               │
 │                                                          │
-│  5. COMPUTATION                                          │
-│     • evaluate_expression: Eval math expression         │
-│     • run_script: Execute script                        │
-│     • execute_command: Run shell command                │
+│  5. COMPUTAZIONE                                         │
+│     • evaluate_expression: Valuta espressione matematica│
+│     • run_script: Esegue script                         │
+│     • execute_command: Esegue comando shell             │
 │                                                          │
-│  6. COMMUNICATION                                        │
-│     • send_notification: Notify user                    │
-│     • request_input: Ask user for input                 │
-│     • request_approval: Request human approval          │
+│  6. COMUNICAZIONE                                        │
+│     • send_notification: Notifica l'utente              │
+│     • request_input: Chiede input all'utente            │
+│     • request_approval: Richiede approvazione umana     │
 │                                                          │
-│  7. MEMORY OPERATIONS                                    │
-│     • search_episodes: Query episodic memory            │
-│     • retrieve_pattern: Get pattern from cache          │
-│     • store_note: Save note for later                   │
+│  7. OPERAZIONI MEMORIA                                   │
+│     • search_episodes: Query su memoria episodica       │
+│     • retrieve_pattern: Ottiene pattern dalla cache     │
+│     • store_note: Salva nota per dopo                   │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 1.7 Tool Registry Operations
+### 1.7 Operazioni del Tool Registry
 
 ```
 1. REGISTER_TOOL(tool_spec)
-   • Validate tool specification
-   • Check for name conflicts
-   • Assign tool_id
-   • Create capability indices
-   • Store in catalog
-   • Return tool_id
+   • Valida specifica del tool
+   • Verifica conflitti di nome
+   • Assegna tool_id
+   • Crea indici di capability
+   • Memorizza nel catalogo
+   • Restituisce tool_id
 
 2. UNREGISTER_TOOL(tool_id)
-   • Mark tool as disabled
-   • Remove from active indices
-   • Keep for historical record
+   • Marca tool come disabilitato
+   • Rimuove dagli indici attivi
+   • Mantiene per record storico
 
 3. UPDATE_TOOL(tool_id, updates)
-   • Validate updates
-   • Increment version
-   • Update catalog
-   • Update indices
-   • Notify dependent tools if breaking change
+   • Valida aggiornamenti
+   • Incrementa versione
+   • Aggiorna catalogo
+   • Aggiorna indici
+   • Notifica tool dipendenti se breaking change
 
 4. GET_TOOL(tool_id)
-   • Retrieve tool spec from catalog
-   • Check if active
-   • Return tool or error
+   • Recupera specifica tool dal catalogo
+   • Verifica se attivo
+   • Restituisce tool o errore
 
 5. DISCOVER_TOOLS(requirement, context)
-   • Parse requirement
-   • Query capability index
-   • Filter by constraints
-   • Rank by suitability
-   • Return top matches
+   • Parsa requirement
+   • Query sull'indice di capability
+   • Filtra per vincoli
+   • Ordina per idoneità
+   • Restituisce i migliori match
 
 6. INVOKE_TOOL(tool_id, parameters, context)
-   • Permission check
-   • Input validation
-   • Safety verification (if dangerous)
-   • Execute tool
-   • Output processing
+   • Verifica permessi
+   • Validazione input
+   • Verifica sicurezza (se pericoloso)
+   • Esegue tool
+   • Elaborazione output
    • Logging
-   • Return result
+   • Restituisce risultato
 
 7. LIST_TOOLS(filters)
-   • Query catalog with filters
-   • Return matching tools
+   • Query sul catalogo con filtri
+   • Restituisce tool corrispondenti
 
 8. GET_TOOL_USAGE_STATS(tool_id, time_range)
-   • Query usage logs
-   • Compute statistics
-   • Return metrics
+   • Query sui log d'uso
+   • Calcola statistiche
+   • Restituisce metriche
 
 9. CHECK_PERMISSIONS(tool_id, context)
-   • Verify required permissions available
-   • Return boolean + missing permissions if any
+   • Verifica permessi richiesti disponibili
+   • Restituisce boolean + permessi mancanti se presenti
 
 10. REQUEST_APPROVAL(tool_id, parameters, reason)
-    • For dangerous operations
-    • Present request to human
-    • Await approval/denial
-    • Return decision
+    • Per operazioni pericolose
+    • Presenta richiesta all'umano
+    • Attende approvazione/rifiuto
+    • Restituisce decisione
 ```
 
 ## 2. Model Router
 
-### 2.1 Purpose & Responsibilities
+### 2.1 Scopo e Responsabilità
 
-**Core Function**: Selezionare optimal LLM per ogni reasoning task, bilanciando quality, cost, e latency.
+**Funzione Centrale**: Selezionare optimal LLM per ogni reasoning task, bilanciando quality, cost, e latency.
 
 **Key Insight**: Not all tasks require most capable (expensive) model. Strategic routing can reduce cost 5-10x without quality loss.
 
-**Responsibilities**:
-1. **Model Selection**: Choose appropriate model for task
-2. **Load Balancing**: Distribute requests across instances
-3. **Failover**: Handle model unavailability
-4. **Context Management**: Ensure task fits in model's context window
-5. **Cost Optimization**: Minimize spend while meeting quality targets
-6. **Performance Tracking**: Monitor model performance per task type
+**Responsabilità**:
+1. **Selezione Modello**: Scegli modello appropriato per il task
+2. **Bilanciamento del Carico**: Distribuisci richieste tra istanze
+3. **Failover**: Gestisci indisponibilità del modello
+4. **Gestione Contesto**: Assicura che il task rientri nella finestra di contesto del modello
+5. **Ottimizzazione Costi**: Minimizza la spesa mantenendo gli obiettivi di qualità
+6. **Tracking Prestazioni**: Monitora prestazioni del modello per tipo di task
 
-### 2.2 Model Tier System
+### 2.2 Sistema a Livelli di Modello
 
-**Three-Tier Architecture**:
+**Architettura a Tre Livelli**:
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                    MODEL TIERS                           │
+│                    LIVELLI DI MODELLO                    │
 │                                                          │
-│  TIER 1: SMALL/FAST MODELS                               │
-│  ├─ Examples: GPT-3.5, Claude Haiku, Llama 2 7B         │
-│  ├─ Cost: $0.001-0.002 per 1K tokens                    │
-│  ├─ Latency: 1-3s typical                               │
-│  ├─ Context: 4K-8K tokens                               │
-│  ├─ Strengths: Speed, cost, simple tasks                │
-│  └─ Use for: Simple queries, formatting, classification  │
+│  LIVELLO 1: MODELLI PICCOLI/VELOCI                       │
+│  ├─ Esempi: GPT-3.5, Claude Haiku, Llama 2 7B          │
+│  ├─ Costo: $0.001-0.002 per 1K token                    │
+│  ├─ Latenza: 1-3s tipica                                │
+│  ├─ Contesto: 4K-8K token                               │
+│  ├─ Punti di forza: Velocità, costo, task semplici      │
+│  └─ Usare per: Query semplici, formattazione,           │
+│                classificazione                           │
 │                                                          │
-│  TIER 2: MEDIUM MODELS                                   │
-│  ├─ Examples: GPT-4o-mini, Claude Sonnet               │
-│  ├─ Cost: $0.01-0.03 per 1K tokens                      │
-│  ├─ Latency: 3-8s typical                               │
-│  ├─ Context: 16K-128K tokens                            │
-│  ├─ Strengths: Balance of capability and cost           │
-│  └─ Use for: Most coding, moderate complexity tasks     │
+│  LIVELLO 2: MODELLI MEDI                                 │
+│  ├─ Esempi: GPT-4o-mini, Claude Sonnet                 │
+│  ├─ Costo: $0.01-0.03 per 1K token                      │
+│  ├─ Latenza: 3-8s tipica                                │
+│  ├─ Contesto: 16K-128K token                            │
+│  ├─ Punti di forza: Equilibrio tra capability e costo   │
+│  └─ Usare per: Maggior parte coding, task complessità   │
+│                moderata                                  │
 │                                                          │
-│  TIER 3: LARGE/CAPABLE MODELS                            │
-│  ├─ Examples: GPT-4, Claude Opus, GPT-4-turbo          │
-│  ├─ Cost: $0.03-0.10 per 1K tokens                      │
-│  ├─ Latency: 5-15s typical                              │
-│  ├─ Context: 128K-200K tokens                           │
-│  ├─ Strengths: Maximum capability, complex reasoning    │
-│  └─ Use for: Complex architecture, novel problems       │
+│  LIVELLO 3: MODELLI GRANDI/CAPACI                        │
+│  ├─ Esempi: GPT-4, Claude Opus, GPT-4-turbo            │
+│  ├─ Costo: $0.03-0.10 per 1K token                      │
+│  ├─ Latenza: 5-15s tipica                               │
+│  ├─ Contesto: 128K-200K token                           │
+│  ├─ Punti di forza: Massima capability, reasoning       │
+│  │                   complesso                           │
+│  └─ Usare per: Architettura complessa, problemi nuovi   │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 2.3 Routing Decision Tree
+### 2.3 Albero Decisionale di Routing
 
-**Decision Algorithm**:
+**Algoritmo di Decisione**:
 ```
-Function SELECT_MODEL(task, context):
+Funzione SELECT_MODEL(task, context):
 
-  # STEP 1: Classify task complexity
+  # STEP 1: Classifica complessità del task
   complexity = CLASSIFY_COMPLEXITY(task)
-  # Returns: SIMPLE | MODERATE | COMPLEX
+  # Restituisce: SIMPLE | MODERATE | COMPLEX
 
-  # STEP 2: Check for routing hints
-  IF context.model_hint:
-    # Explicit hint from planning (e.g., "use_best_model")
-    IF context.model_hint == "best":
-      RETURN TIER_3_MODEL
-    ELSE IF context.model_hint == "fast":
-      RETURN TIER_1_MODEL
+  # STEP 2: Verifica suggerimenti di routing
+  SE context.model_hint:
+    # Suggerimento esplicito dalla pianificazione (es. "use_best_model")
+    SE context.model_hint == "best":
+      RESTITUISCI TIER_3_MODEL
+    ALTRIMENTI SE context.model_hint == "fast":
+      RESTITUISCI TIER_1_MODEL
 
-  # STEP 3: Route by complexity and other factors
+  # STEP 3: Routing per complessità e altri fattori
 
-  IF complexity == SIMPLE:
-    # Simple tasks → Fast models
+  SE complexity == SIMPLE:
+    # Task semplici → Modelli veloci
 
-    IF task.requires_creativity:
-      # Creative tasks need better models
-      RETURN TIER_2_MODEL
-    ELSE IF task.is_classification:
-      # Classification fine with small model
-      RETURN TIER_1_MODEL
-    ELSE IF task.is_formatting:
-      # Formatting trivial
-      RETURN TIER_1_MODEL
-    ELSE:
-      # Default simple
-      RETURN TIER_1_MODEL
+    SE task.requires_creativity:
+      # Task creativi necessitano modelli migliori
+      RESTITUISCI TIER_2_MODEL
+    ALTRIMENTI SE task.is_classification:
+      # Classificazione va bene con modello piccolo
+      RESTITUISCI TIER_1_MODEL
+    ALTRIMENTI SE task.is_formatting:
+      # Formattazione banale
+      RESTITUISCI TIER_1_MODEL
+    ALTRIMENTI:
+      # Default semplice
+      RESTITUISCI TIER_1_MODEL
 
-  ELSE IF complexity == MODERATE:
-    # Moderate tasks → Medium models mostly
+  ALTRIMENTI SE complexity == MODERATE:
+    # Task moderati → Modelli medi per lo più
 
-    IF task.is_coding AND task.language IN WELL_KNOWN_LANGUAGES:
-      # Common coding task
-      RETURN TIER_2_MODEL
-    ELSE IF task.requires_extensive_reasoning:
-      # Needs thinking → Better model
-      RETURN TIER_3_MODEL
-    ELSE IF task.context_size > TIER_2_CONTEXT_LIMIT:
-      # Too much context for tier 2
-      RETURN TIER_3_MODEL
-    ELSE:
-      # Default moderate
-      RETURN TIER_2_MODEL
+    SE task.is_coding AND task.language IN WELL_KNOWN_LANGUAGES:
+      # Task di coding comune
+      RESTITUISCI TIER_2_MODEL
+    ALTRIMENTI SE task.requires_extensive_reasoning:
+      # Richiede thinking → Modello migliore
+      RESTITUISCI TIER_3_MODEL
+    ALTRIMENTI SE task.context_size > TIER_2_CONTEXT_LIMIT:
+      # Troppo contesto per tier 2
+      RESTITUISCI TIER_3_MODEL
+    ALTRIMENTI:
+      # Default moderato
+      RESTITUISCI TIER_2_MODEL
 
-  ELSE:  # complexity == COMPLEX
-    # Complex tasks → Large models
+  ALTRIMENTI:  # complexity == COMPLEX
+    # Task complessi → Modelli grandi
 
-    IF task.is_novel AND NOT task.has_similar_patterns:
-      # Novel problem needs best model
-      RETURN TIER_3_MODEL
-    ELSE IF task.is_safety_critical:
-      # Safety critical → Use best
-      RETURN TIER_3_MODEL
-    ELSE IF budget_constrained(context):
-      # Budget tight → Try tier 2 first
-      RETURN TIER_2_MODEL_WITH_FALLBACK_TO_TIER_3
-    ELSE:
-      # Default complex
-      RETURN TIER_3_MODEL
+    SE task.is_novel AND NOT task.has_similar_patterns:
+      # Problema nuovo richiede modello migliore
+      RESTITUISCI TIER_3_MODEL
+    ALTRIMENTI SE task.is_safety_critical:
+      # Critico per sicurezza → Usa il migliore
+      RESTITUISCI TIER_3_MODEL
+    ALTRIMENTI SE budget_constrained(context):
+      # Budget stretto → Prova tier 2 prima
+      RESTITUISCI TIER_2_MODEL_WITH_FALLBACK_TO_TIER_3
+    ALTRIMENTI:
+      # Default complesso
+      RESTITUISCI TIER_3_MODEL
 
-Function CLASSIFY_COMPLEXITY(task):
+Funzione CLASSIFY_COMPLEXITY(task):
   score = 0
 
-  # Factor 1: Task type
-  IF task.type IN ["classification", "formatting", "simple_query"]:
+  # Fattore 1: Tipo di task
+  SE task.type IN ["classification", "formatting", "simple_query"]:
     score += 1
-  ELSE IF task.type IN ["coding", "analysis", "planning"]:
+  ALTRIMENTI SE task.type IN ["coding", "analysis", "planning"]:
     score += 2
-  ELSE IF task.type IN ["architecture", "novel_problem", "research"]:
+  ALTRIMENTI SE task.type IN ["architecture", "novel_problem", "research"]:
     score += 3
 
-  # Factor 2: Reasoning depth
-  IF task.requires_multi_step_reasoning:
+  # Fattore 2: Profondità del reasoning
+  SE task.requires_multi_step_reasoning:
     score += 1
-  IF task.requires_abstraction:
+  SE task.requires_abstraction:
     score += 1
-  IF task.requires_creativity:
-    score += 1
-
-  # Factor 3: Context size
-  IF task.context_size > 20K:
+  SE task.requires_creativity:
     score += 1
 
-  # Factor 4: Uncertainty
-  IF task.has_high_uncertainty:
+  # Fattore 3: Dimensione del contesto
+  SE task.context_size > 20K:
     score += 1
 
-  # Classification
-  IF score <= 2:
-    RETURN SIMPLE
-  ELSE IF score <= 5:
-    RETURN MODERATE
-  ELSE:
-    RETURN COMPLEX
+  # Fattore 4: Incertezza
+  SE task.has_high_uncertainty:
+    score += 1
+
+  # Classificazione
+  SE score <= 2:
+    RESTITUISCI SIMPLE
+  ALTRIMENTI SE score <= 5:
+    RESTITUISCI MODERATE
+  ALTRIMENTI:
+    RESTITUISCI COMPLEX
 ```
 
-### 2.4 Model Router Architecture
+### 2.4 Architettura del Model Router
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
@@ -657,169 +662,170 @@ Function CLASSIFY_COMPLEXITY(task):
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  MODEL REGISTRY                                          │ │
-│  │  • Available models and their specs                      │ │
-│  │  • API endpoints and credentials                         │ │
-│  │  • Cost per token, latency profiles                      │ │
-│  │  • Context window sizes                                  │ │
-│  │  • Capability profiles (what each model is good at)     │ │
+│  │  • Modelli disponibili e loro specifiche                 │ │
+│  │  • Endpoint API e credenziali                            │ │
+│  │  • Costo per token, profili di latenza                   │ │
+│  │  • Dimensioni finestre di contesto                       │ │
+│  │  • Profili di capability (cosa fa bene ogni modello)    │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  ROUTING ENGINE                                          │ │
-│  │  • Task complexity classification                        │ │
-│  │  • Model selection logic                                 │ │
-│  │  • Constraint satisfaction (budget, latency)             │ │
-│  │  • Fallback chain definition                            │ │
+│  │  • Classificazione complessità task                      │ │
+│  │  • Logica di selezione modello                           │ │
+│  │  • Soddisfazione vincoli (budget, latenza)               │ │
+│  │  • Definizione catena di fallback                        │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  LOAD BALANCER                                           │ │
-│  │  • Multiple instances per model tier                     │ │
-│  │  • Request distribution                                  │ │
-│  │  • Health checking                                       │ │
-│  │  • Circuit breaking for failing instances               │ │
+│  │  • Istanze multiple per livello di modello               │ │
+│  │  • Distribuzione richieste                               │ │
+│  │  • Controllo stato di salute                             │ │
+│  │  • Circuit breaking per istanze fallite                  │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  INVOCATION LAYER                                        │ │
-│  │  • API client for each model provider                    │ │
-│  │  • Retry logic with exponential backoff                  │ │
-│  │  • Rate limiting (respect API limits)                    │ │
-│  │  • Response parsing and normalization                    │ │
+│  │  • Client API per ogni provider di modello               │ │
+│  │  • Logica di retry con backoff esponenziale              │ │
+│  │  • Rate limiting (rispetta limiti API)                   │ │
+│  │  • Parsing e normalizzazione risposta                    │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  PERFORMANCE TRACKER                                     │ │
-│  │  • Log every model invocation                            │ │
-│  │  • Track: latency, cost, quality (when available)        │ │
-│  │  • Detect performance degradation                        │ │
-│  │  • Generate routing optimization recommendations         │ │
+│  │  • Registra ogni invocazione del modello                 │ │
+│  │  • Traccia: latenza, costo, qualità (quando disponibile) │ │
+│  │  • Rileva degrado delle prestazioni                      │ │
+│  │  • Genera raccomandazioni per ottimizzazione routing     │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.5 Context Window Management
+### 2.5 Gestione della Finestra di Contesto
 
-**Challenge**: Tasks may have context that exceeds model's window.
+**Sfida**: I task possono avere contesto che supera la finestra del modello.
 
-**Strategies**:
+**Strategie**:
 ```
 ┌──────────────────────────────────────────────────────────┐
-│            CONTEXT WINDOW MANAGEMENT                     │
+│       GESTIONE DELLA FINESTRA DI CONTESTO                │
 │                                                          │
-│  STRATEGY 1: MODEL UPGRADE                               │
-│  • If context > current_model.context_limit              │
-│  • Route to model with larger context window             │
-│  • Example: GPT-3.5 (4K) → GPT-4-turbo (128K)           │
-│  • Pro: Simple, no information loss                      │
-│  • Con: More expensive                                   │
+│  STRATEGIA 1: UPGRADE DEL MODELLO                        │
+│  • Se context > current_model.context_limit              │
+│  • Instrada a modello con finestra di contesto più grande│
+│  • Esempio: GPT-3.5 (4K) → GPT-4-turbo (128K)           │
+│  • Pro: Semplice, nessuna perdita di informazioni        │
+│  • Contro: Più costoso                                   │
 │                                                          │
-│  STRATEGY 2: CONTEXT COMPRESSION                         │
-│  • Summarize non-essential parts                         │
-│  • Keep hot context (recent, relevant) intact            │
-│  • Use LLM to generate summary of cold context           │
-│  • Pro: Fits in smaller context window                   │
-│  • Con: Potential information loss                       │
+│  STRATEGIA 2: COMPRESSIONE DEL CONTESTO                  │
+│  • Riassumi parti non essenziali                         │
+│  • Mantieni intatto il contesto caldo (recente,          │
+│    rilevante)                                            │
+│  • Usa LLM per generare riassunto del contesto freddo    │
+│  • Pro: Si adatta a finestra di contesto più piccola     │
+│  • Contro: Potenziale perdita di informazioni            │
 │                                                          │
-│  STRATEGY 3: CONTEXT SPLITTING                           │
-│  • Break task into sub-tasks with smaller context        │
-│  • Process each independently                            │
-│  • Merge results                                         │
-│  • Pro: Can use faster models                            │
-│  • Con: May lose cross-context reasoning                 │
+│  STRATEGIA 3: DIVISIONE DEL CONTESTO                     │
+│  • Dividi task in sub-task con contesto più piccolo      │
+│  • Elabora ciascuno indipendentemente                    │
+│  • Unisci risultati                                      │
+│  • Pro: Può usare modelli più veloci                     │
+│  • Contro: Può perdere reasoning cross-context           │
 │                                                          │
-│  STRATEGY 4: RETRIEVAL-AUGMENTED                         │
-│  • Store full context externally                         │
-│  • Retrieve relevant pieces on-demand                    │
-│  • Include only retrieved context in prompt              │
-│  • Pro: Handles unlimited context size                   │
-│  • Con: Retrieval quality critical                       │
+│  STRATEGIA 4: RETRIEVAL-AUGMENTED                        │
+│  • Memorizza contesto completo esternamente              │
+│  • Recupera pezzi rilevanti on-demand                    │
+│  • Include solo contesto recuperato nel prompt           │
+│  • Pro: Gestisce dimensione contesto illimitata          │
+│  • Contro: Qualità del retrieval critica                 │
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Context Management Algorithm**:
+**Algoritmo di Gestione del Contesto**:
 ```
-Function MANAGE_CONTEXT(task, model):
+Funzione MANAGE_CONTEXT(task, model):
 
   context_size = ESTIMATE_TOKENS(task.context)
 
-  IF context_size <= model.context_window * 0.8:
-    # Fits comfortably (80% threshold for safety margin)
-    RETURN task.context
+  SE context_size <= model.context_window * 0.8:
+    # Si adatta comodamente (soglia 80% per margine di sicurezza)
+    RESTITUISCI task.context
 
-  ELSE IF context_size <= TIER_3_MODEL.context_window * 0.8:
-    # Doesn't fit in current model but fits in larger one
-    # Upgrade model
+  ALTRIMENTI SE context_size <= TIER_3_MODEL.context_window * 0.8:
+    # Non si adatta al modello corrente ma si adatta a uno più grande
+    # Upgrade del modello
     upgraded_model = SELECT_MODEL_WITH_CONTEXT(context_size)
-    RETURN (task.context, upgraded_model)
+    RESTITUISCI (task.context, upgraded_model)
 
-  ELSE:
-    # Doesn't fit even in largest model
-    # Must compress or split
+  ALTRIMENTI:
+    # Non si adatta nemmeno al modello più grande
+    # Deve comprimere o dividere
 
-    IF task.allows_summarization:
-      # Strategy 2: Compress
+    SE task.allows_summarization:
+      # Strategia 2: Comprimi
       compressed_context = COMPRESS_CONTEXT(
         task.context,
         target_size=model.context_window * 0.7
       )
-      RETURN compressed_context
+      RESTITUISCI compressed_context
 
-    ELSE IF task.is_splittable:
-      # Strategy 3: Split
+    ALTRIMENTI SE task.is_splittable:
+      # Strategia 3: Dividi
       subtasks = SPLIT_TASK(task, max_context_size=model.context_window * 0.7)
-      RETURN subtasks  # Will be processed separately
+      RESTITUISCI subtasks  # Saranno elaborati separatamente
 
-    ELSE:
-      # Strategy 4: Retrieval-augmented
+    ALTRIMENTI:
+      # Strategia 4: Retrieval-augmented
       relevant_context = RETRIEVE_RELEVANT_CONTEXT(
         task.query,
         full_context=task.context,
         max_size=model.context_window * 0.7
       )
-      RETURN relevant_context
+      RESTITUISCI relevant_context
 
-Function COMPRESS_CONTEXT(context, target_size):
-  # Identify hot vs cold content
-  hot = IDENTIFY_HOT_CONTENT(context)  # Recent, referenced
+Funzione COMPRESS_CONTEXT(context, target_size):
+  # Identifica contenuto caldo vs freddo
+  hot = IDENTIFY_HOT_CONTENT(context)  # Recente, referenziato
   cold = context - hot
 
   current_size = SIZE(hot)
 
-  IF current_size >= target_size:
-    # Even hot content too large, must summarize aggressively
-    RETURN AGGRESSIVE_SUMMARIZE(hot, target_size)
+  SE current_size >= target_size:
+    # Anche il contenuto caldo è troppo grande, deve riassumere in modo aggressivo
+    RESTITUISCI AGGRESSIVE_SUMMARIZE(hot, target_size)
 
-  # Summarize cold content to fit
+  # Riassumi contenuto freddo per adattarsi
   remaining_budget = target_size - current_size
   cold_summary = SUMMARIZE(cold, max_size=remaining_budget)
 
-  RETURN hot + cold_summary
+  RESTITUISCI hot + cold_summary
 ```
 
-### 2.6 Cost Optimization
+### 2.6 Ottimizzazione dei Costi
 
-**Cost Tracking and Optimization**:
+**Tracking e Ottimizzazione dei Costi**:
 ```
 CostOptimizer {
-  // Budget Management
+  // Gestione Budget
   budget: {
     daily_limit: float,
     per_task_limit: float,
     current_spend_today: float
   },
 
-  // Routing Preferences
+  // Preferenze di Routing
   routing_policy: {
     mode: "MINIMIZE_COST" | "BALANCE" | "MAXIMIZE_QUALITY",
 
-    // For BALANCE mode
+    // Per modalità BALANCE
     cost_weight: float,  // 0-1
     quality_weight: float,  // 0-1
     latency_weight: float  // 0-1
   },
 
-  // Model Cost Profiles
+  // Profili di Costo dei Modelli
   model_costs: {
     model_id: {
       input_cost_per_1k: float,
@@ -829,21 +835,21 @@ CostOptimizer {
   }
 }
 
-Function OPTIMIZE_ROUTING(task, budget_remaining):
+Funzione OPTIMIZE_ROUTING(task, budget_remaining):
 
-  IF budget_remaining < MINIMUM_VIABLE_BUDGET:
-    # Emergency: Use only cheapest model
-    RETURN TIER_1_MODEL
+  SE budget_remaining < MINIMUM_VIABLE_BUDGET:
+    # Emergenza: Usa solo il modello più economico
+    RESTITUISCI TIER_1_MODEL
 
-  # Estimate cost for each viable model
+  # Stima costo per ogni modello praticabile
   viable_models = []
 
-  FOR tier IN [TIER_1, TIER_2, TIER_3]:
+  PER OGNI tier IN [TIER_1, TIER_2, TIER_3]:
     model = GET_MODEL_FOR_TIER(tier)
     estimated_cost = ESTIMATE_COST(task, model)
 
-    IF estimated_cost <= budget_remaining * 0.1:
-      # Use at most 10% of remaining budget per task
+    SE estimated_cost <= budget_remaining * 0.1:
+      # Usa al massimo il 10% del budget rimanente per task
       quality_score = ESTIMATE_QUALITY(task, model)
       viable_models.append({
         model: model,
@@ -851,20 +857,20 @@ Function OPTIMIZE_ROUTING(task, budget_remaining):
         quality: quality_score
       })
 
-  # Select based on policy
-  IF routing_policy.mode == "MINIMIZE_COST":
-    RETURN MIN(viable_models, key=lambda x: x.cost).model
+  # Seleziona in base alla policy
+  SE routing_policy.mode == "MINIMIZE_COST":
+    RESTITUISCI MIN(viable_models, key=lambda x: x.cost).model
 
-  ELSE IF routing_policy.mode == "MAXIMIZE_QUALITY":
-    RETURN MAX(viable_models, key=lambda x: x.quality).model
+  ALTRIMENTI SE routing_policy.mode == "MAXIMIZE_QUALITY":
+    RESTITUISCI MAX(viable_models, key=lambda x: x.quality).model
 
-  ELSE:  # BALANCE mode
-    # Compute weighted score
+  ALTRIMENTI:  # Modalità BALANCE
+    # Calcola score ponderato
     best = None
     best_score = -INF
 
-    FOR candidate IN viable_models:
-      # Normalize cost and quality to [0, 1]
+    PER OGNI candidate IN viable_models:
+      # Normalizza costo e qualità a [0, 1]
       cost_normalized = 1 - (candidate.cost / MAX_COST)
       quality_normalized = candidate.quality
 
@@ -873,196 +879,196 @@ Function OPTIMIZE_ROUTING(task, budget_remaining):
         quality_weight * quality_normalized
       )
 
-      IF score > best_score:
+      SE score > best_score:
         best_score = score
         best = candidate.model
 
-    RETURN best
+    RESTITUISCI best
 
-Function ESTIMATE_COST(task, model):
+Funzione ESTIMATE_COST(task, model):
   input_tokens = ESTIMATE_TOKENS(task.context + task.prompt)
   output_tokens = ESTIMATE_OUTPUT_TOKENS(task)
 
   input_cost = (input_tokens / 1000) * model.input_cost_per_1k
   output_cost = (output_tokens / 1000) * model.output_cost_per_1k
 
-  RETURN input_cost + output_cost + model.minimum_charge
+  RESTITUISCI input_cost + output_cost + model.minimum_charge
 ```
 
-### 2.7 Fallback and Retry Logic
+### 2.7 Logica di Fallback e Retry
 
-**Handling Model Failures**:
+**Gestione dei Fallimenti del Modello**:
 ```
-Function INVOKE_WITH_FALLBACK(task, primary_model):
+Funzione INVOKE_WITH_FALLBACK(task, primary_model):
 
-  # Define fallback chain
+  # Definisci catena di fallback
   fallback_chain = BUILD_FALLBACK_CHAIN(primary_model)
-  # Example: [GPT-4, Claude-Opus, GPT-4-turbo]
+  # Esempio: [GPT-4, Claude-Opus, GPT-4-turbo]
 
-  FOR model IN fallback_chain:
-    TRY:
+  PER OGNI model IN fallback_chain:
+    PROVA:
       result = INVOKE_MODEL(model, task, max_retries=3)
-      RETURN result
+      RESTITUISCI result
 
-    EXCEPT RateLimitError:
-      # Rate limited, try next model
-      LOG_WARNING(f"Rate limited on {model}, trying fallback")
-      CONTINUE
+    ECCETTO RateLimitError:
+      # Rate limited, prova modello successivo
+      LOG_WARNING(f"Rate limited su {model}, provo fallback")
+      CONTINUA
 
-    EXCEPT TimeoutError:
-      # Timeout, try next model
-      LOG_WARNING(f"Timeout on {model}, trying fallback")
-      CONTINUE
+    ECCETTO TimeoutError:
+      # Timeout, prova modello successivo
+      LOG_WARNING(f"Timeout su {model}, provo fallback")
+      CONTINUA
 
-    EXCEPT ModelUnavailable:
-      # Model down, try next model
-      LOG_WARNING(f"{model} unavailable, trying fallback")
-      CONTINUE
+    ECCETTO ModelUnavailable:
+      # Modello non disponibile, prova modello successivo
+      LOG_WARNING(f"{model} non disponibile, provo fallback")
+      CONTINUA
 
-    EXCEPT InvalidRequestError:
-      # Problem with our request, unlikely to work on other model
-      RETURN ERROR(InvalidRequestError)
+    ECCETTO InvalidRequestError:
+      # Problema con la nostra richiesta, improbabile che funzioni su altro modello
+      RESTITUISCI ERROR(InvalidRequestError)
 
-  # All models in chain failed
-  RETURN ERROR("All models failed")
+  # Tutti i modelli nella catena sono falliti
+  RESTITUISCI ERROR("Tutti i modelli sono falliti")
 
-Function INVOKE_MODEL(model, task, max_retries=3):
-  FOR attempt IN RANGE(1, max_retries + 1):
-    TRY:
+Funzione INVOKE_MODEL(model, task, max_retries=3):
+  PER OGNI attempt IN RANGE(1, max_retries + 1):
+    PROVA:
       response = model.api_client.complete(
         prompt=task.prompt,
         context=task.context,
         max_tokens=task.max_output_tokens,
         timeout=model.typical_latency * 3
       )
-      RETURN response
+      RESTITUISCI response
 
-    EXCEPT (NetworkError, TransientError):
-      IF attempt < max_retries:
-        # Retry with exponential backoff
+    ECCETTO (NetworkError, TransientError):
+      SE attempt < max_retries:
+        # Riprova con backoff esponenziale
         wait_time = 2 ** attempt  # 2s, 4s, 8s
         SLEEP(wait_time)
-        CONTINUE
-      ELSE:
-        RAISE
+        CONTINUA
+      ALTRIMENTI:
+        RILANCIA
 
-    EXCEPT NonRetriableError:
-      # Don't retry
-      RAISE
+    ECCETTO NonRetriableError:
+      # Non riprovare
+      RILANCIA
 ```
 
-### 2.8 Model Router Operations
+### 2.8 Operazioni del Model Router
 
 ```
 1. SELECT_MODEL(task, context, constraints)
-   • Classify task complexity
-   • Evaluate constraints (budget, latency)
-   • Apply routing policy
-   • Return selected model
+   • Classifica complessità del task
+   • Valuta vincoli (budget, latenza)
+   • Applica policy di routing
+   • Restituisce modello selezionato
 
 2. INVOKE_MODEL(model_id, prompt, context, parameters)
-   • Load balance across instances
-   • Manage context window
-   • Invoke API
-   • Handle retries
-   • Return response
+   • Bilancia carico tra istanze
+   • Gestisce finestra di contesto
+   • Invoca API
+   • Gestisce retry
+   • Restituisce risposta
 
 3. ESTIMATE_COST(task, model_id)
-   • Estimate token usage
-   • Calculate cost
-   • Return estimate
+   • Stima uso dei token
+   • Calcola costo
+   • Restituisce stima
 
 4. GET_MODEL_INFO(model_id)
-   • Return model specifications
-   • Context window, cost, latency, etc.
+   • Restituisce specifiche del modello
+   • Finestra di contesto, costo, latenza, etc.
 
 5. UPDATE_MODEL_STATS(model_id, invocation_result)
-   • Record latency
-   • Record cost
-   • Update success rate
-   • Detect performance issues
+   • Registra latenza
+   • Registra costo
+   • Aggiorna tasso di successo
+   • Rileva problemi di prestazioni
 
 6. GET_ROUTING_RECOMMENDATIONS()
-   • Analyze routing patterns
-   • Identify optimization opportunities
-   • Return recommendations
+   • Analizza pattern di routing
+   • Identifica opportunità di ottimizzazione
+   • Restituisce raccomandazioni
 
 7. SET_ROUTING_POLICY(policy)
-   • Update routing preferences
-   • Apply new policy to future requests
+   • Aggiorna preferenze di routing
+   • Applica nuova policy alle richieste future
 
 8. CHECK_BUDGET_STATUS()
-   • Return remaining budget
-   • Spending rate
-   • Projected depletion time
+   • Restituisce budget rimanente
+   • Tasso di spesa
+   • Tempo previsto di esaurimento
 ```
 
 ## 3. Safety Verifier
 
-### 3.1 Purpose & Responsibilities
+### 3.1 Scopo e Responsabilità
 
-**Core Function**: Enforce safety bounds su tutte le operazioni dell'agente, implementando bounded emergence framework.
+**Funzione Centrale**: Enforce safety bounds su tutte le operazioni dell'agente, implementando bounded emergence framework.
 
-**Critical Role**: Questo è il layer che previene l'agente da:
+**Ruolo Critico**: Questo è il layer che previene l'agente da:
 - Eseguire azioni non autorizzate
 - Generare output dannosi
 - Violare constraint di sistema
 - Superare limiti di risorse
 - Operare fuori dai bounds definiti
 
-**Responsibilities**:
-1. **Input Validation**: Verify input safety e sanity
-2. **Action Authorization**: Approve/reject action requests
-3. **Output Verification**: Validate output meets requirements
-4. **Bound Enforcement**: Ensure agent operates within defined bounds
-5. **Injection Prevention**: Detect e block injection attacks
-6. **Audit Logging**: Record all safety decisions
+**Responsabilità**:
+1. **Validazione Input**: Verify input safety e sanity
+2. **Autorizzazione Azioni**: Approva/rifiuta richieste di azione
+3. **Verifica Output**: Valida che l'output soddisfi i requisiti
+4. **Applicazione Bounds**: Assicura che l'agente operi entro i bound definiti
+5. **Prevenzione Injection**: Rileva e blocca attacchi injection
+6. **Audit Logging**: Registra tutte le decisioni di sicurezza
 
-### 3.2 Safety Bounds Taxonomy
+### 3.2 Tassonomia dei Safety Bounds
 
-**Five Types of Bounds** (da Bounded Emergence Theory):
+**Cinque Tipi di Bounds** (da Bounded Emergence Theory):
 ```
 ┌──────────────────────────────────────────────────────────┐
 │                    SAFETY BOUNDS                         │
 │                                                          │
 │  1. INPUT BOUNDS                                         │
-│     • What input agent can process                       │
-│     • Schema validation                                  │
-│     • Size limits                                        │
-│     • Content filtering                                  │
-│     • Injection detection                                │
-│     Example: "Input must be valid JSON < 1MB"            │
+│     • Quale input l'agente può processare                │
+│     • Validazione dello schema                           │
+│     • Limiti di dimensione                               │
+│     • Filtraggio dei contenuti                           │
+│     • Rilevamento injection                              │
+│     Esempio: "L'input deve essere JSON valido < 1MB"     │
 │                                                          │
 │  2. OUTPUT BOUNDS                                        │
-│     • What output agent can generate                     │
-│     • Format requirements                                │
-│     • Content policy                                     │
-│     • Quality thresholds                                 │
-│     Example: "Output must be valid Python code"          │
+│     • Quale output l'agente può generare                 │
+│     • Requisiti di formato                               │
+│     • Policy sui contenuti                               │
+│     • Soglie di qualità                                  │
+│     Esempio: "L'output deve essere codice Python valido" │
 │                                                          │
-│  3. ACTION BOUNDS (Most Critical)                        │
-│     • What actions agent can perform                     │
-│     • Tool whitelist                                     │
-│     • Permission system                                  │
-│     • Prohibited operations                              │
-│     Example: "Can read files but not delete"             │
+│  3. ACTION BOUNDS (Più Critici)                          │
+│     • Quali azioni l'agente può eseguire                 │
+│     • Whitelist degli strumenti                          │
+│     • Sistema di permessi                                │
+│     • Operazioni proibite                                │
+│     Esempio: "Può leggere file ma non eliminarli"        │
 │                                                          │
 │  4. SAFETY BOUNDS                                        │
-│     • Hard limits on dangerous operations                │
-│     • Human approval gates                               │
-│     • Irreversible action protection                     │
-│     Example: "Never access production database"          │
+│     • Limiti rigidi su operazioni pericolose             │
+│     • Gate di approvazione umana                         │
+│     • Protezione azioni irreversibili                    │
+│     Esempio: "Non accedere mai al database di produzione"│
 │                                                          │
 │  5. RESOURCE BOUNDS                                      │
-│     • Limits on resource consumption                     │
-│     • Time limits                                        │
-│     • Token/cost budgets                                 │
-│     • Rate limits                                        │
-│     Example: "Max 5 minutes, $1 per task"                │
+│     • Limiti sul consumo di risorse                      │
+│     • Limiti di tempo                                    │
+│     • Budget token/costo                                 │
+│     • Limiti di rate                                     │
+│     Esempio: "Max 5 minuti, $1 per task"                 │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 3.3 Safety Verifier Architecture
+### 3.3 Architettura del Safety Verifier
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
@@ -1070,70 +1076,70 @@ Function INVOKE_MODEL(model, task, max_retries=3):
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  BOUNDS REGISTRY                                         │ │
-│  │  • Store all defined safety bounds                       │ │
-│  │  • Hierarchical structure (global → task-specific)       │ │
-│  │  • Version controlled                                    │ │
+│  │  • Memorizza tutti i safety bounds definiti              │ │
+│  │  • Struttura gerarchica (globale → specifico per task)   │ │
+│  │  • Versionato                                            │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  INPUT VALIDATOR                                         │ │
-│  │  • Schema validation                                     │ │
-│  │  • Injection detection (SQL, command, prompt)            │ │
-│  │  • Content filtering                                     │ │
-│  │  • Size/format checking                                  │ │
+│  │  • Validazione dello schema                              │ │
+│  │  • Rilevamento injection (SQL, command, prompt)          │ │
+│  │  • Filtraggio dei contenuti                              │ │
+│  │  • Verifica dimensione/formato                           │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  ACTION AUTHORIZER                                       │ │
-│  │  • Permission checking                                   │ │
-│  │  • Tool whitelist enforcement                            │ │
-│  │  • Prohibited action detection                           │ │
-│  │  • Human approval routing (for dangerous ops)            │ │
+│  │  • Verifica permessi                                     │ │
+│  │  • Applicazione whitelist degli strumenti                │ │
+│  │  • Rilevamento azioni proibite                           │ │
+│  │  • Routing approvazione umana (per ops pericolose)       │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  OUTPUT VALIDATOR                                        │ │
-│  │  • Format verification                                   │ │
-│  │  • Content policy enforcement                            │ │
-│  │  • Quality checking                                      │ │
-│  │  • Constraint satisfaction verification                  │ │
+│  │  • Verifica del formato                                  │ │
+│  │  • Applicazione policy sui contenuti                     │ │
+│  │  • Verifica della qualità                                │ │
+│  │  • Verifica soddisfazione vincoli                        │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  RESOURCE MONITOR                                        │ │
-│  │  • Track time elapsed                                    │ │
-│  │  • Track cost accumulated                                │ │
-│  │  • Track token usage                                     │ │
-│  │  • Enforce limits, abort if exceeded                     │ │
+│  │  • Traccia tempo trascorso                               │ │
+│  │  • Traccia costo accumulato                              │ │
+│  │  • Traccia uso dei token                                 │ │
+│  │  • Applica limiti, interrompe se superati                │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  AUDIT LOGGER                                            │ │
-│  │  • Log every safety decision                             │ │
-│  │  • Record violations                                     │ │
-│  │  • Traceability for forensics                            │ │
+│  │  • Registra ogni decisione di sicurezza                  │ │
+│  │  • Registra violazioni                                   │ │
+│  │  • Tracciabilità per forensics                           │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 3.4 Input Validation
+### 3.4 Validazione Input
 
-**Multi-Layer Input Validation**:
+**Validazione Input Multi-Layer**:
 ```
-Function VALIDATE_INPUT(input, bounds, context):
+Funzione VALIDATE_INPUT(input, bounds, context):
 
-  # LAYER 1: Schema Validation
-  IF bounds.input_schema:
+  # LAYER 1: Validazione dello Schema
+  SE bounds.input_schema:
     validation_result = VALIDATE_SCHEMA(input, bounds.input_schema)
-    IF NOT validation_result.valid:
-      RETURN REJECT("Schema validation failed", validation_result.errors)
+    SE NON validation_result.valid:
+      RESTITUISCI REJECT("Validazione schema fallita", validation_result.errors)
 
-  # LAYER 2: Size Limits
+  # LAYER 2: Limiti di Dimensione
   input_size = COMPUTE_SIZE(input)
-  IF input_size > bounds.max_input_size:
-    RETURN REJECT(f"Input too large: {input_size} > {bounds.max_input_size}")
+  SE input_size > bounds.max_input_size:
+    RESTITUISCI REJECT(f"Input troppo grande: {input_size} > {bounds.max_input_size}")
 
-  # LAYER 3: Injection Detection
+  # LAYER 3: Rilevamento Injection
   injection_checks = [
     CHECK_SQL_INJECTION(input),
     CHECK_COMMAND_INJECTION(input),
@@ -1141,136 +1147,136 @@ Function VALIDATE_INPUT(input, bounds, context):
     CHECK_PATH_TRAVERSAL(input)
   ]
 
-  FOR check IN injection_checks:
-    IF check.detected:
-      RETURN REJECT(f"Security violation: {check.type}", check.details)
+  PER OGNI check IN injection_checks:
+    SE check.detected:
+      RESTITUISCI REJECT(f"Violazione sicurezza: {check.type}", check.details)
 
-  # LAYER 4: Content Filtering
-  IF bounds.content_policy:
+  # LAYER 4: Filtraggio Contenuti
+  SE bounds.content_policy:
     content_check = CHECK_CONTENT_POLICY(input, bounds.content_policy)
-    IF NOT content_check.passes:
-      RETURN REJECT("Content policy violation", content_check.violations)
+    SE NON content_check.passes:
+      RESTITUISCI REJECT("Violazione policy contenuti", content_check.violations)
 
-  # LAYER 5: Context-Specific Validation
-  IF bounds.custom_validators:
-    FOR validator IN bounds.custom_validators:
+  # LAYER 5: Validazione Specifica per Contesto
+  SE bounds.custom_validators:
+    PER OGNI validator IN bounds.custom_validators:
       result = validator(input, context)
-      IF NOT result.valid:
-        RETURN REJECT(f"Custom validation failed: {validator.name}", result.reason)
+      SE NON result.valid:
+        RESTITUISCI REJECT(f"Validazione custom fallita: {validator.name}", result.reason)
 
-  # All checks passed
-  RETURN ACCEPT()
+  # Tutti i controlli passati
+  RESTITUISCI ACCEPT()
 
-# Injection Detection Functions
+# Funzioni di Rilevamento Injection
 
-Function CHECK_SQL_INJECTION(input):
-  # Detect common SQL injection patterns
+Funzione CHECK_SQL_INJECTION(input):
+  # Rileva pattern comuni di SQL injection
   dangerous_patterns = [
     r"'\s*OR\s+'1'\s*=\s*'1",
     r";\s*DROP\s+TABLE",
     r"UNION\s+SELECT",
-    r"--\s*$",  # SQL comment
-    r"/\*.*\*/"  # SQL block comment
+    r"--\s*$",  # Commento SQL
+    r"/\*.*\*/"  # Commento a blocchi SQL
   ]
 
-  FOR pattern IN dangerous_patterns:
-    IF REGEX_MATCH(pattern, input, case_insensitive=True):
-      RETURN {detected: True, type: "SQL_INJECTION", pattern: pattern}
+  PER OGNI pattern IN dangerous_patterns:
+    SE REGEX_MATCH(pattern, input, case_insensitive=True):
+      RESTITUISCI {detected: True, type: "SQL_INJECTION", pattern: pattern}
 
-  RETURN {detected: False}
+  RESTITUISCI {detected: False}
 
-Function CHECK_COMMAND_INJECTION(input):
-  # Detect shell command injection
+Funzione CHECK_COMMAND_INJECTION(input):
+  # Rileva injection di comandi shell
   dangerous_chars = [";", "|", "&", "$", "`", "\n", "$(", "${"]
   dangerous_commands = ["rm", "dd", "mkfs", "wget", "curl"]
 
-  FOR char IN dangerous_chars:
-    IF char IN input:
-      RETURN {detected: True, type: "COMMAND_INJECTION", char: char}
+  PER OGNI char IN dangerous_chars:
+    SE char IN input:
+      RESTITUISCI {detected: True, type: "COMMAND_INJECTION", char: char}
 
-  FOR cmd IN dangerous_commands:
-    IF cmd IN input.split():
-      RETURN {detected: True, type: "DANGEROUS_COMMAND", command: cmd}
+  PER OGNI cmd IN dangerous_commands:
+    SE cmd IN input.split():
+      RESTITUISCI {detected: True, type: "DANGEROUS_COMMAND", command: cmd}
 
-  RETURN {detected: False}
+  RESTITUISCI {detected: False}
 
-Function CHECK_PROMPT_INJECTION(input):
-  # Detect attempts to manipulate agent via prompt injection
+Funzione CHECK_PROMPT_INJECTION(input):
+  # Rileva tentativi di manipolare l'agente via prompt injection
   injection_indicators = [
-    "ignore previous instructions",
-    "disregard all",
-    "new instructions:",
+    "ignora le istruzioni precedenti",
+    "ignora tutto",
+    "nuove istruzioni:",
     "system:",
-    "admin mode",
-    "override safety"
+    "modalità admin",
+    "sovrascrivi sicurezza"
   ]
 
   input_lower = input.lower()
 
-  FOR indicator IN injection_indicators:
-    IF indicator IN input_lower:
-      RETURN {detected: True, type: "PROMPT_INJECTION", indicator: indicator}
+  PER OGNI indicator IN injection_indicators:
+    SE indicator IN input_lower:
+      RESTITUISCI {detected: True, type: "PROMPT_INJECTION", indicator: indicator}
 
-  RETURN {detected: False}
+  RESTITUISCI {detected: False}
 ```
 
-### 3.5 Action Authorization
+### 3.5 Autorizzazione Azioni
 
-**Permission-Based Authorization**:
+**Autorizzazione Basata su Permessi**:
 ```
 Permission {
   permission_id: string,
-  name: string,  // e.g., "file:read", "file:write", "web:fetch"
+  name: string,  // es. "file:read", "file:write", "web:fetch"
   description: string,
   category: "READ" | "WRITE" | "DELETE" | "EXECUTE" | "ADMIN",
   risk_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL",
   requires_approval: boolean
 }
 
-Function AUTHORIZE_ACTION(action, context):
+Funzione AUTHORIZE_ACTION(action, context):
 
-  # STEP 1: Check if action is explicitly prohibited
-  IF action IN context.bounds.prohibited_actions:
-    RETURN DENY("Action explicitly prohibited", reason="security_policy")
+  # STEP 1: Verifica se l'azione è esplicitamente proibita
+  SE action IN context.bounds.prohibited_actions:
+    RESTITUISCI DENY("Azione esplicitamente proibita", reason="security_policy")
 
-  # STEP 2: Check required permission
+  # STEP 2: Verifica permesso richiesto
   required_permission = action.tool.safety.permission_required
 
-  IF required_permission NOT IN context.available_permissions:
-    RETURN DENY(
-      "Insufficient permissions",
+  SE required_permission NON IN context.available_permissions:
+    RESTITUISCI DENY(
+      "Permessi insufficienti",
       required=required_permission,
       available=context.available_permissions
     )
 
-  # STEP 3: Check if action is dangerous and requires approval
-  IF action.tool.safety.dangerous:
-    IF action.tool.safety.permission_required.requires_approval:
-      IF NOT context.has_human_approval:
-        # Request human approval
+  # STEP 3: Verifica se l'azione è pericolosa e richiede approvazione
+  SE action.tool.safety.dangerous:
+    SE action.tool.safety.permission_required.requires_approval:
+      SE NON context.has_human_approval:
+        # Richiede approvazione umana
         approval = REQUEST_HUMAN_APPROVAL(action, context)
-        IF approval.denied:
-          RETURN DENY("Human approval denied", reason=approval.reason)
-        # If approved, continue
+        SE approval.denied:
+          RESTITUISCI DENY("Approvazione umana negata", reason=approval.reason)
+        # Se approvato, continua
 
-  # STEP 4: Check action-specific constraints
-  IF action.tool.safety.constraints:
-    FOR constraint IN action.tool.safety.constraints:
-      IF NOT EVALUATE_CONSTRAINT(constraint, action, context):
-        RETURN DENY(f"Constraint violation: {constraint.name}")
+  # STEP 4: Verifica vincoli specifici dell'azione
+  SE action.tool.safety.constraints:
+    PER OGNI constraint IN action.tool.safety.constraints:
+      SE NON EVALUATE_CONSTRAINT(constraint, action, context):
+        RESTITUISCI DENY(f"Violazione vincolo: {constraint.name}")
 
-  # STEP 5: Check if action would exceed resource bounds
+  # STEP 5: Verifica se l'azione supererebbe i resource bounds
   estimated_resource_usage = ESTIMATE_RESOURCE_USAGE(action)
-  IF context.resources_used + estimated_resource_usage > context.resource_limits:
-    RETURN DENY("Would exceed resource limits")
+  SE context.resources_used + estimated_resource_usage > context.resource_limits:
+    RESTITUISCI DENY("Supererebbe i limiti di risorse")
 
-  # STEP 6: Log authorization decision
+  # STEP 6: Registra decisione di autorizzazione
   LOG_AUTHORIZATION(action, context, decision="APPROVED")
 
-  RETURN APPROVE()
+  RESTITUISCI APPROVE()
 
-Function REQUEST_HUMAN_APPROVAL(action, context):
-  # Present action to human for approval
+Funzione REQUEST_HUMAN_APPROVAL(action, context):
+  # Presenta azione all'umano per approvazione
   approval_request = {
     action_description: action.description,
     tool: action.tool.name,
@@ -1280,105 +1286,105 @@ Function REQUEST_HUMAN_APPROVAL(action, context):
     reversible: action.tool.safety.reversible
   }
 
-  # Block until human responds
+  # Blocca finché l'umano risponde
   response = PRESENT_TO_HUMAN(approval_request)
 
-  RETURN response  # {approved: boolean, reason: string}
+  RESTITUISCI response  # {approved: boolean, reason: string}
 ```
 
-### 3.6 Output Validation
+### 3.6 Validazione Output
 
-**Multi-Criteria Output Checking**:
+**Verifica Output Multi-Criteri**:
 ```
-Function VALIDATE_OUTPUT(output, expected_schema, success_criteria, bounds):
+Funzione VALIDATE_OUTPUT(output, expected_schema, success_criteria, bounds):
 
-  # LAYER 1: Schema Validation
-  IF expected_schema:
+  # LAYER 1: Validazione dello Schema
+  SE expected_schema:
     schema_result = VALIDATE_SCHEMA(output, expected_schema)
-    IF NOT schema_result.valid:
-      RETURN REJECT("Output schema invalid", schema_result.errors)
+    SE NON schema_result.valid:
+      RESTITUISCI REJECT("Schema output non valido", schema_result.errors)
 
-  # LAYER 2: Success Criteria Verification
-  FOR criterion IN success_criteria:
+  # LAYER 2: Verifica Criteri di Successo
+  PER OGNI criterion IN success_criteria:
     result = VERIFY_CRITERION(output, criterion)
-    IF criterion.required AND NOT result.passed:
-      RETURN REJECT(f"Required criterion not met: {criterion.description}")
+    SE criterion.required AND NON result.passed:
+      RESTITUISCI REJECT(f"Criterio richiesto non soddisfatto: {criterion.description}")
 
-  # LAYER 3: Content Policy
-  IF bounds.output_content_policy:
+  # LAYER 3: Policy sui Contenuti
+  SE bounds.output_content_policy:
     policy_check = CHECK_CONTENT_POLICY(output, bounds.output_content_policy)
-    IF NOT policy_check.passes:
-      RETURN REJECT("Output content policy violation", policy_check.violations)
+    SE NON policy_check.passes:
+      RESTITUISCI REJECT("Violazione policy contenuti output", policy_check.violations)
 
-  # LAYER 4: Safety Checks
+  # LAYER 4: Verifiche di Sicurezza
   safety_checks = [
     CHECK_NO_SECRETS_LEAKED(output),
     CHECK_NO_MALICIOUS_CODE(output),
     CHECK_NO_PII_EXPOSED(output)
   ]
 
-  FOR check IN safety_checks:
-    IF check.failed:
-      RETURN REJECT(f"Safety check failed: {check.name}", check.details)
+  PER OGNI check IN safety_checks:
+    SE check.failed:
+      RESTITUISCI REJECT(f"Verifica sicurezza fallita: {check.name}", check.details)
 
-  # LAYER 5: Quality Thresholds (if specified)
-  IF bounds.min_quality_score:
+  # LAYER 5: Soglie di Qualità (se specificato)
+  SE bounds.min_quality_score:
     quality = ASSESS_OUTPUT_QUALITY(output)
-    IF quality < bounds.min_quality_score:
-      RETURN REJECT(f"Output quality too low: {quality} < {bounds.min_quality_score}")
+    SE quality < bounds.min_quality_score:
+      RESTITUISCI REJECT(f"Qualità output troppo bassa: {quality} < {bounds.min_quality_score}")
 
-  RETURN ACCEPT()
+  RESTITUISCI ACCEPT()
 
-Function CHECK_NO_SECRETS_LEAKED(output):
-  # Detect common secret patterns
+Funzione CHECK_NO_SECRETS_LEAKED(output):
+  # Rileva pattern comuni di segreti
   secret_patterns = [
-    r"(api[_-]?key|apikey)[\s:=]+['\"]\w+['\"]",  # API keys
-    r"(password|passwd|pwd)[\s:=]+['\"]\w+['\"]",  # Passwords
-    r"-----BEGIN (RSA |)PRIVATE KEY-----",  # Private keys
-    r"sk-[A-Za-z0-9]{32,}",  # OpenAI-style secret keys
-    r"ghp_[A-Za-z0-9]{36}",  # GitHub tokens
+    r"(api[_-]?key|apikey)[\s:=]+['\"]\w+['\"]",  # Chiavi API
+    r"(password|passwd|pwd)[\s:=]+['\"]\w+['\"]",  # Password
+    r"-----BEGIN (RSA |)PRIVATE KEY-----",  # Chiavi private
+    r"sk-[A-Za-z0-9]{32,}",  # Chiavi segrete stile OpenAI
+    r"ghp_[A-Za-z0-9]{36}",  # Token GitHub
   ]
 
-  FOR pattern IN secret_patterns:
+  PER OGNI pattern IN secret_patterns:
     matches = REGEX_FINDALL(pattern, output, case_insensitive=True)
-    IF matches:
-      RETURN {failed: True, name: "SecretDetection", details: "Potential secret found"}
+    SE matches:
+      RESTITUISCI {failed: True, name: "SecretDetection", details: "Potenziale segreto trovato"}
 
-  RETURN {failed: False}
+  RESTITUISCI {failed: False}
 
-Function CHECK_NO_MALICIOUS_CODE(output):
-  # If output is code, scan for dangerous patterns
-  IF NOT IS_CODE(output):
-    RETURN {failed: False}
+Funzione CHECK_NO_MALICIOUS_CODE(output):
+  # Se l'output è codice, scansiona per pattern pericolosi
+  SE NON IS_CODE(output):
+    RESTITUISCI {failed: False}
 
   dangerous_code_patterns = [
-    r"eval\s*\(",  # Eval is dangerous
-    r"exec\s*\(",  # Exec is dangerous
-    r"__import__\s*\(",  # Dynamic imports
-    r"subprocess\.",  # Shell execution
-    r"os\.system",  # Shell execution
-    r"rm\s+-rf\s+/",  # Destructive commands
+    r"eval\s*\(",  # Eval è pericoloso
+    r"exec\s*\(",  # Exec è pericoloso
+    r"__import__\s*\(",  # Import dinamici
+    r"subprocess\.",  # Esecuzione shell
+    r"os\.system",  # Esecuzione shell
+    r"rm\s+-rf\s+/",  # Comandi distruttivi
   ]
 
-  FOR pattern IN dangerous_code_patterns:
-    IF REGEX_MATCH(pattern, output):
-      RETURN {
+  PER OGNI pattern IN dangerous_code_patterns:
+    SE REGEX_MATCH(pattern, output):
+      RESTITUISCI {
         failed: True,
         name: "MaliciousCode",
-        details: f"Dangerous pattern detected: {pattern}"
+        details: f"Pattern pericoloso rilevato: {pattern}"
       }
 
-  RETURN {failed: False}
+  RESTITUISCI {failed: False}
 ```
 
-### 3.7 Resource Monitoring
+### 3.7 Monitoraggio Risorse
 
-**Real-Time Resource Tracking**:
+**Tracciamento Risorse in Tempo Reale**:
 ```
 ResourceMonitor {
   limits: {
-    max_time: float,  // seconds
-    max_cost: float,  // dollars
+    max_time: float,  // secondi
+    max_cost: float,  // dollari
     max_tokens: int,
     max_llm_calls: int,
     max_tool_calls: int
@@ -1395,50 +1401,50 @@ ResourceMonitor {
   start_time: datetime
 }
 
-Function MONITOR_RESOURCES(monitor, operation, estimated_cost):
+Funzione MONITOR_RESOURCES(monitor, operation, estimated_cost):
 
-  # Check if operation would exceed any limit
+  # Verifica se l'operazione supererebbe qualsiasi limite
   violations = []
 
-  # Time check
-  IF monitor.current_usage.time_elapsed >= monitor.limits.max_time:
-    violations.append("Time limit exceeded")
+  # Verifica tempo
+  SE monitor.current_usage.time_elapsed >= monitor.limits.max_time:
+    violations.append("Limite tempo superato")
 
-  # Cost check
-  IF monitor.current_usage.cost_accumulated + estimated_cost.cost > monitor.limits.max_cost:
-    violations.append("Cost limit would be exceeded")
+  # Verifica costo
+  SE monitor.current_usage.cost_accumulated + estimated_cost.cost > monitor.limits.max_cost:
+    violations.append("Limite costo verrebbe superato")
 
-  # Token check
-  IF monitor.current_usage.tokens_used + estimated_cost.tokens > monitor.limits.max_tokens:
-    violations.append("Token limit would be exceeded")
+  # Verifica token
+  SE monitor.current_usage.tokens_used + estimated_cost.tokens > monitor.limits.max_tokens:
+    violations.append("Limite token verrebbe superato")
 
-  # Call count checks
-  IF operation.type == "LLM_CALL":
-    IF monitor.current_usage.llm_calls_made >= monitor.limits.max_llm_calls:
-      violations.append("LLM call limit exceeded")
+  # Verifica conteggio chiamate
+  SE operation.type == "LLM_CALL":
+    SE monitor.current_usage.llm_calls_made >= monitor.limits.max_llm_calls:
+      violations.append("Limite chiamate LLM superato")
 
-  IF operation.type == "TOOL_CALL":
-    IF monitor.current_usage.tool_calls_made >= monitor.limits.max_tool_calls:
-      violations.append("Tool call limit exceeded")
+  SE operation.type == "TOOL_CALL":
+    SE monitor.current_usage.tool_calls_made >= monitor.limits.max_tool_calls:
+      violations.append("Limite chiamate tool superato")
 
-  # If any violations, reject operation
-  IF violations:
-    RETURN REJECT("Resource limit violation", violations)
+  # Se ci sono violazioni, rifiuta operazione
+  SE violations:
+    RESTITUISCI REJECT("Violazione limite risorse", violations)
 
-  # Otherwise, approve and update usage
+  # Altrimenti, approva e aggiorna uso
   monitor.current_usage.time_elapsed = (now - monitor.start_time).seconds
   monitor.current_usage.cost_accumulated += estimated_cost.cost
   monitor.current_usage.tokens_used += estimated_cost.tokens
 
-  IF operation.type == "LLM_CALL":
+  SE operation.type == "LLM_CALL":
     monitor.current_usage.llm_calls_made += 1
-  IF operation.type == "TOOL_CALL":
+  SE operation.type == "TOOL_CALL":
     monitor.current_usage.tool_calls_made += 1
 
-  RETURN APPROVE()
+  RESTITUISCI APPROVE()
 
-Function GET_RESOURCE_STATUS(monitor):
-  RETURN {
+Funzione GET_RESOURCE_STATUS(monitor):
+  RESTITUISCI {
     time: {
       used: monitor.current_usage.time_elapsed,
       limit: monitor.limits.max_time,
@@ -1451,33 +1457,33 @@ Function GET_RESOURCE_STATUS(monitor):
       remaining: monitor.limits.max_cost - monitor.current_usage.cost_accumulated,
       percentage: (monitor.current_usage.cost_accumulated / monitor.limits.max_cost) * 100
     },
-    // Similar for tokens, llm_calls, tool_calls
+    // Simile per tokens, llm_calls, tool_calls
   }
 ```
 
 ### 3.8 Audit Logging
 
-**Comprehensive Audit Trail**:
+**Audit Trail Completo**:
 ```
 AuditLog Entry {
   timestamp: datetime,
   event_type: "INPUT_VALIDATION" | "ACTION_AUTHORIZATION" | "OUTPUT_VALIDATION" | "RESOURCE_CHECK",
   decision: "APPROVED" | "REJECTED" | "REQUIRES_APPROVAL",
 
-  // Context
+  // Contesto
   task_id: string,
   execution_phase: string,
 
-  // What was checked
-  subject: {...},  // The thing being validated
+  // Cosa è stato verificato
+  subject: {...},  // La cosa che viene validata
   bounds_applied: [BoundReference],
 
-  // Decision details
+  // Dettagli della decisione
   reason: string,
   violations: [Violation] | null,
   warnings: [Warning] | null,
 
-  // If human approval involved
+  // Se coinvolge approvazione umana
   approval_request_id: string | null,
   human_decision: "APPROVED" | "DENIED" | null,
   human_reason: string | null,
@@ -1487,7 +1493,7 @@ AuditLog Entry {
   rule_version: string
 }
 
-Function LOG_SAFETY_DECISION(event_type, decision, details):
+Funzione LOG_SAFETY_DECISION(event_type, decision, details):
   entry = AuditLogEntry {
     timestamp: NOW(),
     event_type: event_type,
@@ -1495,177 +1501,178 @@ Function LOG_SAFETY_DECISION(event_type, decision, details):
     ...details
   }
 
-  # Write to audit log (append-only, immutable)
+  # Scrivi nell'audit log (append-only, immutabile)
   AUDIT_LOG.append(entry)
 
-  # If rejection or violation, also alert
-  IF decision == "REJECTED":
+  # Se rifiuto o violazione, genera anche alert
+  SE decision == "REJECTED":
     ALERT_SECURITY_TEAM(entry)
 
-  # If human approval required, track
-  IF decision == "REQUIRES_APPROVAL":
+  # Se richiesta approvazione umana, traccia
+  SE decision == "REQUIRES_APPROVAL":
     TRACK_APPROVAL_REQUEST(entry)
 ```
 
-### 3.9 Safety Verifier Operations
+### 3.9 Operazioni del Safety Verifier
 
 ```
 1. VALIDATE_INPUT(input, bounds, context)
-   • Multi-layer validation
-   • Schema, size, injection, content
-   • Return validation result
+   • Validazione multi-layer
+   • Schema, dimensione, injection, contenuto
+   • Restituisce risultato validazione
 
 2. AUTHORIZE_ACTION(action, context)
-   • Permission check
-   • Danger assessment
-   • Human approval if needed
-   • Return authorization decision
+   • Verifica permessi
+   • Valutazione pericolo
+   • Approvazione umana se necessaria
+   • Restituisce decisione autorizzazione
 
 3. VALIDATE_OUTPUT(output, schema, criteria, bounds)
-   • Schema validation
-   • Success criteria check
-   • Safety checks (secrets, malicious code)
-   • Return validation result
+   • Validazione schema
+   • Verifica criteri di successo
+   • Verifiche sicurezza (segreti, codice malevolo)
+   • Restituisce risultato validazione
 
 4. MONITOR_RESOURCES(monitor, operation, estimated_cost)
-   • Check resource limits
-   • Update usage tracking
-   • Abort if limit exceeded
-   • Return approval/rejection
+   • Verifica limiti risorse
+   • Aggiorna tracciamento uso
+   • Interrompe se limite superato
+   • Restituisce approvazione/rifiuto
 
 5. REQUEST_HUMAN_APPROVAL(action, context)
-   • Present to human
-   • Wait for decision
-   • Log decision
-   • Return approval result
+   • Presenta all'umano
+   • Attende decisione
+   • Registra decisione
+   • Restituisce risultato approvazione
 
 6. GET_RESOURCE_STATUS(monitor)
-   • Return current resource usage
-   • Remaining budgets
-   • Percentage utilized
+   • Restituisce uso corrente risorse
+   • Budget rimanenti
+   • Percentuale utilizzata
 
 7. LOG_SAFETY_DECISION(event_type, decision, details)
-   • Create audit log entry
-   • Alert if violation
-   • Track for forensics
+   • Crea voce audit log
+   • Allerta se violazione
+   • Traccia per forensics
 
 8. UPDATE_BOUNDS(bound_updates)
-   • Update safety bounds
-   • Version increment
-   • Validate new bounds
-   • Propagate changes
+   • Aggiorna safety bounds
+   • Incremento versione
+   • Valida nuovi bounds
+   • Propaga modifiche
 
 9. GET_VIOLATIONS(time_range, filters)
-   • Query audit log
-   • Return violations matching criteria
-   • For security analysis
+   • Query sull'audit log
+   • Restituisce violazioni corrispondenti ai criteri
+   • Per analisi sicurezza
 
 10. GENERATE_SAFETY_REPORT(time_range)
-    • Analyze audit logs
-    • Compute statistics
-    • Identify patterns
-    • Return safety health report
+    • Analizza audit log
+    • Calcola statistiche
+    • Identifica pattern
+    • Restituisce report stato sicurezza
 ```
 
-## 4. Capability Layer Integration
+## 4. Integrazione del Capability Layer
 
-### 4.1 Typical Interaction Flow
+### 4.1 Flusso di Interazione Tipico
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│         CAPABILITY LAYER: COMPLETE INTERACTION FLOW            │
+│      CAPABILITY LAYER: FLUSSO DI INTERAZIONE COMPLETO          │
 │                                                                │
-│  Execution Engine: "Need to read file 'data.json'"             │
+│  Execution Engine: "Ho bisogno di leggere file 'data.json'"    │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  STEP 1: Safety Verification (Pre-check)                 │ │
-│  │  • Validate request is safe                              │ │
-│  │  • Check file path for traversal attacks                 │ │
-│  │  • Verify file read permission available                 │ │
-│  │  Decision: APPROVED                                      │ │
+│  │  STEP 1: Verifica Sicurezza (Pre-check)                  │ │
+│  │  • Valida che la richiesta sia sicura                    │ │
+│  │  • Verifica percorso file per attacchi di traversal      │ │
+│  │  • Verifica permesso lettura file disponibile            │ │
+│  │  Decisione: APPROVATO                                    │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  STEP 2: Tool Discovery                                  │ │
-│  │  • Query Tool Registry for "read file" capability        │ │
-│  │  • Get matching tools: [read_file, read_text_file, ...]  │ │
-│  │  • Select best match: read_file                          │ │
+│  │  STEP 2: Scoperta Tool                                   │ │
+│  │  • Query Tool Registry per capability "read file"        │ │
+│  │  • Ottiene tool corrispondenti: [read_file, ...]         │ │
+│  │  • Seleziona miglior match: read_file                    │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  STEP 3: Tool Invocation                                 │ │
-│  │  • Validate parameters against tool schema               │ │
-│  │  • Execute: read_file("data.json")                       │ │
-│  │  • Capture output                                        │ │
-│  │  Result: File contents returned                          │ │
+│  │  STEP 3: Invocazione Tool                                │ │
+│  │  • Valida parametri rispetto allo schema del tool        │ │
+│  │  • Esegue: read_file("data.json")                        │ │
+│  │  • Cattura output                                        │ │
+│  │  Risultato: Contenuto file restituito                    │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  STEP 4: Output Validation                               │ │
-│  │  • Check output is valid JSON                            │ │
-│  │  • Scan for sensitive data                               │ │
-│  │  • Verify meets success criteria                         │ │
-│  │  Decision: APPROVED                                      │ │
+│  │  STEP 4: Validazione Output                              │ │
+│  │  • Verifica che l'output sia JSON valido                 │ │
+│  │  • Scansiona per dati sensibili                          │ │
+│  │  • Verifica che soddisfi criteri di successo             │ │
+│  │  Decisione: APPROVATO                                    │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Return to Execution Engine: File contents (validated)         │
+│  Restituisce a Execution Engine: Contenuto file (validato)     │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Next: "Parse JSON and extract field 'users'"            │ │
-│  │  • LLM reasoning needed → Route to Model Router          │ │
+│  │  Successivo: "Parsa JSON ed estrai campo 'users'"       │ │
+│  │  • Reasoning LLM necessario → Instrada a Model Router    │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  STEP 5: Model Selection                                 │ │
-│  │  • Task: Parse JSON (simple)                             │ │
-│  │  • Complexity: LOW                                       │ │
-│  │  • Route to: TIER_1_MODEL (fast/cheap)                   │ │
+│  │  STEP 5: Selezione Modello                               │ │
+│  │  • Task: Parsa JSON (semplice)                           │ │
+│  │  • Complessità: LOW                                      │ │
+│  │  • Instrada a: TIER_1_MODEL (veloce/economico)           │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  STEP 6: LLM Invocation                                  │ │
-│  │  • Context: File contents                                │ │
-│  │  • Prompt: "Extract 'users' field"                       │ │
-│  │  • Invoke model with retry/fallback                      │ │
-│  │  Result: Extracted users list                            │ │
+│  │  STEP 6: Invocazione LLM                                 │ │
+│  │  • Contesto: Contenuto file                              │ │
+│  │  • Prompt: "Estrai campo 'users'"                        │ │
+│  │  • Invoca modello con retry/fallback                     │ │
+│  │  Risultato: Lista utenti estratta                        │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  STEP 7: Resource Monitoring                             │ │
-│  │  • Update time elapsed                                   │ │
-│  │  • Update cost ($0.001 for LLM call)                     │ │
-│  │  • Update token count                                    │ │
-│  │  • Check all within limits ✓                             │ │
+│  │  STEP 7: Monitoraggio Risorse                            │ │
+│  │  • Aggiorna tempo trascorso                              │ │
+│  │  • Aggiorna costo ($0.001 per chiamata LLM)              │ │
+│  │  • Aggiorna conteggio token                              │ │
+│  │  • Verifica tutti entro limiti ✓                         │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
-│  Return to Execution Engine: Users list (validated, within budget) │
+│  Restituisce a Execution Engine: Lista utenti (validata,       │
+│                                   entro budget)                │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.2 Performance Characteristics
+### 4.2 Caratteristiche di Prestazioni
 
-**Capability Layer Metrics**:
+**Metriche del Capability Layer**:
 ```
 TOOL REGISTRY
-  • Tool lookup: <10ms (cached)
-  • Tool invocation overhead: <50ms
-  • Permission check: <5ms
-  • Total tools supported: 50-200 (typical)
+  • Lookup tool: <10ms (cached)
+  • Overhead invocazione tool: <50ms
+  • Verifica permessi: <5ms
+  • Tool supportati totali: 50-200 (tipico)
 
 MODEL ROUTER
-  • Model selection: <20ms
-  • Model invocation: 1-15s (depends on model tier)
-  • Cost optimization: 5-10x reduction vs always-best-model
-  • Fallback handling: <2s additional latency
+  • Selezione modello: <20ms
+  • Invocazione modello: 1-15s (dipende dal tier del modello)
+  • Ottimizzazione costi: riduzione 5-10x vs sempre-miglior-modello
+  • Gestione fallback: <2s latenza aggiuntiva
 
 SAFETY VERIFIER
-  • Input validation: <50ms
-  • Action authorization: <30ms
-  • Output validation: <100ms
+  • Validazione input: <50ms
+  • Autorizzazione azioni: <30ms
+  • Validazione output: <100ms
   • Audit logging: <10ms (async)
-  • Human approval wait: 30s - 5min (human dependent)
+  • Attesa approvazione umana: 30s - 5min (dipendente dall'umano)
 ```
 
 ---
 
-**Next**: [05-infrastructure.md](05-infrastructure.md) → Observability, Resource Management, Error Handling specifications
+**Prossimo**: [05-infrastructure.md](05-infrastructure.md) → Specifiche di Observability, Resource Management, Error Handling

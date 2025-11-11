@@ -1,132 +1,132 @@
-# Infrastructure Layer: Observability, Resources, and Error Handling
+# Infrastructure Layer: Osservabilità, Risorse e Gestione degli Errori
 
-## Overview
+## Panoramica
 
-L'Infrastructure Layer fornisce i servizi fondazionali che supportano tutti gli altri layer: observability per capire cosa sta accadendo, resource management per controllare consumi, ed error handling per gestire failure in modo robusto.
+L'Infrastructure Layer fornisce i servizi fondazionali che supportano tutti gli altri layer: osservabilità per capire cosa sta accadendo, gestione delle risorse per controllare i consumi, e gestione degli errori per trattare i fallimenti in modo robusto.
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
 │                   INFRASTRUCTURE LAYER                        │
 │                                                               │
 │  ┌─────────────────────────────────────────────────────────┐ │
-│  │  OBSERVABILITY SYSTEM                                   │ │
-│  │  • Structured logging                                   │ │
-│  │  • Metrics collection                                   │ │
-│  │  • Distributed tracing                                  │ │
-│  │  • Real-time monitoring                                 │ │
-│  │  Purpose: Understand system behavior                    │ │
+│  │  SISTEMA DI OSSERVABILITÀ                               │ │
+│  │  • Logging strutturato                                  │ │
+│  │  • Raccolta metriche                                    │ │
+│  │  • Tracciamento distribuito                             │ │
+│  │  • Monitoraggio real-time                               │ │
+│  │  Scopo: Comprendere il comportamento del sistema       │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                          ↕                                    │
 │  ┌─────────────────────────────────────────────────────────┐ │
-│  │  RESOURCE MANAGER                                       │ │
-│  │  • Budget tracking                                      │ │
-│  │  • Quota enforcement                                    │ │
-│  │  • Resource allocation                                  │ │
-│  │  • Optimization recommendations                         │ │
-│  │  Purpose: Control resource consumption                  │ │
+│  │  GESTORE RISORSE                                        │ │
+│  │  • Tracciamento budget                                  │ │
+│  │  • Applicazione quote                                   │ │
+│  │  • Allocazione risorse                                  │ │
+│  │  • Raccomandazioni di ottimizzazione                    │ │
+│  │  Scopo: Controllare il consumo di risorse              │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                          ↕                                    │
 │  ┌─────────────────────────────────────────────────────────┐ │
-│  │  ERROR HANDLER                                          │ │
-│  │  • Error classification                                 │ │
-│  │  • Automatic recovery                                   │ │
-│  │  • Escalation logic                                     │ │
-│  │  • Incident tracking                                    │ │
-│  │  Purpose: Handle failures gracefully                    │ │
+│  │  GESTORE ERRORI                                         │ │
+│  │  • Classificazione errori                               │ │
+│  │  • Recupero automatico                                  │ │
+│  │  • Logica di escalation                                 │ │
+│  │  • Tracciamento incidenti                               │ │
+│  │  Scopo: Gestire i fallimenti con grazia                │ │
 │  └─────────────────────────────────────────────────────────┘ │
 └───────────────────────────────────────────────────────────────┘
 ```
 
-## 1. Observability System
+## 1. Sistema di Osservabilità
 
-### 1.1 Purpose & Responsibilities
+### 1.1 Scopo e Responsabilità
 
-**Core Function**: Rendere il sistema trasparente - capire cosa sta accadendo, perché, e come sta performando.
+**Funzione Principale**: Rendere il sistema trasparente - capire cosa sta accadendo, perché, e come sta performando.
 
-**Three Pillars of Observability**:
-1. **Logs**: Eventi discreti con contesto
-2. **Metrics**: Misurazioni quantitative aggregate
-3. **Traces**: Flusso di esecuzione end-to-end
+**Tre Pilastri dell'Osservabilità**:
+1. **Log**: Eventi discreti con contesto
+2. **Metriche**: Misurazioni quantitative aggregate
+3. **Tracce**: Flusso di esecuzione end-to-end
 
-**Responsibilities**:
-1. **Structured Logging**: Log eventi con metadata strutturato
-2. **Metrics Collection**: Raccogliere metriche performance/business
-3. **Distributed Tracing**: Tracciare richieste attraverso componenti
+**Responsabilità**:
+1. **Logging Strutturato**: Registrare eventi con metadata strutturati
+2. **Raccolta Metriche**: Raccogliere metriche di performance/business
+3. **Tracciamento Distribuito**: Tracciare richieste attraverso componenti
 4. **Alerting**: Notificare anomalie e problemi
-5. **Dashboarding**: Visualizzare stato sistema
-6. **Debugging Support**: Fornire info per troubleshooting
+5. **Dashboarding**: Visualizzare lo stato del sistema
+6. **Supporto Debugging**: Fornire informazioni per troubleshooting
 
-### 1.2 Logging System
+### 1.2 Sistema di Logging
 
-**Structured Logging Architecture**:
+**Architettura Logging Strutturato**:
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                      LOGGING SYSTEM                            │
+│                      SISTEMA DI LOGGING                        │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  LOG PRODUCERS (Ogni componente)                         │ │
+│  │  PRODUTTORI DI LOG (Ogni componente)                     │ │
 │  │  • Cognitive Layer                                       │ │
-│  │  • Memory System                                         │ │
+│  │  • Sistema Memoria                                       │ │
 │  │  • Capability Layer                                      │ │
 │  │  • Infrastructure                                        │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  LOG AGGREGATOR                                          │ │
-│  │  • Collect from all sources                              │ │
-│  │  • Add correlation IDs                                   │ │
-│  │  • Enrich with context                                   │ │
-│  │  • Buffer and batch                                      │ │
+│  │  AGGREGATORE LOG                                         │ │
+│  │  • Raccogliere da tutte le sorgenti                      │ │
+│  │  • Aggiungere ID di correlazione                         │ │
+│  │  • Arricchire con contesto                               │ │
+│  │  • Buffer e batch                                        │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  LOG STORAGE                                             │ │
-│  │  • Time-series optimized                                 │ │
-│  │  • Indexed by: timestamp, level, component, task_id     │ │
-│  │  • Retention: 30 days hot, 1 year cold                  │ │
-│  │  Technology: Elasticsearch, Loki, or CloudWatch         │ │
+│  │  STORAGE LOG                                             │ │
+│  │  • Ottimizzato per serie temporali                       │ │
+│  │  • Indicizzato per: timestamp, level, component, task_id│ │
+│  │  • Retention: 30 giorni hot, 1 anno cold                │ │
+│  │  Tecnologia: Elasticsearch, Loki, o CloudWatch          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  LOG QUERY & ANALYSIS                                    │ │
-│  │  • Full-text search                                      │ │
-│  │  • Filtering and aggregation                             │ │
-│  │  • Pattern detection                                     │ │
-│  │  • Export for analysis                                   │ │
+│  │  QUERY E ANALISI LOG                                     │ │
+│  │  • Ricerca full-text                                     │ │
+│  │  • Filtraggio e aggregazione                             │ │
+│  │  • Rilevamento pattern                                   │ │
+│  │  • Export per analisi                                    │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-**Log Entry Schema**:
+**Schema Entry Log**:
 ```
 LogEntry {
-  // Identification
+  // Identificazione
   timestamp: datetime (ISO 8601, UTC),
   log_id: string (UUID),
 
-  // Categorization
+  // Categorizzazione
   level: "DEBUG" | "INFO" | "WARNING" | "ERROR" | "CRITICAL",
-  component: string,  // e.g., "PlanningEngine", "ModelRouter"
-  event_type: string,  // e.g., "task_started", "tool_invoked"
+  component: string,  // es. "PlanningEngine", "ModelRouter"
+  event_type: string,  // es. "task_started", "tool_invoked"
 
-  // Correlation
+  // Correlazione
   task_id: string,
   session_id: string,
   user_id: string,
-  trace_id: string,  // For distributed tracing
+  trace_id: string,  // Per tracciamento distribuito
   span_id: string,
 
-  // Content
+  // Contenuto
   message: string,
   structured_data: {
-    // Event-specific data
-    // Examples:
-    // - tool_name, parameters for tool invocations
-    // - model_id, tokens_used for LLM calls
-    // - error_code, stack_trace for errors
+    // Dati specifici dell'evento
+    // Esempi:
+    // - tool_name, parameters per invocazioni tool
+    // - model_id, tokens_used per chiamate LLM
+    // - error_code, stack_trace per errori
   },
 
-  // Context
+  // Contesto
   context: {
     execution_phase: string,
     parent_task: string,
@@ -141,143 +141,143 @@ LogEntry {
 }
 ```
 
-**Log Levels and Usage**:
+**Livelli di Log e Utilizzo**:
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                    LOG LEVELS                            │
+│                    LIVELLI DI LOG                        │
 │                                                          │
-│  DEBUG (Development only)                                │
-│  • Detailed diagnostic info                             │
-│  • Variable values, internal state                      │
-│  • Example: "Working memory size: 15234 tokens"         │
-│  → Not in production (too verbose)                      │
+│  DEBUG (Solo sviluppo)                                   │
+│  • Info diagnostiche dettagliate                        │
+│  • Valori variabili, stato interno                      │
+│  • Esempio: "Dimensione working memory: 15234 token"    │
+│  → Non in produzione (troppo verbose)                   │
 │                                                          │
-│  INFO (Normal operations)                                │
-│  • Significant events                                   │
-│  • State transitions                                    │
-│  • Example: "Task T-123 completed successfully"         │
-│  → Production default level                             │
+│  INFO (Operazioni normali)                               │
+│  • Eventi significativi                                 │
+│  • Transizioni di stato                                 │
+│  • Esempio: "Task T-123 completato con successo"        │
+│  → Livello default in produzione                        │
 │                                                          │
-│  WARNING (Potential issues)                              │
-│  • Degraded performance                                 │
-│  • Recoverable errors                                   │
-│  • Example: "Model Router fallback to tier 2"           │
-│  → Investigate if frequent                              │
+│  WARNING (Potenziali problemi)                           │
+│  • Performance degradata                                │
+│  • Errori recuperabili                                  │
+│  • Esempio: "Model Router fallback a tier 2"            │
+│  → Investigare se frequenti                             │
 │                                                          │
-│  ERROR (Failures)                                        │
-│  • Operation failures                                   │
-│  • Unexpected errors                                    │
-│  • Example: "Tool invocation failed: timeout"           │
-│  → Requires investigation                               │
+│  ERROR (Fallimenti)                                      │
+│  • Fallimenti operazioni                                │
+│  • Errori inaspettati                                   │
+│  • Esempio: "Invocazione tool fallita: timeout"         │
+│  → Richiede investigazione                              │
 │                                                          │
-│  CRITICAL (System-level failures)                        │
-│  • Service unavailable                                  │
-│  • Data corruption                                      │
-│  • Example: "Memory system unreachable"                 │
-│  → Immediate action required                            │
+│  CRITICAL (Fallimenti a livello di sistema)              │
+│  • Servizio non disponibile                             │
+│  • Corruzione dati                                      │
+│  • Esempio: "Sistema memoria non raggiungibile"         │
+│  → Azione immediata richiesta                           │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 1.3 Metrics System
+### 1.3 Sistema Metriche
 
-**Metrics Collection Architecture**:
+**Architettura Raccolta Metriche**:
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                     METRICS SYSTEM                             │
+│                     SISTEMA METRICHE                           │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  METRICS INSTRUMENTATION                                 │ │
-│  │  • Counters (increment-only)                             │ │
-│  │  • Gauges (current value)                                │ │
-│  │  • Histograms (distributions)                            │ │
-│  │  • Timers (durations)                                    │ │
+│  │  STRUMENTAZIONE METRICHE                                 │ │
+│  │  • Contatori (solo incremento)                           │ │
+│  │  • Gauge (valore corrente)                               │ │
+│  │  • Istogrammi (distribuzioni)                            │ │
+│  │  • Timer (durate)                                        │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  METRICS AGGREGATOR                                      │ │
-│  │  • Collect from all components                           │ │
-│  │  • Aggregate at 1min, 5min, 1hr intervals               │ │
-│  │  • Compute percentiles (p50, p95, p99)                   │ │
-│  │  • Downsampling for long-term storage                    │ │
+│  │  AGGREGATORE METRICHE                                    │ │
+│  │  • Raccogliere da tutti i componenti                     │ │
+│  │  • Aggregare a intervalli 1min, 5min, 1h                │ │
+│  │  • Calcolare percentili (p50, p95, p99)                  │ │
+│  │  • Downsampling per storage long-term                    │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  TIME-SERIES DATABASE                                    │ │
-│  │  • Store metrics with timestamps                         │ │
-│  │  • Indexed by metric name + labels                       │ │
-│  │  • Retention: 1 week raw, 1 month aggregated, 1 year     │ │
-│  │  Technology: Prometheus, InfluxDB, or CloudWatch         │ │
+│  │  DATABASE TIME-SERIES                                    │ │
+│  │  • Memorizzare metriche con timestamp                    │ │
+│  │  • Indicizzato per nome metrica + etichette              │ │
+│  │  • Retention: 1 settimana raw, 1 mese aggregato, 1 anno │ │
+│  │  Tecnologia: Prometheus, InfluxDB, o CloudWatch          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  DASHBOARDS & ALERTS                                     │ │
-│  │  • Real-time visualization                               │ │
-│  │  • Anomaly detection                                     │ │
-│  │  • Threshold-based alerts                                │ │
-│  │  Technology: Grafana, Datadog, or custom                 │ │
+│  │  DASHBOARD E ALERT                                       │ │
+│  │  • Visualizzazione real-time                             │ │
+│  │  • Rilevamento anomalie                                  │ │
+│  │  • Alert basati su soglie                                │ │
+│  │  Tecnologia: Grafana, Datadog, o custom                  │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-**Key Metrics Categories**:
+**Categorie Metriche Chiave**:
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                   METRIC CATEGORIES                      │
+│                   CATEGORIE METRICHE                     │
 │                                                          │
-│  1. THROUGHPUT METRICS                                   │
-│     • tasks_started (counter)                           │
-│     • tasks_completed (counter)                         │
-│     • tasks_failed (counter)                            │
+│  1. METRICHE THROUGHPUT                                  │
+│     • tasks_started (contatore)                         │
+│     • tasks_completed (contatore)                       │
+│     • tasks_failed (contatore)                          │
 │     • tasks_per_minute (gauge)                          │
-│     Labels: [user_id, task_type, complexity]            │
+│     Etichette: [user_id, task_type, complexity]         │
 │                                                          │
-│  2. LATENCY METRICS                                      │
-│     • task_duration_seconds (histogram)                 │
-│     • goal_analysis_duration (histogram)                │
-│     • planning_duration (histogram)                     │
-│     • execution_duration (histogram)                    │
-│     • reflection_duration (histogram)                   │
-│     Percentiles: p50, p90, p95, p99                     │
+│  2. METRICHE LATENZA                                     │
+│     • task_duration_seconds (istogramma)                │
+│     • goal_analysis_duration (istogramma)               │
+│     • planning_duration (istogramma)                    │
+│     • execution_duration (istogramma)                   │
+│     • reflection_duration (istogramma)                  │
+│     Percentili: p50, p90, p95, p99                      │
 │                                                          │
-│  3. COST METRICS                                         │
-│     • llm_cost_dollars (counter)                        │
-│     • tokens_consumed (counter)                         │
-│     • tool_invocation_cost (counter)                    │
+│  3. METRICHE COSTO                                       │
+│     • llm_cost_dollars (contatore)                      │
+│     • tokens_consumed (contatore)                       │
+│     • tool_invocation_cost (contatore)                  │
 │     • cost_per_task (gauge)                             │
-│     Labels: [model_id, tool_name]                       │
+│     Etichette: [model_id, tool_name]                    │
 │                                                          │
-│  4. QUALITY METRICS                                      │
+│  4. METRICHE QUALITÀ                                     │
 │     • success_rate (gauge)                              │
 │     • verification_pass_rate (gauge)                    │
 │     • human_satisfaction_score (gauge)                  │
 │     • retry_rate (gauge)                                │
 │                                                          │
-│  5. RESOURCE METRICS                                     │
+│  5. METRICHE RISORSE                                     │
 │     • memory_usage_mb (gauge)                           │
 │     • cpu_utilization_percent (gauge)                   │
 │     • active_tasks (gauge)                              │
 │     • queue_depth (gauge)                               │
 │                                                          │
-│  6. COMPONENT METRICS                                    │
-│     • model_router_calls (counter)                      │
-│     • tool_registry_lookups (counter)                   │
-│     • episodic_memory_queries (counter)                 │
-│     • pattern_cache_hits (counter)                      │
-│     • safety_violations (counter)                       │
+│  6. METRICHE COMPONENTI                                  │
+│     • model_router_calls (contatore)                    │
+│     • tool_registry_lookups (contatore)                 │
+│     • episodic_memory_queries (contatore)               │
+│     • pattern_cache_hits (contatore)                    │
+│     • safety_violations (contatore)                     │
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Metric Naming Convention**:
+**Convenzione Naming Metriche**:
 ```
-<component>_<metric>_<unit>
+<componente>_<metrica>_<unità>
 
-Examples:
+Esempi:
 - planning_engine_duration_seconds
 - model_router_cost_dollars
 - safety_verifier_rejections_total
 - memory_system_cache_hit_ratio
 
-Labels for dimensionality:
+Etichette per dimensionalità:
 {
   component="PlanningEngine",
   strategy="HTN",
@@ -286,74 +286,74 @@ Labels for dimensionality:
 }
 ```
 
-### 1.4 Distributed Tracing
+### 1.4 Tracciamento Distribuito
 
-**Tracing Architecture**:
+**Architettura Tracciamento**:
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                   DISTRIBUTED TRACING                          │
+│                   TRACCIAMENTO DISTRIBUITO                     │
 │                                                                │
-│  Request: "User asks: Refactor authentication"                 │
+│  Richiesta: "Utente chiede: Refactoring autenticazione"       │
 │    ↓                                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  TRACE ROOT (Span 1)                                     │ │
-│  │  Operation: handle_task                                  │ │
+│  │  Operazione: handle_task                                 │ │
 │  │  trace_id: abc123                                        │ │
 │  │  span_id: span-1                                         │ │
-│  │  Start: 2024-01-15 10:00:00                              │ │
-│  │  Duration: 245s                                          │ │
+│  │  Inizio: 2024-01-15 10:00:00                             │ │
+│  │  Durata: 245s                                            │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  SPAN 2: Goal Analysis                                   │ │
+│  │  SPAN 2: Analisi Obiettivi                              │ │
 │  │  parent_span: span-1                                     │ │
-│  │  Duration: 18s                                           │ │
-│  │  ├─ SPAN 3: Semantic parsing (5s)                        │ │
-│  │  ├─ SPAN 4: Goal extraction (8s)                         │ │
-│  │  └─ SPAN 5: Complexity classification (3s)               │ │
+│  │  Durata: 18s                                             │ │
+│  │  ├─ SPAN 3: Parsing semantico (5s)                       │ │
+│  │  ├─ SPAN 4: Estrazione goal (8s)                         │ │
+│  │  └─ SPAN 5: Classificazione complessità (3s)             │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  SPAN 6: Planning                                        │ │
-│  │  Duration: 42s                                           │ │
+│  │  SPAN 6: Pianificazione                                  │ │
+│  │  Durata: 42s                                             │ │
 │  │  ├─ SPAN 7: Query pattern cache (2s)                     │ │
-│  │  ├─ SPAN 8: Task decomposition (30s)                     │ │
-│  │  └─ SPAN 9: Dependency analysis (8s)                     │ │
+│  │  ├─ SPAN 8: Decomposizione task (30s)                    │ │
+│  │  └─ SPAN 9: Analisi dipendenze (8s)                      │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  SPAN 10: Execution                                      │ │
-│  │  Duration: 165s                                          │ │
-│  │  ├─ SPAN 11: Subtask 1 execution (35s)                   │ │
-│  │  │  ├─ SPAN 12: LLM call (20s)                           │ │
-│  │  │  └─ SPAN 13: Tool invocation (10s)                    │ │
-│  │  ├─ SPAN 14: Subtask 2 execution (45s)                   │ │
-│  │  └─ ... (more subtasks)                                  │ │
+│  │  SPAN 10: Esecuzione                                     │ │
+│  │  Durata: 165s                                            │ │
+│  │  ├─ SPAN 11: Esecuzione Subtask 1 (35s)                  │ │
+│  │  │  ├─ SPAN 12: Chiamata LLM (20s)                       │ │
+│  │  │  └─ SPAN 13: Invocazione tool (10s)                   │ │
+│  │  ├─ SPAN 14: Esecuzione Subtask 2 (45s)                  │ │
+│  │  └─ ... (altri subtask)                                  │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  SPAN 20: Reflection                                     │ │
-│  │  Duration: 25s (async)                                   │ │
-│  │  ├─ SPAN 21: Episode analysis (8s)                       │ │
-│  │  ├─ SPAN 22: Pattern extraction (12s)                    │ │
-│  │  └─ SPAN 23: Memory update (3s)                          │ │
+│  │  SPAN 20: Riflessione                                    │ │
+│  │  Durata: 25s (asincrono)                                 │ │
+│  │  ├─ SPAN 21: Analisi episodio (8s)                       │ │
+│  │  ├─ SPAN 22: Estrazione pattern (12s)                    │ │
+│  │  └─ SPAN 23: Aggiornamento memoria (3s)                  │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  Visualization: Waterfall chart showing parent-child           │
-│  relationships and timing                                      │
+│  Visualizzazione: Grafico waterfall che mostra relazioni      │
+│  parent-child e timing                                         │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-**Span Schema**:
+**Schema Span**:
 ```
 Span {
-  // Identification
-  trace_id: string,  // Same for entire request
-  span_id: string,   // Unique per span
+  // Identificazione
+  trace_id: string,  // Stesso per l'intera richiesta
+  span_id: string,   // Unico per span
   parent_span_id: string | null,
 
-  // Operation
-  operation_name: string,  // e.g., "PlanningEngine.generate_plan"
+  // Operazione
+  operation_name: string,  // es. "PlanningEngine.generate_plan"
   component: string,
 
   // Timing
@@ -361,16 +361,16 @@ Span {
   end_time: datetime,
   duration_ms: int,
 
-  // Context
+  // Contesto
   tags: {
-    // Key-value pairs for filtering
+    // Coppie chiave-valore per filtraggio
     task_type: string,
     model_id: string,
     user_id: string,
     ...
   },
 
-  // Events within span
+  // Eventi all'interno dello span
   events: [
     {
       timestamp: datetime,
@@ -379,801 +379,808 @@ Span {
     }
   ],
 
-  // Outcome
+  // Esito
   status: "OK" | "ERROR",
   error: Error | null
 }
 ```
 
-**Trace Sampling Strategy**:
+**Strategia Campionamento Tracce**:
 ```
-High Traffic → Cannot trace everything → Sampling
+Traffico Alto → Non si può tracciare tutto → Campionamento
 
-SAMPLING STRATEGIES:
+STRATEGIE DI CAMPIONAMENTO:
 
-1. PROBABILITY-BASED
-   • Sample X% of all traces randomly
-   • Example: 10% sampling
-   • Pro: Statistically representative
-   • Con: May miss rare issues
+1. BASATO SU PROBABILITÀ
+   • Campionare X% di tutte le tracce casualmente
+   • Esempio: 10% campionamento
+   • Pro: Statisticamente rappresentativo
+   • Contro: Potrebbe perdere problemi rari
 
-2. RATE-LIMITED
-   • Sample max N traces per second
-   • Example: 100 traces/sec
-   • Pro: Control storage cost
-   • Con: May lose detail during spikes
+2. LIMITATO PER RATE
+   • Campionare max N tracce al secondo
+   • Esempio: 100 tracce/sec
+   • Pro: Controllo costo storage
+   • Contro: Potrebbe perdere dettagli durante picchi
 
-3. TAIL-BASED (Smart Sampling)
-   • Keep all errors
-   • Keep slow traces (>p95 latency)
-   • Sample others at low rate
-   • Example: 100% errors, 100% >p95, 1% others
-   • Pro: Catch interesting traces
-   • Con: More complex logic
+3. TAIL-BASED (Campionamento Intelligente)
+   • Mantenere tutti gli errori
+   • Mantenere tracce lente (>p95 latenza)
+   • Campionare altre a basso rate
+   • Esempio: 100% errori, 100% >p95, 1% altre
+   • Pro: Catturare tracce interessanti
+   • Contro: Logica più complessa
 
-RECOMMENDED: Tail-based sampling
+RACCOMANDATO: Campionamento tail-based
 ```
 
-### 1.5 Monitoring Dashboards
+### 1.5 Dashboard di Monitoraggio
 
-**System Health Dashboard**:
+**Dashboard Salute Sistema**:
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                  SYSTEM HEALTH DASHBOARD                       │
+│                  DASHBOARD SALUTE SISTEMA                      │
 │                                                                │
 │  ┌────────────────────────┐  ┌────────────────────────────┐   │
-│  │ Tasks/Min: 12.5 ↑      │  │ Success Rate: 89.2% ↓      │   │
-│  │ [====Graph====]        │  │ [====Graph====]            │   │
+│  │ Task/Min: 12.5 ↑       │  │ Tasso Successo: 89.2% ↓    │   │
+│  │ [====Grafico====]      │  │ [====Grafico====]          │   │
 │  └────────────────────────┘  └────────────────────────────┘   │
 │                                                                │
 │  ┌────────────────────────┐  ┌────────────────────────────┐   │
-│  │ P95 Latency: 28.3s ↑   │  │ Cost/Task: $0.18 →         │   │
-│  │ [====Graph====]        │  │ [====Graph====]            │   │
+│  │ P95 Latenza: 28.3s ↑   │  │ Costo/Task: $0.18 →        │   │
+│  │ [====Grafico====]      │  │ [====Grafico====]          │   │
 │  └────────────────────────┘  └────────────────────────────┘   │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Component Health                                         │ │
-│  │ ✅ Cognitive Layer      OK    (avg latency: 85s)        │ │
-│  │ ✅ Memory System        OK    (cache hit: 78%)          │ │
-│  │ ⚠️  Model Router        DEGRADED (fallback rate: 12%)   │ │
-│  │ ✅ Safety Verifier      OK    (violations: 0)           │ │
+│  │ Salute Componenti                                        │ │
+│  │ ✅ Cognitive Layer      OK    (latenza media: 85s)      │ │
+│  │ ✅ Sistema Memoria      OK    (cache hit: 78%)          │ │
+│  │ ⚠️  Model Router        DEGRADATO (tasso fallback: 12%) │ │
+│  │ ✅ Safety Verifier      OK    (violazioni: 0)           │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Active Alerts                                            │ │
-│  │ 🔴 CRITICAL: Model Router fallback rate > 10% (12%)     │ │
-│  │ 🟡 WARNING: Task success rate < 90% (89.2%)             │ │
+│  │ Alert Attivi                                             │ │
+│  │ 🔴 CRITICO: Tasso fallback Model Router > 10% (12%)     │ │
+│  │ 🟡 WARNING: Tasso successo task < 90% (89.2%)           │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Recent Errors (Last 5)                                   │ │
+│  │ Errori Recenti (Ultimi 5)                                │ │
 │  │ • 10:23:15 - Tool timeout: web_search                   │ │
-│  │ • 10:18:42 - Model unavailable: gpt-4 (using fallback)  │ │
-│  │ • 10:12:33 - Safety violation: path traversal attempt   │ │
-│  │ • 10:05:19 - Planning failed: recursion depth exceeded │ │
-│  │ • 09:58:07 - Memory query timeout                       │ │
+│  │ • 10:18:42 - Model non disponibile: gpt-4 (usando       │ │
+│  │              fallback)                                   │ │
+│  │ • 10:12:33 - Violazione safety: tentativo path          │ │
+│  │              traversal                                   │ │
+│  │ • 10:05:19 - Pianificazione fallita: profondità         │ │
+│  │              ricorsione superata                         │ │
+│  │ • 09:58:07 - Query memoria timeout                      │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-**Alert Rules**:
+**Regole Alert**:
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                    ALERT RULES                           │
+│                    REGOLE ALERT                          │
 │                                                          │
-│  CRITICAL (Page immediately)                             │
-│  • Success rate < 70% for 5 minutes                     │
-│  • P95 latency > 5x baseline for 10 minutes             │
-│  • Error rate > 50% for 5 minutes                       │
-│  • Any component completely unavailable                  │
-│  • Safety violations > 10 per minute                     │
+│  CRITICO (Avvisare immediatamente)                       │
+│  • Tasso successo < 70% per 5 minuti                    │
+│  • Latenza P95 > 5x baseline per 10 minuti              │
+│  • Tasso errori > 50% per 5 minuti                      │
+│  • Qualsiasi componente completamente non disponibile    │
+│  • Violazioni safety > 10 al minuto                      │
 │                                                          │
-│  WARNING (Investigate within 1 hour)                     │
-│  • Success rate < 90% for 15 minutes                    │
-│  • P95 latency > 2x baseline for 15 minutes             │
-│  • Cost/task > budget by 50%                            │
-│  • Memory cache hit rate < 50%                          │
-│  • Model router fallback rate > 10%                     │
+│  WARNING (Investigare entro 1 ora)                       │
+│  • Tasso successo < 90% per 15 minuti                   │
+│  • Latenza P95 > 2x baseline per 15 minuti              │
+│  • Costo/task > budget del 50%                          │
+│  • Tasso hit cache memoria < 50%                        │
+│  • Tasso fallback model router > 10%                     │
 │                                                          │
-│  INFO (Monitor)                                          │
-│  • Success rate < 95% for 30 minutes                    │
-│  • Any metric trending outside normal range             │
-│  • New error types appearing                            │
+│  INFO (Monitorare)                                       │
+│  • Tasso successo < 95% per 30 minuti                   │
+│  • Qualsiasi metrica tendente fuori dal range normale   │
+│  • Nuovi tipi di errore che appaiono                    │
 └──────────────────────────────────────────────────────────┘
 ```
 
-## 2. Resource Manager
+## 2. Gestore Risorse
 
-### 2.1 Purpose & Responsibilities
+### 2.1 Scopo e Responsabilità
 
-**Core Function**: Controllare e ottimizzare consumption di risorse (tempo, costo, memoria, compute).
+**Funzione Principale**: Controllare e ottimizzare il consumo di risorse (tempo, costo, memoria, compute).
 
-**Key Insight**: Senza resource management, agent può:
-- Spendere budget intero su singolo task
-- Runare indefinitamente (denial of service)
-- Exhaustare memoria
-- Causare rate limiting su external APIs
+**Insight Chiave**: Senza gestione delle risorse, l'agente può:
+- Spendere l'intero budget su un singolo task
+- Eseguire indefinitamente (denial of service)
+- Esaurire la memoria
+- Causare rate limiting su API esterne
 
-**Responsibilities**:
-1. **Budget Tracking**: Monitor spending contro limiti
-2. **Quota Enforcement**: Enforce per-user, per-task quotas
-3. **Resource Allocation**: Distribute resources ottimalmente
-4. **Throttling**: Limit rate quando necessario
-5. **Optimization**: Suggest improvements per efficiency
+**Responsabilità**:
+1. **Tracciamento Budget**: Monitorare spesa rispetto ai limiti
+2. **Applicazione Quote**: Applicare quote per-utente, per-task
+3. **Allocazione Risorse**: Distribuire risorse ottimalmente
+4. **Throttling**: Limitare il rate quando necessario
+5. **Ottimizzazione**: Suggerire miglioramenti per efficienza
 
-### 2.2 Resource Manager Architecture
+### 2.2 Architettura Gestore Risorse
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    RESOURCE MANAGER                            │
+│                    GESTORE RISORSE                             │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  BUDGET CONTROLLER                                       │ │
-│  │  • Track spending per user/org                           │ │
-│  │  • Enforce limits (daily, monthly, per-task)             │ │
-│  │  • Alert approaching limits                              │ │
+│  │  CONTROLLORE BUDGET                                      │ │
+│  │  • Tracciare spesa per utente/org                        │ │
+│  │  • Applicare limiti (giornalieri, mensili, per-task)     │ │
+│  │  • Alert avvicinamento limiti                            │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  QUOTA MANAGER                                           │ │
-│  │  • Define quotas (requests/min, concurrent tasks)        │ │
-│  │  • Check quota before operation                          │ │
-│  │  • Queue requests if quota exceeded                      │ │
+│  │  GESTORE QUOTE                                           │ │
+│  │  • Definire quote (richieste/min, task concorrenti)      │ │
+│  │  • Verificare quota prima dell'operazione                │ │
+│  │  • Accodare richieste se quota superata                  │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  RESOURCE ALLOCATOR                                      │ │
-│  │  • Prioritize tasks                                      │ │
-│  │  • Allocate compute resources                            │ │
+│  │  ALLOCATORE RISORSE                                      │ │
+│  │  • Prioritizzare task                                    │ │
+│  │  • Allocare risorse compute                              │ │
 │  │  • Load balancing                                        │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  OPTIMIZATION ENGINE                                     │ │
-│  │  • Analyze resource usage patterns                       │ │
-│  │  • Identify waste                                        │ │
-│  │  • Recommend improvements                                │ │
+│  │  MOTORE DI OTTIMIZZAZIONE                                │ │
+│  │  • Analizzare pattern di utilizzo risorse                │ │
+│  │  • Identificare sprechi                                  │ │
+│  │  • Raccomandare miglioramenti                            │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.3 Budget System
+### 2.3 Sistema Budget
 
-**Budget Hierarchy**:
+**Gerarchia Budget**:
 ```
 ┌────────────────────────────────────────────────────────────┐
-│                   BUDGET HIERARCHY                         │
+│                   GERARCHIA BUDGET                         │
 │                                                            │
-│  Organization Budget (Top Level)                           │
-│  └─ $10,000 / month                                        │
+│  Budget Organizzazione (Livello Top)                       │
+│  └─ $10.000 / mese                                         │
 │     │                                                       │
-│     ├─ User Budget (Per User)                              │
-│     │  └─ $500 / month                                     │
+│     ├─ Budget Utente (Per Utente)                          │
+│     │  └─ $500 / mese                                      │
 │     │     │                                                │
-│     │     ├─ Task Budget (Per Task)                        │
-│     │     │  └─ $1.00 / task (soft limit)                  │
-│     │     │     └─ $5.00 / task (hard limit)               │
+│     │     ├─ Budget Task (Per Task)                        │
+│     │     │  └─ $1.00 / task (limite soft)                 │
+│     │     │     └─ $5.00 / task (limite hard)              │
 │     │     │                                                │
-│     │     └─ Daily Budget                                  │
-│     │        └─ $20 / day                                  │
+│     │     └─ Budget Giornaliero                            │
+│     │        └─ $20 / giorno                               │
 │     │                                                       │
-│     └─ Service Budget (By Service Type)                    │
-│        ├─ LLM: $7,000 / month                              │
-│        ├─ Tools: $2,000 / month                            │
-│        └─ Infrastructure: $1,000 / month                   │
+│     └─ Budget Servizio (Per Tipo Servizio)                 │
+│        ├─ LLM: $7.000 / mese                               │
+│        ├─ Tool: $2.000 / mese                              │
+│        └─ Infrastructure: $1.000 / mese                    │
 └────────────────────────────────────────────────────────────┘
 ```
 
-**Budget Enforcement Logic**:
+**Logica Applicazione Budget**:
 ```
-Function CHECK_BUDGET(operation, estimated_cost, context):
+Funzione CHECK_BUDGET(operazione, costo_stimato, contesto):
 
-  # LEVEL 1: Check organization budget
-  org_remaining = org_budget.monthly_limit - org_budget.spent_this_month
-  IF estimated_cost > org_remaining:
-    IF org_budget.allow_overage:
-      LOG_WARNING("Organization budget exceeded, allowing overage")
-    ELSE:
-      RETURN REJECT("Organization budget exhausted")
+  # LIVELLO 1: Verificare budget organizzazione
+  org_rimanente = org_budget.limite_mensile - org_budget.speso_questo_mese
+  SE costo_stimato > org_rimanente:
+    SE org_budget.consenti_eccedenza:
+      LOG_WARNING("Budget organizzazione superato, consentendo eccedenza")
+    ALTRIMENTI:
+      RITORNA RIGETTA("Budget organizzazione esaurito")
 
-  # LEVEL 2: Check user budget
-  user_remaining = user_budget.monthly_limit - user_budget.spent_this_month
-  IF estimated_cost > user_remaining:
-    RETURN REJECT("User monthly budget exhausted")
+  # LIVELLO 2: Verificare budget utente
+  utente_rimanente = utente_budget.limite_mensile - utente_budget.speso_questo_mese
+  SE costo_stimato > utente_rimanente:
+    RITORNA RIGETTA("Budget mensile utente esaurito")
 
-  # LEVEL 3: Check daily budget
-  daily_remaining = user_budget.daily_limit - user_budget.spent_today
-  IF estimated_cost > daily_remaining:
-    RETURN REJECT("Daily budget exhausted, try tomorrow")
+  # LIVELLO 3: Verificare budget giornaliero
+  giornaliero_rimanente = utente_budget.limite_giornaliero - utente_budget.speso_oggi
+  SE costo_stimato > giornaliero_rimanente:
+    RITORNA RIGETTA("Budget giornaliero esaurito, riprova domani")
 
-  # LEVEL 4: Check per-task soft limit
-  IF estimated_cost > task_budget.soft_limit:
-    IF estimated_cost < task_budget.hard_limit:
-      # Request approval to exceed soft limit
-      approval = REQUEST_APPROVAL("Estimated cost ${estimated_cost} exceeds soft limit ${task_budget.soft_limit}")
-      IF NOT approval:
-        RETURN REJECT("Soft limit exceeded, approval denied")
-    ELSE:
-      RETURN REJECT("Hard limit would be exceeded")
+  # LIVELLO 4: Verificare limite soft per-task
+  SE costo_stimato > task_budget.limite_soft:
+    SE costo_stimato < task_budget.limite_hard:
+      # Richiedere approvazione per superare limite soft
+      approvazione = RICHIEDI_APPROVAZIONE("Costo stimato ${costo_stimato} supera limite soft ${task_budget.limite_soft}")
+      SE NON approvazione:
+        RITORNA RIGETTA("Limite soft superato, approvazione negata")
+    ALTRIMENTI:
+      RITORNA RIGETTA("Limite hard verrebbe superato")
 
-  # All checks passed
-  RETURN APPROVE()
+  # Tutti i controlli passati
+  RITORNA APPROVA()
 
-Function RECORD_ACTUAL_COST(task_id, actual_cost):
-  # Update all budget levels
-  org_budget.spent_this_month += actual_cost
-  user_budget.spent_this_month += actual_cost
-  user_budget.spent_today += actual_cost
+Funzione REGISTRA_COSTO_EFFETTIVO(task_id, costo_effettivo):
+  # Aggiornare tutti i livelli di budget
+  org_budget.speso_questo_mese += costo_effettivo
+  utente_budget.speso_questo_mese += costo_effettivo
+  utente_budget.speso_oggi += costo_effettivo
 
-  # If overspent vs estimate, analyze
-  estimate = task_budget.estimates[task_id]
-  IF actual_cost > estimate * 1.5:
-    ANALYZE_OVERSPEND(task_id, estimate, actual_cost)
+  # Se speso più rispetto alla stima, analizzare
+  stima = task_budget.stime[task_id]
+  SE costo_effettivo > stima * 1.5:
+    ANALIZZA_ECCESSO_SPESA(task_id, stima, costo_effettivo)
 ```
 
-### 2.4 Quota System
+### 2.4 Sistema Quote
 
-**Quota Types**:
+**Tipi di Quote**:
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                    QUOTA TYPES                           │
+│                    TIPI DI QUOTE                         │
 │                                                          │
-│  RATE QUOTAS (Requests per time period)                  │
+│  QUOTE RATE (Richieste per periodo di tempo)             │
 │  • tasks_per_minute: 10                                 │
 │  • llm_calls_per_minute: 100                            │
 │  • tool_invocations_per_minute: 50                      │
-│  Purpose: Prevent API rate limiting, DoS                │
+│  Scopo: Prevenire rate limiting API, DoS                │
 │                                                          │
-│  CONCURRENCY QUOTAS (Parallel operations)                │
+│  QUOTE CONCORRENZA (Operazioni parallele)                │
 │  • max_concurrent_tasks: 5                              │
 │  • max_concurrent_llm_calls: 10                         │
-│  Purpose: Prevent resource exhaustion                   │
+│  Scopo: Prevenire esaurimento risorse                   │
 │                                                          │
-│  VOLUME QUOTAS (Total amount)                            │
+│  QUOTE VOLUME (Quantità totale)                          │
 │  • max_tasks_per_day: 1000                              │
 │  • max_tokens_per_month: 10M                            │
-│  Purpose: Prevent abuse, control costs                  │
+│  Scopo: Prevenire abuso, controllare costi             │
 │                                                          │
-│  SIZE QUOTAS (Per-item limits)                           │
+│  QUOTE DIMENSIONE (Limiti per-item)                      │
 │  • max_task_duration: 600s (10 min)                     │
-│  • max_context_size: 200K tokens                        │
+│  • max_context_size: 200K token                         │
 │  • max_output_size: 100KB                               │
-│  Purpose: Prevent runaway operations                    │
+│  Scopo: Prevenire operazioni fuori controllo            │
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Quota Enforcement with Queuing**:
+**Applicazione Quote con Accodamento**:
 ```
-Function ENFORCE_QUOTA(operation_type, user_id):
+Funzione APPLICA_QUOTA(tipo_operazione, user_id):
 
-  quota = GET_QUOTA(operation_type, user_id)
-  current_usage = GET_CURRENT_USAGE(operation_type, user_id)
+  quota = OTTIENI_QUOTA(tipo_operazione, user_id)
+  utilizzo_corrente = OTTIENI_UTILIZZO_CORRENTE(tipo_operazione, user_id)
 
-  IF current_usage < quota.limit:
-    # Under quota, allow immediately
-    INCREMENT_USAGE(operation_type, user_id)
-    RETURN ALLOW()
+  SE utilizzo_corrente < quota.limite:
+    # Sotto quota, consentire immediatamente
+    INCREMENTA_UTILIZZO(tipo_operazione, user_id)
+    RITORNA CONSENTI()
 
-  ELSE:
-    # Quota exceeded
-    IF quota.allow_queueing:
-      # Add to queue, will be processed when quota available
-      queue_position = ENQUEUE(operation, user_id)
-      RETURN QUEUED(position=queue_position, estimated_wait=...)
-    ELSE:
-      # Reject immediately
-      RETURN REJECT("Quota exceeded", retry_after=...)
+  ALTRIMENTI:
+    # Quota superata
+    SE quota.consenti_accodamento:
+      # Aggiungere a coda, sarà processata quando quota disponibile
+      posizione_coda = ACCODA(operazione, user_id)
+      RITORNA ACCODATO(posizione=posizione_coda, attesa_stimata=...)
+    ALTRIMENTI:
+      # Rigettare immediatamente
+      RITORNA RIGETTA("Quota superata", riprova_dopo=...)
 ```
 
-### 2.5 Resource Optimization
+### 2.5 Ottimizzazione Risorse
 
-**Optimization Analyzer**:
+**Analizzatore Ottimizzazione**:
 ```
-Function ANALYZE_RESOURCE_USAGE(time_period):
+Funzione ANALIZZA_UTILIZZO_RISORSE(periodo_tempo):
 
-  tasks = GET_TASKS_IN_PERIOD(time_period)
+  task = OTTIENI_TASK_IN_PERIODO(periodo_tempo)
 
-  # ANALYSIS 1: Cost efficiency
-  cost_analysis = {
-    total_cost: SUM(task.cost for task in tasks),
-    avg_cost_per_task: MEAN(task.cost for task in tasks),
-    cost_by_component: GROUP_BY(tasks, 'component', SUM('cost')),
+  # ANALISI 1: Efficienza costo
+  analisi_costo = {
+    costo_totale: SOMMA(task.costo per task in task),
+    costo_medio_per_task: MEDIA(task.costo per task in task),
+    costo_per_componente: RAGGRUPPA_PER(task, 'componente', SOMMA('costo')),
 
-    # Identify expensive outliers
-    expensive_tasks: tasks WHERE cost > PERCENTILE(tasks.cost, 95),
+    # Identificare outlier costosi
+    task_costosi: task DOVE costo > PERCENTILE(task.costo, 95),
 
-    # Model routing efficiency
-    model_routing_savings: ESTIMATE_SAVINGS_FROM_ROUTING(tasks)
+    # Efficienza routing modello
+    risparmio_routing_modello: STIMA_RISPARMIO_DA_ROUTING(task)
   }
 
-  # ANALYSIS 2: Time efficiency
-  time_analysis = {
-    total_time: SUM(task.duration for task in tasks),
-    avg_time_per_task: MEAN(task.duration for task in tasks),
+  # ANALISI 2: Efficienza tempo
+  analisi_tempo = {
+    tempo_totale: SOMMA(task.durata per task in task),
+    tempo_medio_per_task: MEDIA(task.durata per task in task),
 
-    # Bottlenecks
-    bottlenecks: IDENTIFY_BOTTLENECKS(tasks),
+    # Colli di bottiglia
+    colli_bottiglia: IDENTIFICA_COLLI_BOTTIGLIA(task),
 
-    # Parallelization opportunities missed
-    parallelization_potential: FIND_PARALLELIZATION_OPPORTUNITIES(tasks)
+    # Opportunità parallelizzazione mancate
+    potenziale_parallelizzazione: TROVA_OPPORTUNITA_PARALLELIZZAZIONE(task)
   }
 
-  # ANALYSIS 3: Resource utilization
-  utilization_analysis = {
-    cpu_avg: MEAN(sample.cpu for sample in metrics),
-    memory_avg: MEAN(sample.memory for sample in metrics),
+  # ANALISI 3: Utilizzo risorse
+  analisi_utilizzo = {
+    cpu_media: MEDIA(campione.cpu per campione in metriche),
+    memoria_media: MEDIA(campione.memoria per campione in metriche),
 
-    # Under/over provisioned
-    cpu_utilization_rate: cpu_avg / cpu_allocated,
-    memory_utilization_rate: memory_avg / memory_allocated
+    # Sotto/sovra provisionamento
+    tasso_utilizzo_cpu: cpu_media / cpu_allocata,
+    tasso_utilizzo_memoria: memoria_media / memoria_allocata
   }
 
-  # RECOMMENDATIONS
-  recommendations = GENERATE_RECOMMENDATIONS(
-    cost_analysis,
-    time_analysis,
-    utilization_analysis
+  # RACCOMANDAZIONI
+  raccomandazioni = GENERA_RACCOMANDAZIONI(
+    analisi_costo,
+    analisi_tempo,
+    analisi_utilizzo
   )
 
-  RETURN OptimizationReport {
-    analysis: {...},
-    recommendations: recommendations,
-    potential_savings: ESTIMATE_POTENTIAL_SAVINGS(recommendations)
+  RITORNA ReportOttimizzazione {
+    analisi: {...},
+    raccomandazioni: raccomandazioni,
+    risparmio_potenziale: STIMA_RISPARMIO_POTENZIALE(raccomandazioni)
   }
 
-Function GENERATE_RECOMMENDATIONS(cost_analysis, time_analysis, utilization_analysis):
+Funzione GENERA_RACCOMANDAZIONI(analisi_costo, analisi_tempo, analisi_utilizzo):
 
-  recommendations = []
+  raccomandazioni = []
 
-  # Cost optimization
-  IF model_routing_savings.potential > 0.2:  # 20%+ savings possible
-    recommendations.append({
-      type: "COST_OPTIMIZATION",
-      title: "Improve model routing",
-      description: f"Current routing could save {model_routing_savings.potential:.0%} by using smaller models for simple tasks",
-      potential_savings: "$X/month"
+  # Ottimizzazione costo
+  SE risparmio_routing_modello.potenziale > 0.2:  # 20%+ risparmio possibile
+    raccomandazioni.aggiungi({
+      tipo: "OTTIMIZZAZIONE_COSTO",
+      titolo: "Migliorare routing modello",
+      descrizione: f"Il routing corrente potrebbe risparmiare {risparmio_routing_modello.potenziale:.0%} usando modelli più piccoli per task semplici",
+      risparmio_potenziale: "$X/mese"
     })
 
-  # Time optimization
-  FOR bottleneck IN time_analysis.bottlenecks:
-    recommendations.append({
-      type: "TIME_OPTIMIZATION",
-      title: f"Optimize {bottleneck.component}",
-      description: f"{bottleneck.component} takes {bottleneck.avg_time}s on average, {bottleneck.pct:.0%} of total time",
-      actions: bottleneck.suggested_actions
+  # Ottimizzazione tempo
+  PER collo_bottiglia IN analisi_tempo.colli_bottiglia:
+    raccomandazioni.aggiungi({
+      tipo: "OTTIMIZZAZIONE_TEMPO",
+      titolo: f"Ottimizzare {collo_bottiglia.componente}",
+      descrizione: f"{collo_bottiglia.componente} richiede {collo_bottiglia.tempo_medio}s in media, {collo_bottiglia.pct:.0%} del tempo totale",
+      azioni: collo_bottiglia.azioni_suggerite
     })
 
-  # Resource utilization
-  IF utilization_analysis.cpu_utilization_rate < 0.3:
-    recommendations.append({
-      type: "RESOURCE_OPTIMIZATION",
-      title: "Reduce CPU allocation",
-      description: "CPU utilization is only 30%, can reduce allocation to save costs"
+  # Utilizzo risorse
+  SE analisi_utilizzo.tasso_utilizzo_cpu < 0.3:
+    raccomandazioni.aggiungi({
+      tipo: "OTTIMIZZAZIONE_RISORSE",
+      titolo: "Ridurre allocazione CPU",
+      descrizione: "Utilizzo CPU è solo 30%, è possibile ridurre allocazione per risparmiare costi"
     })
 
-  RETURN recommendations
+  RITORNA raccomandazioni
 ```
 
-## 3. Error Handler
+## 3. Gestore Errori
 
-### 3.1 Purpose & Responsibilities
+### 3.1 Scopo e Responsabilità
 
-**Core Function**: Gestire failures in modo robusto - detect, classify, recover quando possibile, escalate quando necessario.
+**Funzione Principale**: Gestire i fallimenti in modo robusto - rilevare, classificare, recuperare quando possibile, escalare quando necessario.
 
-**Philosophy**: Errors are inevitable. Goal is graceful degradation, not perfect reliability.
+**Filosofia**: Gli errori sono inevitabili. L'obiettivo è la degradazione graduale, non l'affidabilità perfetta.
 
-**Responsibilities**:
-1. **Error Detection**: Catch errors from all components
-2. **Error Classification**: Categorize by type and severity
-3. **Automatic Recovery**: Apply recovery strategies
-4. **Escalation**: Route to human when can't auto-recover
-5. **Learning**: Track error patterns per improve over time
+**Responsabilità**:
+1. **Rilevamento Errori**: Catturare errori da tutti i componenti
+2. **Classificazione Errori**: Categorizzare per tipo e gravità
+3. **Recupero Automatico**: Applicare strategie di recupero
+4. **Escalation**: Instradare a umano quando impossibile auto-recuperare
+5. **Apprendimento**: Tracciare pattern di errori per migliorare nel tempo
 
-### 3.2 Error Handler Architecture
+### 3.2 Architettura Gestore Errori
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                      ERROR HANDLER                             │
+│                      GESTORE ERRORI                            │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  ERROR DETECTION                                         │ │
-│  │  • Exception catching                                    │ │
-│  │  • Health checks                                         │ │
-│  │  • Anomaly detection                                     │ │
+│  │  RILEVAMENTO ERRORI                                      │ │
+│  │  • Cattura eccezioni                                     │ │
+│  │  • Health check                                          │ │
+│  │  • Rilevamento anomalie                                  │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  ERROR CLASSIFIER                                        │ │
-│  │  • Categorize error type                                 │ │
-│  │  • Assess severity                                       │ │
-│  │  • Determine recoverability                              │ │
+│  │  CLASSIFICATORE ERRORI                                   │ │
+│  │  • Categorizzare tipo errore                             │ │
+│  │  • Valutare gravità                                      │ │
+│  │  • Determinare recuperabilità                            │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  RECOVERY ENGINE                                         │ │
-│  │  • Select recovery strategy                              │ │
-│  │  • Execute recovery                                      │ │
-│  │  • Verify recovery success                               │ │
+│  │  MOTORE DI RECUPERO                                      │ │
+│  │  • Selezionare strategia recupero                        │ │
+│  │  • Eseguire recupero                                     │ │
+│  │  • Verificare successo recupero                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  ESCALATION MANAGER                                      │ │
-│  │  • Determine if escalation needed                        │ │
-│  │  • Route to appropriate handler                          │ │
-│  │  • Track until resolution                                │ │
+│  │  GESTORE ESCALATION                                      │ │
+│  │  • Determinare se escalation necessaria                  │ │
+│  │  • Instradare a gestore appropriato                      │ │
+│  │  • Tracciare fino a risoluzione                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  ERROR ANALYTICS                                         │ │
-│  │  • Track error frequencies                               │ │
-│  │  • Identify patterns                                     │ │
-│  │  • Suggest preventions                                   │ │
+│  │  ANALISI ERRORI                                          │ │
+│  │  • Tracciare frequenze errori                            │ │
+│  │  • Identificare pattern                                  │ │
+│  │  • Suggerire prevenzioni                                 │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 3.3 Error Taxonomy
+### 3.3 Tassonomia Errori
 
-**Error Categories**:
+**Categorie Errori**:
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                    ERROR TAXONOMY                            │
+│                    TASSONOMIA ERRORI                         │
 │                                                              │
-│  1. TRANSIENT ERRORS (Temporary, retry may work)             │
-│     • Network timeout                                       │
-│     • Rate limit hit                                        │
-│     • Service temporarily unavailable                       │
-│     • Database connection timeout                           │
-│     Recovery: Retry with exponential backoff                │
+│  1. ERRORI TRANSIENTI (Temporanei, retry può funzionare)    │
+│     • Timeout di rete                                       │
+│     • Limite rate raggiunto                                 │
+│     • Servizio temporaneamente non disponibile              │
+│     • Timeout connessione database                          │
+│     Recupero: Retry con backoff esponenziale                │
 │                                                              │
-│  2. RESOURCE ERRORS (Insufficient resources)                 │
-│     • Budget exhausted                                      │
-│     • Memory limit exceeded                                 │
-│     • Timeout (task too long)                               │
-│     • Context window exceeded                               │
-│     Recovery: Abort, notify user, suggest alternatives      │
+│  2. ERRORI RISORSE (Risorse insufficienti)                  │
+│     • Budget esaurito                                       │
+│     • Limite memoria superato                               │
+│     • Timeout (task troppo lungo)                           │
+│     • Context window superata                               │
+│     Recupero: Interrompere, notificare utente, suggerire    │
+│              alternative                                     │
 │                                                              │
-│  3. LOGIC ERRORS (Internal bugs or assumptions)              │
-│     • Assertion failure                                     │
-│     • Null pointer / undefined variable                     │
-│     • Index out of bounds                                   │
-│     • Type mismatch                                         │
-│     Recovery: Fallback to safe default, escalate            │
+│  3. ERRORI LOGICA (Bug interni o assunzioni)                │
+│     • Fallimento asserzione                                 │
+│     • Puntatore nullo / variabile non definita              │
+│     • Indice fuori limiti                                   │
+│     • Mismatch tipo                                         │
+│     Recupero: Fallback a default sicuro, escalare           │
 │                                                              │
-│  4. INPUT ERRORS (Bad user input)                            │
-│     • Invalid syntax                                        │
-│     • Schema validation failure                             │
-│     • Unsupported operation                                 │
-│     • Conflicting constraints                               │
-│     Recovery: Ask user for clarification                    │
+│  4. ERRORI INPUT (Input utente errato)                      │
+│     • Sintassi invalida                                     │
+│     • Fallimento validazione schema                         │
+│     • Operazione non supportata                             │
+│     • Vincoli in conflitto                                  │
+│     Recupero: Chiedere chiarimenti all'utente               │
 │                                                              │
-│  5. EXTERNAL ERRORS (Third-party failures)                   │
-│     • API unavailable                                       │
-│     • API breaking change                                   │
-│     • Tool execution failure                                │
-│     • Model unavailable                                     │
-│     Recovery: Use fallback, alternative approach            │
+│  5. ERRORI ESTERNI (Fallimenti terze parti)                 │
+│     • API non disponibile                                   │
+│     • Cambio breaking API                                   │
+│     • Fallimento esecuzione tool                            │
+│     • Modello non disponibile                               │
+│     Recupero: Usare fallback, approccio alternativo         │
 │                                                              │
-│  6. SAFETY ERRORS (Security violations)                      │
-│     • Permission denied                                     │
-│     • Safety bound violation                                │
-│     • Injection attempt detected                            │
-│     • Prohibited action requested                           │
-│     Recovery: Reject, log, alert security team              │
+│  6. ERRORI SAFETY (Violazioni sicurezza)                    │
+│     • Permesso negato                                       │
+│     • Violazione limite safety                              │
+│     • Tentativo injection rilevato                          │
+│     • Azione proibita richiesta                             │
+│     Recupero: Rifiutare, loggare, allertare team security   │
 └──────────────────────────────────────────────────────────────┘
 ```
 
-**Error Severity Levels**:
+**Livelli di Gravità Errore**:
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                  ERROR SEVERITY                          │
+│                  GRAVITÀ ERRORE                          │
 │                                                          │
-│  LOW (Degraded but operational)                          │
-│  • Non-critical feature unavailable                     │
-│  • Performance degraded but acceptable                  │
-│  • Example: Pattern cache miss (still works, just slower)│
-│  Action: Log, continue operation                        │
+│  BASSA (Degradato ma operativo)                          │
+│  • Funzionalità non critica non disponibile             │
+│  • Performance degradata ma accettabile                 │
+│  • Esempio: Miss cache pattern (funziona, solo più lento)│
+│  Azione: Loggare, continuare operazione                 │
 │                                                          │
-│  MEDIUM (Partial failure)                                │
-│  • Subtask failed but task can continue                 │
-│  • Non-preferred but acceptable alternative used        │
-│  • Example: Tool timeout, using alternative tool        │
-│  Action: Log, apply recovery, notify if frequent        │
+│  MEDIA (Fallimento parziale)                             │
+│  • Subtask fallito ma task può continuare               │
+│  • Alternativa non preferita ma accettabile usata       │
+│  • Esempio: Tool timeout, usando tool alternativo       │
+│  Azione: Loggare, applicare recupero, notificare se     │
+│          frequente                                       │
 │                                                          │
-│  HIGH (Major failure)                                    │
-│  • Task cannot complete successfully                    │
-│  • User action blocked                                  │
-│  • Example: All model APIs unavailable                  │
-│  Action: Abort task, notify user, escalate              │
+│  ALTA (Fallimento maggiore)                              │
+│  • Task non può completare con successo                 │
+│  • Azione utente bloccata                               │
+│  • Esempio: Tutte le API modello non disponibili        │
+│  Azione: Interrompere task, notificare utente, escalare │
 │                                                          │
-│  CRITICAL (System-level failure)                         │
-│  • Multiple tasks affected                              │
-│  • Core service down                                    │
-│  • Data integrity risk                                  │
-│  • Example: Memory system unreachable                   │
-│  Action: Emergency escalation, may pause new tasks      │
+│  CRITICA (Fallimento a livello di sistema)               │
+│  • Task multipli affetti                                │
+│  • Servizio core down                                   │
+│  • Rischio integrità dati                               │
+│  • Esempio: Sistema memoria non raggiungibile           │
+│  Azione: Escalation emergenza, può mettere in pausa     │
+│          nuovi task                                      │
 └──────────────────────────────────────────────────────────┘
 ```
 
-### 3.4 Recovery Strategies
+### 3.4 Strategie di Recupero
 
-**Recovery Strategy Selection**:
+**Selezione Strategia Recupero**:
 ```
-Function HANDLE_ERROR(error, context):
+Funzione GESTISCI_ERRORE(errore, contesto):
 
-  # STEP 1: Classify error
-  classification = CLASSIFY_ERROR(error)
-  # Returns: {category, severity, recoverability}
+  # PASSO 1: Classificare errore
+  classificazione = CLASSIFICA_ERRORE(errore)
+  # Ritorna: {categoria, gravità, recuperabilità}
 
-  # STEP 2: Select recovery strategy
-  strategy = SELECT_RECOVERY_STRATEGY(classification, context)
+  # PASSO 2: Selezionare strategia recupero
+  strategia = SELEZIONA_STRATEGIA_RECUPERO(classificazione, contesto)
 
-  # STEP 3: Execute recovery
-  TRY:
-    recovery_result = EXECUTE_RECOVERY(strategy, error, context)
+  # PASSO 3: Eseguire recupero
+  PROVA:
+    risultato_recupero = ESEGUI_RECUPERO(strategia, errore, contesto)
 
-    IF recovery_result.success:
-      LOG_INFO(f"Error recovered using {strategy}")
-      RETURN CONTINUE(recovery_result.output)
-    ELSE:
-      # Recovery failed, try escalation
-      RETURN ESCALATE(error, strategy, "Recovery failed")
+    SE risultato_recupero.successo:
+      LOG_INFO(f"Errore recuperato usando {strategia}")
+      RITORNA CONTINUA(risultato_recupero.output)
+    ALTRIMENTI:
+      # Recupero fallito, provare escalation
+      RITORNA ESCALA(errore, strategia, "Recupero fallito")
 
-  EXCEPT RecoveryError as recovery_error:
-    # Recovery itself failed
-    RETURN ESCALATE(error, strategy, f"Recovery error: {recovery_error}")
+  ECCETTO ErroreRecupero come errore_recupero:
+    # Recupero stesso fallito
+    RITORNA ESCALA(errore, strategia, f"Errore recupero: {errore_recupero}")
 
-Function SELECT_RECOVERY_STRATEGY(classification, context):
+Funzione SELEZIONA_STRATEGIA_RECUPERO(classificazione, contesto):
 
-  category = classification.category
-  severity = classification.severity
+  categoria = classificazione.categoria
+  gravità = classificazione.gravità
 
-  # TRANSIENT ERRORS → Retry
-  IF category == "TRANSIENT":
-    IF context.retry_count < MAX_RETRIES:
-      RETURN RetryStrategy(
-        max_attempts=MAX_RETRIES - context.retry_count,
-        backoff=EXPONENTIAL
+  # ERRORI TRANSIENTI → Retry
+  SE categoria == "TRANSIENTE":
+    SE contesto.contatore_retry < MAX_RETRY:
+      RITORNA StrategiaRetry(
+        max_tentativi=MAX_RETRY - contesto.contatore_retry,
+        backoff=ESPONENZIALE
       )
-    ELSE:
-      RETURN EscalateStrategy("Max retries exceeded")
+    ALTRIMENTI:
+      RITORNA StrategiaEscalation("Max retry superati")
 
-  # RESOURCE ERRORS → Abort or optimize
-  ELSE IF category == "RESOURCE":
-    IF error.type == "BUDGET_EXHAUSTED":
-      RETURN AbortStrategy("Budget exhausted, cannot continue")
-    ELSE IF error.type == "CONTEXT_TOO_LARGE":
-      RETURN CompressContextStrategy()
-    ELSE IF error.type == "TIMEOUT":
-      RETURN AbortStrategy("Task taking too long")
+  # ERRORI RISORSE → Interrompere o ottimizzare
+  ALTRIMENTI SE categoria == "RISORSA":
+    SE errore.tipo == "BUDGET_ESAURITO":
+      RITORNA StrategiaInterrompi("Budget esaurito, impossibile continuare")
+    ALTRIMENTI SE errore.tipo == "CONTESTO_TROPPO_GRANDE":
+      RITORNA StrategiaComprimiContesto()
+    ALTRIMENTI SE errore.tipo == "TIMEOUT":
+      RITORNA StrategiaInterrompi("Task richiede troppo tempo")
 
-  # EXTERNAL ERRORS → Fallback
-  ELSE IF category == "EXTERNAL":
-    IF FALLBACK_AVAILABLE(error.component):
-      RETURN FallbackStrategy(
-        fallback=GET_FALLBACK(error.component)
+  # ERRORI ESTERNI → Fallback
+  ALTRIMENTI SE categoria == "ESTERNO":
+    SE FALLBACK_DISPONIBILE(errore.componente):
+      RITORNA StrategiaFallback(
+        fallback=OTTIENI_FALLBACK(errore.componente)
       )
-    ELSE:
-      RETURN EscalateStrategy("No fallback available")
+    ALTRIMENTI:
+      RITORNA StrategiaEscalation("Nessun fallback disponibile")
 
-  # INPUT ERRORS → Ask user
-  ELSE IF category == "INPUT":
-    RETURN AskUserStrategy(
-      question=GENERATE_CLARIFICATION_QUESTION(error)
+  # ERRORI INPUT → Chiedere utente
+  ALTRIMENTI SE categoria == "INPUT":
+    RITORNA StrategiaChiediUtente(
+      domanda=GENERA_DOMANDA_CHIARIMENTO(errore)
     )
 
-  # LOGIC ERRORS → Safe default or escalate
-  ELSE IF category == "LOGIC":
-    IF HAS_SAFE_DEFAULT(error.operation):
-      RETURN SafeDefaultStrategy()
-    ELSE:
-      RETURN EscalateStrategy("Internal error, no safe recovery")
+  # ERRORI LOGICA → Default sicuro o escalare
+  ALTRIMENTI SE categoria == "LOGICA":
+    SE HA_DEFAULT_SICURO(errore.operazione):
+      RITORNA StrategiaDefaultSicuro()
+    ALTRIMENTI:
+      RITORNA StrategiaEscalation("Errore interno, nessun recupero sicuro")
 
-  # SAFETY ERRORS → Reject and escalate
-  ELSE IF category == "SAFETY":
-    RETURN RejectAndEscalateStrategy(
-      reason="Security violation",
-      alert_security=True
+  # ERRORI SAFETY → Rifiutare ed escalare
+  ALTRIMENTI SE categoria == "SAFETY":
+    RITORNA StrategiaRifiutaEEscala(
+      ragione="Violazione sicurezza",
+      allerta_security=Vero
     )
 
-  # Unknown category
-  ELSE:
-    RETURN EscalateStrategy("Unknown error type")
+  # Categoria sconosciuta
+  ALTRIMENTI:
+    RITORNA StrategiaEscalation("Tipo errore sconosciuto")
 ```
 
-**Retry Strategy**:
+**Strategia Retry**:
 ```
-RetryStrategy {
-  max_attempts: int,
-  backoff_type: "EXPONENTIAL" | "LINEAR" | "CONSTANT",
-  base_delay: float,  // seconds
-  max_delay: float,
-  jitter: boolean  // Add randomness to prevent thundering herd
+StrategiaRetry {
+  max_tentativi: int,
+  tipo_backoff: "ESPONENZIALE" | "LINEARE" | "COSTANTE",
+  ritardo_base: float,  // secondi
+  ritardo_max: float,
+  jitter: boolean  // Aggiungere casualità per prevenire thundering herd
 }
 
-Function EXECUTE_RETRY(strategy, operation, context):
+Funzione ESEGUI_RETRY(strategia, operazione, contesto):
 
-  FOR attempt IN RANGE(1, strategy.max_attempts + 1):
+  PER tentativo IN INTERVALLO(1, strategia.max_tentativi + 1):
 
-    TRY:
-      result = EXECUTE(operation, context)
-      RETURN SUCCESS(result)
+    PROVA:
+      risultato = ESEGUI(operazione, contesto)
+      RITORNA SUCCESSO(risultato)
 
-    EXCEPT Error as error:
-      IF attempt == strategy.max_attempts:
-        # Last attempt failed
-        RETURN FAILURE("All retry attempts exhausted")
+    ECCETTO Errore come errore:
+      SE tentativo == strategia.max_tentativi:
+        # Ultimo tentativo fallito
+        RITORNA FALLIMENTO("Tutti i tentativi retry esauriti")
 
-      # Calculate wait time
-      IF strategy.backoff_type == "EXPONENTIAL":
-        wait = MIN(strategy.base_delay * (2 ** attempt), strategy.max_delay)
-      ELSE IF strategy.backoff_type == "LINEAR":
-        wait = MIN(strategy.base_delay * attempt, strategy.max_delay)
-      ELSE:
-        wait = strategy.base_delay
+      # Calcolare tempo di attesa
+      SE strategia.tipo_backoff == "ESPONENZIALE":
+        attesa = MIN(strategia.ritardo_base * (2 ** tentativo), strategia.ritardo_max)
+      ALTRIMENTI SE strategia.tipo_backoff == "LINEARE":
+        attesa = MIN(strategia.ritardo_base * tentativo, strategia.ritardo_max)
+      ALTRIMENTI:
+        attesa = strategia.ritardo_base
 
-      # Add jitter
-      IF strategy.jitter:
-        wait = wait * (0.5 + RANDOM() * 0.5)
+      # Aggiungere jitter
+      SE strategia.jitter:
+        attesa = attesa * (0.5 + CASUALE() * 0.5)
 
-      LOG_INFO(f"Retry attempt {attempt}, waiting {wait}s")
-      SLEEP(wait)
-      # Loop continues to next attempt
+      LOG_INFO(f"Tentativo retry {tentativo}, attesa {attesa}s")
+      DORMI(attesa)
+      # Il ciclo continua al tentativo successivo
 ```
 
-### 3.5 Escalation Management
+### 3.5 Gestione Escalation
 
-**Escalation Decision Tree**:
+**Albero Decisionale Escalation**:
 ```
-Error Occurred
+Errore Verificato
     ↓
-Can recover automatically?
-├─ YES → Apply Recovery
+Può recuperare automaticamente?
+├─ SÌ → Applicare Recupero
 │        ↓
-│        Success?
-│        ├─ YES → Continue (Log for learning)
-│        └─ NO → Escalate
+│        Successo?
+│        ├─ SÌ → Continuare (Loggare per apprendimento)
+│        └─ NO → Escalare
 │
-└─ NO → Assess Severity
+└─ NO → Valutare Gravità
           ↓
-          Severity?
-          ├─ LOW → Log, Continue with degraded functionality
-          ├─ MEDIUM → Log, Notify user of issue
-          ├─ HIGH → Abort task, Notify user, Log incident
-          └─ CRITICAL → Emergency escalation, Alert team
+          Gravità?
+          ├─ BASSA → Loggare, Continuare con funzionalità degradata
+          ├─ MEDIA → Loggare, Notificare utente del problema
+          ├─ ALTA → Interrompere task, Notificare utente, Loggare
+          │         incidente
+          └─ CRITICA → Escalation emergenza, Allertare team
 
-Escalation Paths:
-• User notification (for HIGH severity affecting their task)
-• Engineering team alert (for CRITICAL system issues)
-• Security team alert (for safety violations)
-• Incident creation (for repeated failures)
+Percorsi Escalation:
+• Notifica utente (per gravità ALTA che affetta il loro task)
+• Alert team engineering (per problemi di sistema CRITICI)
+• Alert team security (per violazioni safety)
+• Creazione incidente (per fallimenti ripetuti)
 ```
 
-**Escalation Actions**:
+**Azioni Escalation**:
 ```
-Function ESCALATE(error, context, reason):
+Funzione ESCALA(errore, contesto, ragione):
 
-  severity = error.classification.severity
+  gravità = errore.classificazione.gravità
 
-  # Create incident record
-  incident = Incident {
-    id: GENERATE_ID(),
-    timestamp: NOW(),
-    error: error,
-    context: context,
-    reason: reason,
-    status: "OPEN"
+  # Creare record incidente
+  incidente = Incidente {
+    id: GENERA_ID(),
+    timestamp: ORA(),
+    errore: errore,
+    contesto: contesto,
+    ragione: ragione,
+    stato: "APERTO"
   }
 
-  STORE_INCIDENT(incident)
+  MEMORIZZA_INCIDENTE(incidente)
 
-  # Escalation based on severity
-  IF severity == "CRITICAL":
-    # Immediate action required
-    SEND_ALERT(
-      channel="pager",
-      recipients=ON_CALL_ENGINEERS,
-      message=f"CRITICAL: {error.summary}",
-      incident_id=incident.id
+  # Escalation basata su gravità
+  SE gravità == "CRITICA":
+    # Azione immediata richiesta
+    INVIA_ALERT(
+      canale="pager",
+      destinatari=INGEGNERI_REPERIBILITA,
+      messaggio=f"CRITICO: {errore.sommario}",
+      id_incidente=incidente.id
     )
 
-    # May need to stop accepting new tasks
-    IF error.affects_core_system:
-      SET_SYSTEM_STATUS("DEGRADED")
+    # Potrebbe essere necessario fermare accettazione nuovi task
+    SE errore.affetta_sistema_core:
+      IMPOSTA_STATO_SISTEMA("DEGRADATO")
 
-  ELSE IF severity == "HIGH":
-    # Task failed, notify user
-    NOTIFY_USER(
-      user_id=context.user_id,
-      message=f"Task failed: {error.user_friendly_message}",
-      incident_id=incident.id,
-      retry_possible=error.retry_possible
+  ALTRIMENTI SE gravità == "ALTA":
+    # Task fallito, notificare utente
+    NOTIFICA_UTENTE(
+      user_id=contesto.user_id,
+      messaggio=f"Task fallito: {errore.messaggio_user_friendly}",
+      id_incidente=incidente.id,
+      retry_possibile=errore.retry_possibile
     )
 
-    # Alert engineering team (non-urgent)
-    SEND_ALERT(
-      channel="slack",
-      recipients=ENGINEERING_TEAM,
-      message=f"HIGH severity error: {error.summary}",
-      incident_id=incident.id
+    # Allertare team engineering (non urgente)
+    INVIA_ALERT(
+      canale="slack",
+      destinatari=TEAM_ENGINEERING,
+      messaggio=f"Errore gravità ALTA: {errore.sommario}",
+      id_incidente=incidente.id
     )
 
-  ELSE IF severity == "MEDIUM":
-    # Log and notify user if appropriate
-    NOTIFY_USER(
-      user_id=context.user_id,
-      message=f"Task completed with issues: {error.user_friendly_message}",
-      level="WARNING"
+  ALTRIMENTI SE gravità == "MEDIA":
+    # Loggare e notificare utente se appropriato
+    NOTIFICA_UTENTE(
+      user_id=contesto.user_id,
+      messaggio=f"Task completato con problemi: {errore.messaggio_user_friendly}",
+      livello="WARNING"
     )
 
-  RETURN incident.id
+  RITORNA incidente.id
 ```
 
-### 3.6 Error Analytics
+### 3.6 Analisi Errori
 
-**Error Pattern Detection**:
+**Rilevamento Pattern Errori**:
 ```
-Function ANALYZE_ERROR_PATTERNS(time_window):
+Funzione ANALIZZA_PATTERN_ERRORI(finestra_tempo):
 
-  errors = GET_ERRORS_IN_WINDOW(time_window)
+  errori = OTTIENI_ERRORI_IN_FINESTRA(finestra_tempo)
 
-  # PATTERN 1: Frequency spikes
-  error_rate = len(errors) / time_window.duration
-  baseline_rate = GET_BASELINE_ERROR_RATE()
+  # PATTERN 1: Picchi di frequenza
+  tasso_errori = len(errori) / finestra_tempo.durata
+  tasso_baseline = OTTIENI_TASSO_ERRORI_BASELINE()
 
-  IF error_rate > baseline_rate * 2:
-    ALERT("Error rate spike detected", {
-      current: error_rate,
-      baseline: baseline_rate
+  SE tasso_errori > tasso_baseline * 2:
+    ALERT("Picco tasso errori rilevato", {
+      corrente: tasso_errori,
+      baseline: tasso_baseline
     })
 
-  # PATTERN 2: New error types
-  error_types = SET(error.type for error in errors)
-  known_types = GET_KNOWN_ERROR_TYPES()
-  new_types = error_types - known_types
+  # PATTERN 2: Nuovi tipi di errore
+  tipi_errore = INSIEME(errore.tipo per errore in errori)
+  tipi_conosciuti = OTTIENI_TIPI_ERRORE_CONOSCIUTI()
+  nuovi_tipi = tipi_errore - tipi_conosciuti
 
-  IF new_types:
-    ALERT("New error types detected", {
-      new_types: list(new_types),
-      frequency: {type: COUNT(errors where error.type == type) for type in new_types}
+  SE nuovi_tipi:
+    ALERT("Nuovi tipi errore rilevati", {
+      nuovi_tipi: lista(nuovi_tipi),
+      frequenza: {tipo: CONTA(errori dove errore.tipo == tipo) per tipo in nuovi_tipi}
     })
 
-  # PATTERN 3: Correlated errors
-  # Find errors that tend to occur together
-  correlations = FIND_ERROR_CORRELATIONS(errors)
+  # PATTERN 3: Errori correlati
+  # Trovare errori che tendono a verificarsi insieme
+  correlazioni = TROVA_CORRELAZIONI_ERRORI(errori)
 
-  FOR correlation IN correlations WHERE correlation.significance > THRESHOLD:
-    ALERT("Error correlation detected", {
-      error_A: correlation.type_A,
-      error_B: correlation.type_B,
-      correlation: correlation.coefficient,
-      # May indicate common root cause
+  PER correlazione IN correlazioni DOVE correlazione.significatività > SOGLIA:
+    ALERT("Correlazione errori rilevata", {
+      errore_A: correlazione.tipo_A,
+      errore_B: correlazione.tipo_B,
+      correlazione: correlazione.coefficiente,
+      # Può indicare causa radice comune
     })
 
-  # PATTERN 4: Cascading failures
-  # Errors that trigger other errors
-  cascades = FIND_ERROR_CASCADES(errors)
+  # PATTERN 4: Fallimenti a cascata
+  # Errori che innescano altri errori
+  cascate = TROVA_CASCATE_ERRORI(errori)
 
-  FOR cascade IN cascades:
-    ALERT("Cascading failure detected", {
-      trigger: cascade.initial_error,
-      caused: cascade.subsequent_errors,
-      # Need to fix root cause
+  PER cascata IN cascate:
+    ALERT("Fallimento a cascata rilevato", {
+      trigger: cascata.errore_iniziale,
+      causati: cascata.errori_successivi,
+      # Necessario risolvere causa radice
     })
 
-  # PATTERN 5: User-specific patterns
-  user_error_distribution = GROUP_BY(errors, 'user_id')
+  # PATTERN 5: Pattern specifici utente
+  distribuzione_errori_utente = RAGGRUPPA_PER(errori, 'user_id')
 
-  FOR user_id, user_errors IN user_error_distribution:
-    IF len(user_errors) > PERCENTILE(error_counts, 95):
-      INVESTIGATE("User experiencing high error rate", {
+  PER user_id, errori_utente IN distribuzione_errori_utente:
+    SE len(errori_utente) > PERCENTILE(conteggi_errori, 95):
+      INVESTIGA("Utente sta sperimentando alto tasso errori", {
         user_id: user_id,
-        error_count: len(user_errors),
-        common_error_types: MOST_COMMON(user_errors, key='type')
-        # May be user-specific issue or abuse
+        conteggio_errori: len(errori_utente),
+        tipi_errore_comuni: PIÙ_COMUNI(errori_utente, chiave='tipo')
+        # Può essere problema specifico utente o abuso
       })
 ```
 
 ---
 
-**Next**: [06-data-flows.md](06-data-flows.md) → Detailed interaction patterns and data transformations
+**Prossimo**: [06-data-flows.md](06-data-flows.md) → Pattern di interazione dettagliati e trasformazioni dati

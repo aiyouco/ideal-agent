@@ -3284,73 +3284,73 @@ ReflectionInsights {
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 5.2 Cognitive Layer Characteristics
+### 5.2 Caratteristiche del Cognitive Layer
 
-**Key Properties**:
+**Proprietà Chiave**:
 ```
-MODULARITY
-  • Each component has clear responsibility
-  • Clean interfaces between components
-  • Components can be improved independently
+MODULARITÀ
+  • Ogni componente ha responsabilità chiare
+  • Interfacce pulite tra componenti
+  • Componenti migliorabili indipendentemente
 
 BOUNDED EMERGENCE
-  • LLM reasoning within structured framework
-  • Explicit validation at each stage
-  • Safety bounds enforced throughout
+  • Reasoning LLM entro framework strutturato
+  • Validazione esplicita ad ogni stadio
+  • Bounds di sicurezza enforced ovunque
 
-LEARNING & ADAPTATION
-  • Learns from every execution
-  • Adapts strategies based on experience
-  • Builds reusable knowledge over time
+APPRENDIMENTO & ADATTAMENTO
+  • Apprende da ogni esecuzione
+  • Adatta strategie basate sull'esperienza
+  • Costruisce conoscenza riusabile nel tempo
 
-TRANSPARENCY
-  • Complete execution traces
-  • Explicit reasoning captured
-  • Decisions explainable
+TRASPARENZA
+  • Trace di esecuzione complete
+  • Reasoning esplicito catturato
+  • Decisioni spiegabili
 
-ROBUSTNESS
-  • Multiple validation layers
-  • Graceful degradation
-  • Automatic error recovery where possible
+ROBUSTEZZA
+  • Multipli layer di validazione
+  • Degradazione graduale
+  • Recovery automatico da errori quando possibile
 ```
 
-### 5.3 Performance Characteristics
+### 5.3 Caratteristiche di Performance
 
-**Latency Breakdown** (typical complex task):
+**Breakdown Latenza** (task complesso tipico):
 ```
-Goal Analysis:     15-30s  (10-15%)
-Planning:          30-60s  (20-30%)
-Execution:        120-240s (50-70%)
+Analisi Goal:      15-30s  (10-15%)
+Pianificazione:    30-60s  (20-30%)
+Esecuzione:       120-240s (50-70%)
 Reflection:        20-40s  (10-15%)
 ────────────────────────────────
-Total:            185-370s
+Totale:           185-370s
 
-Note: Reflection is often asynchronous,
-      not blocking user-facing response
+Nota: Reflection è spesso asincrona,
+      non blocca risposta utente
 ```
 
-**Resource Usage**:
+**Utilizzo Risorse**:
 ```
-Tokens:
-  • Goal Analysis: 5-10K
-  • Planning: 10-20K
-  • Execution: 40-80K (varies by task)
+Token:
+  • Analisi Goal: 5-10K
+  • Pianificazione: 10-20K
+  • Esecuzione: 40-80K (varia per task)
   • Reflection: 8-15K
-  Total: 63-125K tokens per complex task
+  Totale: 63-125K token per task complesso
 
-LLM Calls:
-  • Goal Analysis: 2-3
-  • Planning: 3-5
-  • Execution: 10-30 (task dependent)
+Chiamate LLM:
+  • Analisi Goal: 2-3
+  • Pianificazione: 3-5
+  • Esecuzione: 10-30 (dipende da task)
   • Reflection: 2-4
-  Total: 17-42 calls per complex task
+  Totale: 17-42 chiamate per task complesso
 
-Cost:
-  • $0.15-0.35 per complex task (model dependent)
+Costo:
+  • $0.15-0.35 per task complesso (dipende da modello)
 ```
 
 ---
 
-**Next**: [03-memory-system.md](03-memory-system.md) → Detailed specifications of memory architecture
+**Prossimo**: [03-memory-system.md](03-memory-system.md) → Specifiche dettagliate dell'architettura di memoria
 
 

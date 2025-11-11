@@ -1,215 +1,215 @@
-# Deployment Guide: Production Operations
+# Guida al Deployment: Operazioni in Produzione
 
-## Overview
+## Panoramica
 
-Questo documento fornisce guidance per deployare e operare il Reflective Adaptive Agent in production, coprendo deployment models, scaling strategies, monitoring, e operational best practices.
+Questo documento fornisce una guida per il deployment e l'operatività del Reflective Adaptive Agent in produzione, coprendo modelli di deployment, strategie di scaling, monitoraggio e best practice operazionali.
 
-## 1. Deployment Models
+## 1. Modelli di Deployment
 
-### 1.1 Deployment Architectures
+### 1.1 Architetture di Deployment
 
-**Three Primary Deployment Models**:
+**Tre Modelli Principali di Deployment**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│              DEPLOYMENT MODEL COMPARISON                       │
+│           COMPARAZIONE MODELLI DI DEPLOYMENT                   │
 │                                                                │
-│  Model 1: SINGLE-TENANT (One instance per customer)            │
+│  Modello 1: SINGLE-TENANT (Un'istanza per cliente)            │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Customer A          Customer B          Customer C       │ │
+│  │  Cliente A          Cliente B          Cliente C         │ │
 │  │  ┌──────────┐       ┌──────────┐       ┌──────────┐     │ │
+│  │  │ Istanza  │       │ Istanza  │       │ Istanza  │     │ │
 │  │  │ Agent    │       │ Agent    │       │ Agent    │     │ │
-│  │  │ Instance │       │ Instance │       │ Instance │     │ │
 │  │  │          │       │          │       │          │     │ │
-│  │  │ Memory   │       │ Memory   │       │ Memory   │     │ │
-│  │  │ (isolated)│       │ (isolated)│       │ (isolated)│     │ │
+│  │  │ Memoria  │       │ Memoria  │       │ Memoria  │     │ │
+│  │  │ (isolata)│       │ (isolata)│       │ (isolata)│     │ │
 │  │  └──────────┘       └──────────┘       └──────────┘     │ │
 │  │                                                          │ │
-│  │  Pros:                                                   │ │
-│  │  ✓ Complete isolation                                    │ │
-│  │  ✓ Custom configuration per customer                     │ │
-│  │  ✓ Easier compliance (data separation)                   │ │
+│  │  Pro:                                                    │ │
+│  │  ✓ Isolamento completo                                   │ │
+│  │  ✓ Configurazione personalizzata per cliente            │ │
+│  │  ✓ Compliance più semplice (separazione dati)           │ │
 │  │                                                          │ │
-│  │  Cons:                                                   │ │
-│  │  ✗ Higher infrastructure cost                            │ │
-│  │  ✗ More complex operations                               │ │
-│  │  ✗ Slower cross-tenant learning                          │ │
+│  │  Contro:                                                 │ │
+│  │  ✗ Costi infrastrutturali più elevati                   │ │
+│  │  ✗ Operazioni più complesse                              │ │
+│  │  ✗ Apprendimento cross-tenant più lento                 │ │
 │  │                                                          │ │
-│  │  Best For: Enterprise customers, regulated industries    │ │
+│  │  Adatto per: Clienti enterprise, industrie regolate     │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  Model 2: MULTI-TENANT (Shared infrastructure)                 │
+│  Modello 2: MULTI-TENANT (Infrastruttura condivisa)           │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  ┌────────────────────────────────────────────────────┐  │ │
-│  │  │         SHARED AGENT INFRASTRUCTURE                │  │ │
+│  │  │      INFRASTRUTTURA AGENT CONDIVISA               │  │ │
 │  │  │                                                    │  │ │
-│  │  │  Cognitive Layer (shared)                          │  │ │
-│  │  │  Capability Layer (shared)                         │  │ │
+│  │  │  Cognitive Layer (condiviso)                      │  │ │
+│  │  │  Capability Layer (condiviso)                     │  │ │
 │  │  │                                                    │  │ │
-│  │  │  Memory System:                                    │  │ │
+│  │  │  Sistema di Memoria:                              │  │ │
 │  │  │  ┌──────────┬──────────┬──────────┐              │  │ │
-│  │  │  │Customer A│Customer B│Customer C│              │  │ │
-│  │  │  │ Namespace│ Namespace│ Namespace│              │  │ │
+│  │  │  │Cliente A │Cliente B │Cliente C │              │  │ │
+│  │  │  │Namespace │Namespace │Namespace │              │  │ │
 │  │  │  └──────────┴──────────┴──────────┘              │  │ │
-│  │  │  (Logically isolated, physically shared)          │  │ │
+│  │  │  (Isolato logicamente, condiviso fisicamente)    │  │ │
 │  │  └────────────────────────────────────────────────────┘  │ │
 │  │                                                          │ │
-│  │  Pros:                                                   │ │
-│  │  ✓ Lower cost per customer                               │ │
-│  │  ✓ Efficient resource utilization                        │ │
-│  │  ✓ Faster cross-tenant learning (if allowed)             │ │
-│  │  ✓ Easier operations (single deployment)                 │ │
+│  │  Pro:                                                    │ │
+│  │  ✓ Costo inferiore per cliente                          │ │
+│  │  ✓ Utilizzo efficiente delle risorse                    │ │
+│  │  ✓ Apprendimento cross-tenant più veloce (se permesso) │ │
+│  │  ✓ Operazioni più semplici (deployment singolo)         │ │
 │  │                                                          │ │
-│  │  Cons:                                                   │ │
-│  │  ✗ Requires robust isolation mechanisms                  │ │
-│  │  ✗ Noisy neighbor issues possible                        │ │
-│  │  ✗ Compliance complexities                               │ │
+│  │  Contro:                                                 │ │
+│  │  ✗ Richiede meccanismi di isolamento robusti           │ │
+│  │  ✗ Possibili problemi di noisy neighbor                 │ │
+│  │  ✗ Complessità di compliance                            │ │
 │  │                                                          │ │
-│  │  Best For: SaaS offerings, SMB customers                 │ │
+│  │  Adatto per: Offerte SaaS, clienti PMI                  │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  Model 3: HYBRID (Mix of both)                                 │
+│  Modello 3: IBRIDO (Mix di entrambi)                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Enterprise customers → Single-tenant                     │ │
-│  │  SMB customers → Multi-tenant                            │ │
-│  │  Shared control plane, isolated data planes              │ │
+│  │  Clienti enterprise → Single-tenant                      │ │
+│  │  Clienti PMI → Multi-tenant                              │ │
+│  │  Control plane condiviso, data plane isolati             │ │
 │  │                                                          │ │
-│  │  Best For: Platform serving diverse customer segments    │ │
+│  │  Adatto per: Piattaforme con segmenti clienti diversi   │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 1.2 Infrastructure Components
+### 1.2 Componenti Infrastrutturali
 
-**Component Deployment Map**:
+**Mappa di Deployment dei Componenti**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                INFRASTRUCTURE COMPONENTS                       │
+│                COMPONENTI INFRASTRUTTURALI                     │
 │                                                                │
-│  APPLICATION TIER                                              │
+│  LIVELLO APPLICATIVO                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Agent Servers (Compute)                                  │ │
-│  │ • Technology: Kubernetes pods / EC2 / Cloud Run          │ │
-│  │ • Scaling: Horizontal (add more pods/instances)          │ │
-│  │ • Resource: 2-4 vCPU, 4-8 GB RAM per instance           │ │
-│  │ • Count: Start with 3 (HA), scale to 10-50+             │ │
+│  │ Server Agent (Compute)                                   │ │
+│  │ • Tecnologia: Pod Kubernetes / EC2 / Cloud Run           │ │
+│  │ • Scaling: Orizzontale (aggiunta di pod/istanze)         │ │
+│  │ • Risorse: 2-4 vCPU, 4-8 GB RAM per istanza            │ │
+│  │ • Conteggio: Partire con 3 (HA), scalare a 10-50+      │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  CACHE TIER                                                    │
+│  LIVELLO CACHE                                                 │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Redis Cluster                                            │ │
-│  │ • Purpose: Working memory, pattern cache, rate limiting  │ │
-│  │ • Size: 8-16 GB per node                                 │ │
-│  │ • Replication: 1 primary + 1 replica minimum             │ │
-│  │ • Persistence: AOF enabled for durability                │ │
+│  │ Cluster Redis                                            │ │
+│  │ • Scopo: Working memory, cache pattern, rate limiting    │ │
+│  │ • Dimensione: 8-16 GB per nodo                           │ │
+│  │ • Replicazione: 1 primary + 1 replica minimo             │ │
+│  │ • Persistenza: AOF abilitato per durabilità              │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  DATABASE TIER                                                 │
+│  LIVELLO DATABASE                                              │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Vector Database (Episodic Memory)                        │ │
-│  │ • Options: Pinecone (managed) / Weaviate / Milvus        │ │
-│  │ • Size: 100K-10M+ vectors                                │ │
-│  │ • Replication: 3x for HA                                 │ │
+│  │ Database Vettoriale (Memoria Episodica)                  │ │
+│  │ • Opzioni: Pinecone (gestito) / Weaviate / Milvus        │ │
+│  │ • Dimensione: 100K-10M+ vettori                          │ │
+│  │ • Replicazione: 3x per HA                                │ │
 │  │                                                          │ │
-│  │ Document Database (Episodes, Patterns)                   │ │
-│  │ • Options: MongoDB / PostgreSQL + JSONB                  │ │
-│  │ • Size: 10-100 GB depending on volume                    │ │
-│  │ • Replication: Primary + 2 secondaries                   │ │
+│  │ Database Documentale (Episodi, Pattern)                  │ │
+│  │ • Opzioni: MongoDB / PostgreSQL + JSONB                  │ │
+│  │ • Dimensione: 10-100 GB a seconda del volume             │ │
+│  │ • Replicazione: Primary + 2 secondari                    │ │
 │  │                                                          │ │
-│  │ Time-Series DB (Metrics)                                 │ │
-│  │ • Options: Prometheus / InfluxDB / CloudWatch            │ │
-│  │ • Retention: 7d raw, 30d downsampled, 1y aggregate       │ │
+│  │ DB Time-Series (Metriche)                                │ │
+│  │ • Opzioni: Prometheus / InfluxDB / CloudWatch            │ │
+│  │ • Retention: 7g raw, 30g downsampled, 1a aggregato       │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  OBJECT STORAGE                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Blob Storage (Large artifacts, logs)                     │ │
-│  │ • Options: S3 / GCS / Azure Blob                         │ │
-│  │ • Size: 100 GB - 10 TB+                                  │ │
-│  │ • Lifecycle: Hot → Warm (30d) → Cold (1y) → Archive     │ │
+│  │ Blob Storage (Artifact grandi, log)                      │ │
+│  │ • Opzioni: S3 / GCS / Azure Blob                         │ │
+│  │ • Dimensione: 100 GB - 10 TB+                            │ │
+│  │ • Lifecycle: Hot → Warm (30g) → Cold (1a) → Archive     │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  EXTERNAL SERVICES                                             │
+│  SERVIZI ESTERNI                                               │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ LLM APIs                                                 │ │
-│  │ • OpenAI, Anthropic, etc.                                │ │
-│  │ • Rate limits: Varies by tier                            │ │
-│  │ • Failover: Multiple providers configured                │ │
+│  │ API LLM                                                  │ │
+│  │ • OpenAI, Anthropic, ecc.                                │ │
+│  │ • Limiti rate: Variano per tier                          │ │
+│  │ • Failover: Multipli provider configurati                │ │
 │  │                                                          │ │
-│  │ Tool APIs                                                │ │
-│  │ • Web search, databases, custom tools                    │ │
+│  │ API Tool                                                 │ │
+│  │ • Ricerca web, database, tool personalizzati             │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  OBSERVABILITY STACK                                           │
+│  STACK OSSERVABILITÀ                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ • Logs: Elasticsearch + Kibana / CloudWatch Logs         │ │
-│  │ • Metrics: Prometheus + Grafana / CloudWatch Metrics     │ │
-│  │ • Traces: Jaeger / AWS X-Ray                             │ │
-│  │ • Alerts: PagerDuty / OpsGenie                           │ │
+│  │ • Log: Elasticsearch + Kibana / CloudWatch Logs          │ │
+│  │ • Metriche: Prometheus + Grafana / CloudWatch Metrics    │ │
+│  │ • Trace: Jaeger / AWS X-Ray                              │ │
+│  │ • Alert: PagerDuty / OpsGenie                            │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## 2. Scaling Strategies
+## 2. Strategie di Scaling
 
-### 2.1 Horizontal Scaling
+### 2.1 Scaling Orizzontale
 
-**Application Tier Scaling**:
+**Scaling del Livello Applicativo**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│           HORIZONTAL SCALING ARCHITECTURE                      │
+│        ARCHITETTURA DI SCALING ORIZZONTALE                     │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │  LOAD BALANCER                                           │ │
-│  │  • Distribute requests across agent instances            │ │
-│  │  • Health checks (every 10s)                             │ │
-│  │  • Algorithm: Least connections                          │ │
+│  │  • Distribuisce richieste tra istanze agent             │ │
+│  │  • Health check (ogni 10s)                               │ │
+│  │  • Algoritmo: Least connections                          │ │
 │  └────────────────────────┬─────────────────────────────────┘ │
 │                           ↓                                    │
 │  ┌────────────────────────────────────────────────────────┐   │
-│  │ Agent Instance Pool (Auto-scaling)                     │   │
+│  │ Pool di Istanze Agent (Auto-scaling)                   │   │
 │  │                                                        │   │
-│  │  Min: 3 instances (HA)                                 │   │
-│  │  Max: 50 instances (or more)                           │   │
-│  │  Target: 70% CPU utilization                           │   │
+│  │  Min: 3 istanze (HA)                                   │   │
+│  │  Max: 50 istanze (o più)                               │   │
+│  │  Target: 70% utilizzo CPU                              │   │
 │  │                                                        │   │
 │  │  ┌──────┐  ┌──────┐  ┌──────┐      ┌──────┐          │   │
 │  │  │Agent │  │Agent │  │Agent │  ... │Agent │          │   │
 │  │  │  1   │  │  2   │  │  3   │      │  N   │          │   │
 │  │  └──────┘  └──────┘  └──────┘      └──────┘          │   │
 │  │                                                        │   │
-│  │  Scaling Triggers:                                     │   │
-│  │  • CPU > 70% for 3 minutes → Scale up                  │   │
-│  │  • CPU < 30% for 10 minutes → Scale down               │   │
-│  │  • Queue depth > 100 → Scale up                        │   │
-│  │  • Active tasks per instance > 10 → Scale up           │   │
+│  │  Trigger di Scaling:                                   │   │
+│  │  • CPU > 70% per 3 minuti → Scale up                   │   │
+│  │  • CPU < 30% per 10 minuti → Scale down                │   │
+│  │  • Profondità coda > 100 → Scale up                    │   │
+│  │  • Task attivi per istanza > 10 → Scale up             │   │
 │  └────────────────────────────────────────────────────────┘   │
 │                                                                │
-│  Scaling Policies:                                             │
-│  • Scale up: Fast (add instance in 30-60s)                    │
-│  • Scale down: Slow (remove instance after 10min idle)        │
-│  • Cooldown: 5 minutes between scaling events                 │
-│  • Graceful shutdown: Finish in-progress tasks before remove  │
+│  Policy di Scaling:                                            │
+│  • Scale up: Veloce (aggiunge istanza in 30-60s)             │
+│  • Scale down: Lento (rimuove istanza dopo 10min idle)       │
+│  • Cooldown: 5 minuti tra eventi di scaling                   │
+│  • Spegnimento graduale: Finisce task in corso prima di rimuovere│
 └────────────────────────────────────────────────────────────────┘
 ```
 
-**Scaling Decision Algorithm**:
+**Algoritmo di Decisione per lo Scaling**:
 
 ```
 Function AUTO_SCALE():
 
-  # Every 1 minute
+  # Ogni 1 minuto
   current_metrics = GET_METRICS(window="5min")
 
-  # Compute scaling signals
+  # Calcola segnali di scaling
   cpu_signal = current_metrics.cpu_avg / TARGET_CPU  # > 1 = scale up
   memory_signal = current_metrics.memory_avg / TARGET_MEMORY
   queue_signal = current_metrics.queue_depth / TARGET_QUEUE_DEPTH
   concurrency_signal = current_metrics.tasks_per_instance / TARGET_TASKS_PER_INSTANCE
 
-  # Weighted combination
+  # Combinazione pesata
   scale_signal = (
     0.4 * cpu_signal +
     0.2 * memory_signal +
@@ -217,120 +217,120 @@ Function AUTO_SCALE():
     0.2 * concurrency_signal
   )
 
-  # Decision
+  # Decisione
   IF scale_signal > 1.3:
-    # Significantly over capacity
-    desired_instances = current_instances * 1.5  # Scale up aggressively
+    # Significativamente sopra capacità
+    desired_instances = current_instances * 1.5  # Scale up aggressivo
   ELSE IF scale_signal > 1.1:
-    # Slightly over capacity
-    desired_instances = current_instances + 1  # Scale up gradually
+    # Leggermente sopra capacità
+    desired_instances = current_instances + 1  # Scale up graduale
   ELSE IF scale_signal < 0.5:
-    # Significantly under capacity
-    desired_instances = current_instances * 0.7  # Scale down aggressively
+    # Significativamente sotto capacità
+    desired_instances = current_instances * 0.7  # Scale down aggressivo
   ELSE IF scale_signal < 0.7:
-    # Slightly under capacity
-    desired_instances = current_instances - 1  # Scale down gradually
+    # Leggermente sotto capacità
+    desired_instances = current_instances - 1  # Scale down graduale
   ELSE:
-    # In target range
-    desired_instances = current_instances  # No change
+    # Nel range target
+    desired_instances = current_instances  # Nessun cambio
 
-  # Apply constraints
+  # Applica vincoli
   desired_instances = CLAMP(desired_instances, MIN_INSTANCES, MAX_INSTANCES)
 
-  # Execute if different and cooldown elapsed
+  # Esegui se diverso e cooldown trascorso
   IF desired_instances != current_instances AND COOLDOWN_ELAPSED():
     SCALE_TO(desired_instances)
-    LOG_INFO(f"Scaling from {current_instances} to {desired_instances}")
+    LOG_INFO(f"Scaling da {current_instances} a {desired_instances}")
 ```
 
-### 2.2 Database Scaling
+### 2.2 Scaling dei Database
 
-**Vector Database Scaling**:
+**Scaling del Database Vettoriale**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│           VECTOR DATABASE SCALING STRATEGY                     │
+│      STRATEGIA DI SCALING DEL DATABASE VETTORIALE              │
 │                                                                │
-│  STAGE 1: Single Cluster (0-1M vectors)                        │
+│  STAGE 1: Cluster Singolo (0-1M vettori)                       │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Single cluster with replication                         │ │
-│  │  • 3 nodes (1 primary, 2 replicas)                       │ │
-│  │  • Query latency: <100ms for top-10                      │ │
-│  │  • Cost: ~$500-1000/month                                │ │
+│  │  Cluster singolo con replicazione                        │ │
+│  │  • 3 nodi (1 primary, 2 repliche)                        │ │
+│  │  • Latenza query: <100ms per top-10                      │ │
+│  │  • Costo: ~$500-1000/mese                                │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  STAGE 2: Horizontal Sharding (1M-10M vectors)                 │
+│  STAGE 2: Sharding Orizzontale (1M-10M vettori)                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Shard by user_id or time range                          │ │
+│  │  Shard per user_id o range temporale                     │ │
 │  │                                                          │ │
 │  │  Shard 1         Shard 2         Shard 3                │ │
-│  │  Users A-H       Users I-P       Users Q-Z               │ │
-│  │  [3 nodes]       [3 nodes]       [3 nodes]              │ │
+│  │  Utenti A-H      Utenti I-P      Utenti Q-Z             │ │
+│  │  [3 nodi]        [3 nodi]        [3 nodi]               │ │
 │  │                                                          │ │
-│  │  Query Router decides which shard(s) to query            │ │
-│  │  Cost: ~$1500-3000/month                                 │ │
+│  │  Query Router decide quale/i shard interrogare          │ │
+│  │  Costo: ~$1500-3000/mese                                 │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  STAGE 3: Tiered Storage (>10M vectors)                        │
+│  STAGE 3: Storage a Livelli (>10M vettori)                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Hot Tier: Recent vectors (last 30 days)                 │ │
-│  │    Fast SSD storage, <100ms query                        │ │
+│  │  Tier Hot: Vettori recenti (ultimi 30 giorni)           │ │
+│  │    Storage SSD veloce, <100ms query                      │ │
 │  │                                                          │ │
-│  │  Warm Tier: Older vectors (30-180 days)                  │ │
-│  │    HDD storage, <500ms query                             │ │
+│  │  Tier Warm: Vettori più vecchi (30-180 giorni)          │ │
+│  │    Storage HDD, <500ms query                             │ │
 │  │                                                          │ │
-│  │  Cold Tier: Archive (>180 days)                          │ │
-│  │    Object storage, seconds query (rarely accessed)       │ │
+│  │  Tier Cold: Archivio (>180 giorni)                      │ │
+│  │    Object storage, query in secondi (raramente accesso) │ │
 │  │                                                          │ │
-│  │  Query optimizer checks hot first, then warm if needed   │ │
-│  │  Cost: ~$3000-5000/month                                 │ │
+│  │  Ottimizzatore query controlla hot prima, poi warm se serve│
+│  │  Costo: ~$3000-5000/mese                                 │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-**Document Database Scaling**:
+**Scaling del Database Documentale**:
 
 ```
-Options:
+Opzioni:
 
-1. VERTICAL SCALING (Easier, limited)
-   • Increase instance size (CPU, RAM, IOPS)
-   • Works up to ~1TB data, ~1000 QPS
-   • Cost: Predictable, ~$500-2000/month
+1. SCALING VERTICALE (Più semplice, limitato)
+   • Aumenta dimensione istanza (CPU, RAM, IOPS)
+   • Funziona fino a ~1TB dati, ~1000 QPS
+   • Costo: Prevedibile, ~$500-2000/mese
 
-2. READ REPLICAS (For read-heavy workload)
-   • 1 primary (writes) + N replicas (reads)
-   • Route episodic memory queries to replicas
-   • Works up to ~5000 read QPS
-   • Cost: ~$1000-3000/month
+2. READ REPLICA (Per carico read-heavy)
+   • 1 primary (scritture) + N repliche (letture)
+   • Instrada query memoria episodica alle repliche
+   • Funziona fino a ~5000 QPS lettura
+   • Costo: ~$1000-3000/mese
 
-3. SHARDING (For write-heavy or large data)
-   • Shard by user_id or time range
-   • Each shard independent database
-   • Application-level routing
-   • Works up to 10TB+ data
-   • Cost: ~$3000-10000/month
+3. SHARDING (Per write-heavy o dati grandi)
+   • Shard per user_id o range temporale
+   • Ogni shard è database indipendente
+   • Routing a livello applicativo
+   • Funziona fino a 10TB+ dati
+   • Costo: ~$3000-10000/mese
 ```
 
-## 3. High Availability
+## 3. Alta Disponibilità
 
-### 3.1 HA Architecture
+### 3.1 Architettura HA
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│        HIGH AVAILABILITY ARCHITECTURE                          │
+│        ARCHITETTURA AD ALTA DISPONIBILITÀ                      │
 │                                                                │
-│  MULTI-AZ DEPLOYMENT                                           │
+│  DEPLOYMENT MULTI-AZ                                           │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  Region: us-east-1                                       │ │
+│  │  Regione: us-east-1                                      │ │
 │  │                                                          │ │
 │  │  ┌──────────────────┐         ┌──────────────────┐     │ │
 │  │  │ Availability     │         │ Availability     │     │ │
 │  │  │ Zone A           │         │ Zone B           │     │ │
 │  │  │                  │         │                  │     │ │
 │  │  │ ┌──────────────┐ │         │ ┌──────────────┐ │     │ │
-│  │  │ │ Agent Pods   │ │         │ │ Agent Pods   │ │     │ │
-│  │  │ │ (3 replicas) │ │         │ │ (3 replicas) │ │     │ │
+│  │  │ │ Pod Agent    │ │         │ │ Pod Agent    │ │     │ │
+│  │  │ │ (3 repliche) │ │         │ │ (3 repliche) │ │     │ │
 │  │  │ └──────────────┘ │         │ └──────────────┘ │     │ │
 │  │  │                  │         │                  │     │ │
 │  │  │ ┌──────────────┐ │         │ ┌──────────────┐ │     │ │
@@ -344,499 +344,499 @@ Options:
 │  │  │ └──────────────┘ │ Repl    │ └──────────────┘ │     │ │
 │  │  └──────────────────┘         └──────────────────┘     │ │
 │  │                                                          │ │
-│  │  Load Balancer spans both AZs                            │ │
-│  │  Auto-failover if one AZ fails                           │ │
-│  │  RTO: <5 minutes, RPO: <1 minute                         │ │
+│  │  Load Balancer copre entrambe le AZ                      │ │
+│  │  Auto-failover se una AZ fallisce                        │ │
+│  │  RTO: <5 minuti, RPO: <1 minuto                          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  FAILURE SCENARIOS                                             │
+│  SCENARI DI FALLIMENTO                                         │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Scenario 1: Single Agent Instance Fails                  │ │
-│  │  • Load balancer detects failure (10s)                   │ │
-│  │  • Routes traffic to healthy instances                   │ │
-│  │  • Kubernetes spawns replacement (30-60s)                │ │
-│  │  • Impact: None (handled transparently)                  │ │
+│  │ Scenario 1: Singola Istanza Agent Fallisce              │ │
+│  │  • Load balancer rileva fallimento (10s)                │ │
+│  │  • Instrada traffico a istanze sane                      │ │
+│  │  • Kubernetes spawna rimpiazzo (30-60s)                 │ │
+│  │  • Impatto: Nessuno (gestito trasparentemente)          │ │
 │  ├──────────────────────────────────────────────────────────┤ │
-│  │ Scenario 2: Database Primary Fails                       │ │
-│  │  • Replica detects primary down (10s)                    │ │
-│  │  • Automatic failover promotes replica (30s)             │ │
-│  │  • Applications reconnect to new primary (30s)           │ │
-│  │  • Impact: 1-2 minute write unavailability               │ │
+│  │ Scenario 2: Database Primary Fallisce                   │ │
+│  │  • Replica rileva primary down (10s)                    │ │
+│  │  • Failover automatico promuove replica (30s)           │ │
+│  │  • Applicazioni si riconnettono a nuovo primary (30s)   │ │
+│  │  • Impatto: 1-2 minuti indisponibilità scrittura        │ │
 │  ├──────────────────────────────────────────────────────────┤ │
-│  │ Scenario 3: Entire AZ Fails                              │ │
-│  │  • Load balancer fails over to other AZ (30s)            │ │
-│  │  • Auto-scaler adds capacity in healthy AZ (2-3 min)     │ │
-│  │  • Database standby promoted to primary (1-2 min)        │ │
-│  │  • Impact: 2-3 minute degraded performance               │ │
+│  │ Scenario 3: Intera AZ Fallisce                          │ │
+│  │  • Load balancer fa failover ad altra AZ (30s)          │ │
+│  │  • Auto-scaler aggiunge capacità in AZ sana (2-3 min)   │ │
+│  │  • Database standby promosso a primary (1-2 min)        │ │
+│  │  • Impatto: 2-3 minuti performance degradata            │ │
 │  ├──────────────────────────────────────────────────────────┤ │
-│  │ Scenario 4: LLM API Unavailable                          │ │
-│  │  • Model router detects failure (5-10s)                  │ │
-│  │  • Falls back to alternative provider (immediate)        │ │
-│  │  • Impact: Minimal (handled by fallback chain)           │ │
+│  │ Scenario 4: API LLM Non Disponibile                     │ │
+│  │  • Model router rileva fallimento (5-10s)               │ │
+│  │  • Fallback a provider alternativo (immediato)          │ │
+│  │  • Impatto: Minimo (gestito da catena fallback)         │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
 ### 3.2 Disaster Recovery
 
-**Backup Strategy**:
+**Strategia di Backup**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                   BACKUP & RECOVERY STRATEGY                   │
+│              STRATEGIA DI BACKUP E RECOVERY                    │
 │                                                                │
-│  DATABASES                                                     │
+│  DATABASE                                                      │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Continuous Replication                                   │ │
-│  │  • Primary → Standby (synchronous)                       │ │
-│  │  • RPO: <1 minute                                        │ │
+│  │ Replicazione Continua                                    │ │
+│  │  • Primary → Standby (sincrona)                          │ │
+│  │  • RPO: <1 minuto                                        │ │
 │  │                                                          │ │
-│  │ Automated Snapshots                                      │ │
-│  │  • Frequency: Every 6 hours                              │ │
-│  │  • Retention: 7 days (28 snapshots)                      │ │
-│  │  • Restore time: 10-30 minutes                           │ │
+│  │ Snapshot Automatici                                      │ │
+│  │  • Frequenza: Ogni 6 ore                                 │ │
+│  │  • Retention: 7 giorni (28 snapshot)                     │ │
+│  │  • Tempo di restore: 10-30 minuti                        │ │
 │  │                                                          │ │
-│  │ Long-term Backups                                        │ │
-│  │  • Frequency: Weekly                                     │ │
-│  │  • Retention: 1 year                                     │ │
-│  │  • Storage: Cheaper archive tier                         │ │
+│  │ Backup Long-term                                         │ │
+│  │  • Frequenza: Settimanale                                │ │
+│  │  • Retention: 1 anno                                     │ │
+│  │  • Storage: Tier archive più economico                   │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  OBJECT STORAGE (S3/GCS)                                       │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Versioning Enabled                                       │ │
-│  │  • All objects versioned                                 │ │
-│  │  • Can recover from accidental deletion                  │ │
-│  │  • Version retention: 30 days                            │ │
+│  │ Versioning Abilitato                                     │ │
+│  │  • Tutti gli oggetti versionati                          │ │
+│  │  • Può recuperare da cancellazione accidentale           │ │
+│  │  • Retention versioni: 30 giorni                         │ │
 │  │                                                          │ │
-│  │ Cross-Region Replication                                 │ │
-│  │  • Critical data replicated to another region            │ │
-│  │  • Asynchronous (minutes delay)                          │ │
-│  │  • For disaster recovery scenarios                       │ │
+│  │ Replicazione Cross-Region                                │ │
+│  │  • Dati critici replicati in altra regione               │ │
+│  │  • Asincrona (ritardo minuti)                            │ │
+│  │  • Per scenari disaster recovery                         │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  CONFIGURATION                                                 │
+│  CONFIGURAZIONE                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │ Infrastructure as Code (IaC)                             │ │
-│  │  • All infrastructure defined in Terraform/CloudFormation│ │
-│  │  • Version controlled in Git                             │ │
-│  │  • Can rebuild entire stack from code                    │ │
+│  │  • Tutta l'infrastruttura definita in Terraform/CloudFormation│
+│  │  • Version control in Git                                │ │
+│  │  • Può ricostruire intero stack da codice                │ │
 │  │                                                          │ │
 │  │ Configuration Management                                 │ │
-│  │  • Secrets in dedicated vault (HashiCorp Vault / AWS Secrets)│
-│  │  • Application config in version control                 │ │
-│  │  • Can restore configuration quickly                     │ │
+│  │  • Secret in vault dedicato (HashiCorp Vault / AWS Secrets)│
+│  │  • Config applicazione in version control                │ │
+│  │  • Può ripristinare configurazione rapidamente           │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  RECOVERY TIME OBJECTIVES                                      │
+│  OBIETTIVI DI TEMPO DI RECOVERY                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
 │  │ RTO (Recovery Time Objective):                           │ │
-│  │  • Critical systems: 15 minutes                          │ │
-│  │  • Non-critical systems: 4 hours                         │ │
+│  │  • Sistemi critici: 15 minuti                            │ │
+│  │  • Sistemi non critici: 4 ore                            │ │
 │  │                                                          │ │
 │  │ RPO (Recovery Point Objective):                          │ │
-│  │  • Critical data: 1 minute (continuous replication)      │ │
-│  │  • Non-critical data: 6 hours (snapshot-based)           │ │
+│  │  • Dati critici: 1 minuto (replicazione continua)        │ │
+│  │  • Dati non critici: 6 ore (basato su snapshot)          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## 4. Monitoring & Alerting
+## 4. Monitoraggio e Alerting
 
-### 4.1 Production Monitoring Setup
+### 4.1 Setup di Monitoraggio in Produzione
 
-**Monitoring Dashboard Hierarchy**:
+**Gerarchia Dashboard di Monitoraggio**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│              MONITORING DASHBOARD STRUCTURE                    │
+│           STRUTTURA DASHBOARD DI MONITORAGGIO                  │
 │                                                                │
-│  LEVEL 1: EXECUTIVE DASHBOARD (High-level KPIs)                │
+│  LIVELLO 1: DASHBOARD EXECUTIVE (KPI alto livello)             │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ • System Status: ✅ Operational                           │ │
-│  │ • Success Rate: 91.3% (Target: >90%)                     │ │
-│  │ • P95 Latency: 28s (Target: <30s)                        │ │
-│  │ • Cost per Task: $0.17 (Budget: $0.30)                   │ │
-│  │ • Active Users: 245                                      │ │
-│  │ • Tasks Today: 1,832                                     │ │
+│  │ • Stato Sistema: ✅ Operativo                            │ │
+│  │ • Tasso Successo: 91.3% (Target: >90%)                   │ │
+│  │ • Latenza P95: 28s (Target: <30s)                        │ │
+│  │ • Costo per Task: $0.17 (Budget: $0.30)                  │ │
+│  │ • Utenti Attivi: 245                                     │ │
+│  │ • Task Oggi: 1,832                                       │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  LEVEL 2: OPERATIONAL DASHBOARD (Component health)             │
+│  LIVELLO 2: DASHBOARD OPERATIVA (Salute componenti)            │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Component Status:                                        │ │
-│  │ ✅ Agent Instances (12/12 healthy)                       │ │
-│  │ ✅ Redis Cache (hit rate: 78%)                           │ │
-│  │ ✅ Vector DB (latency: 85ms)                             │ │
-│  │ ✅ Document DB (connections: 45/100)                     │ │
-│  │ ⚠️ Model Router (fallback rate: 8%)                      │ │
-│  │ ✅ Safety Verifier (violations: 2 today)                 │ │
+│  │ Stato Componenti:                                        │ │
+│  │ ✅ Istanze Agent (12/12 sane)                            │ │
+│  │ ✅ Cache Redis (hit rate: 78%)                           │ │
+│  │ ✅ DB Vettoriale (latenza: 85ms)                         │ │
+│  │ ✅ DB Documentale (connessioni: 45/100)                  │ │
+│  │ ⚠️ Model Router (tasso fallback: 8%)                     │ │
+│  │ ✅ Safety Verifier (violazioni: 2 oggi)                  │ │
 │  │                                                          │ │
-│  │ Resource Utilization:                                    │ │
-│  │ • CPU: 65% avg                                           │ │
-│  │ • Memory: 72% avg                                        │ │
-│  │ • Network: 120 Mbps                                      │ │
+│  │ Utilizzo Risorse:                                        │ │
+│  │ • CPU: 65% media                                         │ │
+│  │ • Memoria: 72% media                                     │ │
+│  │ • Rete: 120 Mbps                                         │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  LEVEL 3: DETAILED DASHBOARDS (Deep dive per component)        │
+│  LIVELLO 3: DASHBOARD DETTAGLIATE (Approfondimento per componente)│
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ Cognitive Layer Dashboard                                │ │
-│  │ • Planning duration trend                                │ │
-│  │ • Execution success rate by complexity                   │ │
-│  │ • Reflection insights generated                          │ │
+│  │ Dashboard Cognitive Layer                                │ │
+│  │ • Trend durata pianificazione                            │ │
+│  │ • Tasso successo esecuzione per complessità              │ │
+│  │ • Insight riflessione generati                           │ │
 │  │                                                          │ │
-│  │ Memory System Dashboard                                  │ │
-│  │ • Episodic memory growth                                 │ │
-│  │ • Pattern cache performance                              │ │
-│  │ • Query latency distribution                             │ │
+│  │ Dashboard Sistema Memoria                                │ │
+│  │ • Crescita memoria episodica                             │ │
+│  │ • Performance cache pattern                              │ │
+│  │ • Distribuzione latenza query                            │ │
 │  │                                                          │ │
-│  │ Model Router Dashboard                                   │ │
-│  │ • Cost per model                                         │ │
-│  │ • Routing decisions breakdown                            │ │
-│  │ • Fallback frequency                                     │ │
+│  │ Dashboard Model Router                                   │ │
+│  │ • Costo per modello                                      │ │
+│  │ • Breakdown decisioni routing                            │ │
+│  │ • Frequenza fallback                                     │ │
 │  │                                                          │ │
-│  │ Safety Verifier Dashboard                                │ │
-│  │ • Violations by type                                     │ │
-│  │ • Authorization decision distribution                    │ │
-│  │ • Human approval requests                                │ │
+│  │ Dashboard Safety Verifier                                │ │
+│  │ • Violazioni per tipo                                    │ │
+│  │ • Distribuzione decisioni autorizzazione                 │ │
+│  │ • Richieste approvazione umana                           │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.2 Alert Configuration
+### 4.2 Configurazione Alert
 
-**Alert Severity Matrix**:
+**Matrice di Severità Alert**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    ALERT CONFIGURATION                         │
+│                 CONFIGURAZIONE ALERT                           │
 │                                                                │
-│  🔴 CRITICAL (Page on-call immediately)                        │
+│  🔴 CRITICO (Notifica on-call immediatamente)                  │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ • System down (all instances unhealthy)                  │ │
-│  │ • Success rate <50% for 5 minutes                        │ │
-│  │ • Database unreachable                                   │ │
-│  │ • P95 latency >10x baseline for 10 minutes               │ │
-│  │ • Security breach detected                               │ │
+│  │ • Sistema down (tutte istanze non sane)                  │ │
+│  │ • Tasso successo <50% per 5 minuti                       │ │
+│  │ • Database irraggiungibile                               │ │
+│  │ • Latenza P95 >10x baseline per 10 minuti                │ │
+│  │ • Breach di sicurezza rilevato                           │ │
 │  │                                                          │ │
-│  │ Response Time: 5 minutes                                 │ │
-│  │ Notification: Phone call + SMS + Slack                   │ │
+│  │ Tempo Risposta: 5 minuti                                 │ │
+│  │ Notifica: Chiamata telefonica + SMS + Slack              │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  🟠 HIGH (Investigate within 30 minutes)                       │
+│  🟠 ALTO (Investigare entro 30 minuti)                         │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ • Success rate <80% for 15 minutes                       │ │
-│  │ • P95 latency >2x baseline for 15 minutes                │ │
-│  │ • Error rate >25% for 10 minutes                         │ │
-│  │ • Memory usage >90% for 10 minutes                       │ │
-│  │ • Database replica lag >5 minutes                        │ │
+│  │ • Tasso successo <80% per 15 minuti                      │ │
+│  │ • Latenza P95 >2x baseline per 15 minuti                 │ │
+│  │ • Tasso errore >25% per 10 minuti                        │ │
+│  │ • Uso memoria >90% per 10 minuti                         │ │
+│  │ • Lag replica database >5 minuti                         │ │
 │  │                                                          │ │
-│  │ Response Time: 30 minutes                                │ │
-│  │ Notification: Slack + Email                              │ │
+│  │ Tempo Risposta: 30 minuti                                │ │
+│  │ Notifica: Slack + Email                                  │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  🟡 MEDIUM (Investigate within 2 hours)                        │
+│  🟡 MEDIO (Investigare entro 2 ore)                            │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ • Success rate <90% for 30 minutes                       │ │
-│  │ • Cost per task >150% of budget                          │ │
-│  │ • Cache hit rate <50% for 30 minutes                     │ │
-│  │ • Model fallback rate >15% for 30 minutes                │ │
-│  │ • Disk usage >80%                                        │ │
+│  │ • Tasso successo <90% per 30 minuti                      │ │
+│  │ • Costo per task >150% del budget                        │ │
+│  │ • Cache hit rate <50% per 30 minuti                      │ │
+│  │ • Tasso fallback modello >15% per 30 minuti              │ │
+│  │ • Uso disco >80%                                         │ │
 │  │                                                          │ │
-│  │ Response Time: 2 hours                                   │ │
-│  │ Notification: Slack                                      │ │
+│  │ Tempo Risposta: 2 ore                                    │ │
+│  │ Notifica: Slack                                          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  🟢 LOW (Review during business hours)                         │
+│  🟢 BASSO (Revisione durante orario lavorativo)                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │ • Success rate <95% for 1 hour                           │ │
-│  │ • New error types appearing                              │ │
-│  │ • Slow trend degradation                                 │ │
-│  │ • Certificate expiring in 30 days                        │ │
+│  │ • Tasso successo <95% per 1 ora                          │ │
+│  │ • Nuovi tipi di errore che appaiono                      │ │
+│  │ • Trend lento di degradazione                            │ │
+│  │ • Certificato in scadenza tra 30 giorni                  │ │
 │  │                                                          │ │
-│  │ Response Time: Next business day                         │ │
-│  │ Notification: Email                                      │ │
+│  │ Tempo Risposta: Prossimo giorno lavorativo               │ │
+│  │ Notifica: Email                                          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## 5. Operational Playbooks
+## 5. Playbook Operativi
 
-### 5.1 Common Incident Responses
+### 5.1 Risposte a Incidenti Comuni
 
-**Playbook: High Error Rate**
-
-```
-SYMPTOMS:
-• Error rate >20% for 10+ minutes
-• Success rate dropping rapidly
-• Users reporting failures
-
-INVESTIGATION STEPS:
-1. Check dashboard: What component is failing?
-2. Review recent deployments: Any changes in last hour?
-3. Check external dependencies: LLM APIs, databases status
-4. Review error logs: What error types are occurring?
-5. Check resource utilization: Any resource exhaustion?
-
-RESOLUTION STRATEGIES:
-
-IF external API down:
-  → Enable fallback providers
-  → Update status page
-  → Estimate resolution time from provider
-
-IF database connection issues:
-  → Check connection pool settings
-  → Increase max connections if needed
-  → Consider read replica failover
-
-IF deployment-related:
-  → Rollback to previous version
-  → Investigate issue offline
-  → Deploy fix when ready
-
-IF resource exhaustion:
-  → Scale up immediately
-  → Investigate resource leak
-  → Deploy fix if needed
-
-COMMUNICATION:
-• Update status page within 5 minutes
-• Post to customer Slack channel
-• Send email if outage >30 minutes
-```
-
-**Playbook: High Latency**
+**Playbook: Tasso di Errore Elevato**
 
 ```
-SYMPTOMS:
-• P95 latency >2x normal
-• Users reporting slow response
-• Task timeouts increasing
+SINTOMI:
+• Tasso errore >20% per 10+ minuti
+• Tasso successo in rapido calo
+• Utenti che riportano fallimenti
 
-INVESTIGATION:
-1. Identify bottleneck component (from tracing)
-2. Check resource utilization (CPU, memory, network)
-3. Review recent traffic patterns (spike?)
-4. Check database query performance
-5. Check external API latency
+PASSI DI INVESTIGAZIONE:
+1. Controlla dashboard: Quale componente sta fallendo?
+2. Rivedi deployment recenti: Cambiamenti nell'ultima ora?
+3. Controlla dipendenze esterne: Stato API LLM, database
+4. Rivedi log errori: Quali tipi di errore stanno occorrendo?
+5. Controlla utilizzo risorse: Esaurimento risorse?
 
-RESOLUTION:
+STRATEGIE DI RISOLUZIONE:
 
-IF traffic spike:
-  → Scale up to handle load
-  → Consider rate limiting if abusive
+SE API esterna down:
+  → Abilita provider fallback
+  → Aggiorna pagina stato
+  → Stima tempo risoluzione da provider
 
-IF database slow:
-  → Check for slow queries (enable query logging)
-  → Add indices if missing
-  → Consider read replica routing
+SE problemi connessione database:
+  → Controlla impostazioni connection pool
+  → Aumenta max connessioni se necessario
+  → Considera failover read replica
 
-IF model API slow:
-  → Check if provider having issues
-  → Route to faster model tier temporarily
-  → Enable aggressive caching
+SE relato a deployment:
+  → Rollback a versione precedente
+  → Investiga problema offline
+  → Deploya fix quando pronto
 
-IF memory system slow:
-  → Check vector DB performance
-  → Consider cache warming
-  → Add more vector DB nodes
+SE esaurimento risorse:
+  → Scale up immediatamente
+  → Investiga resource leak
+  → Deploya fix se necessario
 
-PREVENTION:
-• Set up predictive scaling
-• Cache aggressively
-• Implement circuit breakers
+COMUNICAZIONE:
+• Aggiorna pagina stato entro 5 minuti
+• Posta su canale Slack clienti
+• Invia email se outage >30 minuti
 ```
 
-### 5.2 Maintenance Operations
-
-**Routine Maintenance Tasks**:
+**Playbook: Latenza Elevata**
 
 ```
-DAILY:
-□ Review overnight alerts
-□ Check backup completion
-□ Review error rate trends
-□ Check resource utilization trends
+SINTOMI:
+• Latenza P95 >2x normale
+• Utenti che riportano risposta lenta
+• Timeout task in aumento
 
-WEEKLY:
-□ Review pattern cache validation results
-□ Analyze cost trends
-□ Check for security vulnerabilities
-□ Review slow query logs
-□ Test backup restoration (sampling)
+INVESTIGAZIONE:
+1. Identifica componente bottleneck (da tracing)
+2. Controlla utilizzo risorse (CPU, memoria, rete)
+3. Rivedi pattern traffico recenti (picco?)
+4. Controlla performance query database
+5. Controlla latenza API esterne
 
-MONTHLY:
-□ Review capacity planning projections
-□ Update scaling thresholds if needed
-□ Review and archive old logs
-□ Update documentation
-□ Disaster recovery drill
-□ Security audit
+RISOLUZIONE:
 
-QUARTERLY:
-□ Comprehensive security review
-□ Performance benchmarking
-□ Cost optimization review
-□ Update dependencies and patches
-□ Architecture review
+SE picco traffico:
+  → Scale up per gestire carico
+  → Considera rate limiting se abusivo
+
+SE database lento:
+  → Controlla query lente (abilita query logging)
+  → Aggiungi indici se mancanti
+  → Considera routing read replica
+
+SE API modello lenta:
+  → Controlla se provider ha problemi
+  → Instrada a tier modello più veloce temporaneamente
+  → Abilita caching aggressivo
+
+SE sistema memoria lento:
+  → Controlla performance DB vettoriale
+  → Considera cache warming
+  → Aggiungi più nodi DB vettoriale
+
+PREVENZIONE:
+• Imposta scaling predittivo
+• Cache aggressiva
+• Implementa circuit breaker
 ```
 
-## 6. Cost Optimization
+### 5.2 Operazioni di Manutenzione
 
-### 6.1 Cost Breakdown
+**Task di Manutenzione Routinaria**:
 
-**Typical Monthly Costs** (for ~10K tasks/day):
+```
+GIORNALIERO:
+□ Rivedi alert notturni
+□ Controlla completamento backup
+□ Rivedi trend tasso errore
+□ Controlla trend utilizzo risorse
+
+SETTIMANALE:
+□ Rivedi risultati validazione cache pattern
+□ Analizza trend costi
+□ Controlla vulnerabilità sicurezza
+□ Rivedi log query lente
+□ Testa ripristino backup (campionamento)
+
+MENSILE:
+□ Rivedi proiezioni capacity planning
+□ Aggiorna soglie scaling se necessario
+□ Rivedi e archivia vecchi log
+□ Aggiorna documentazione
+□ Drill disaster recovery
+□ Audit sicurezza
+
+TRIMESTRALE:
+□ Review sicurezza comprensiva
+□ Benchmarking performance
+□ Review ottimizzazione costi
+□ Aggiorna dipendenze e patch
+□ Review architettura
+```
+
+## 6. Ottimizzazione Costi
+
+### 6.1 Breakdown Costi
+
+**Costi Mensili Tipici** (per ~10K task/giorno):
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│               MONTHLY COST BREAKDOWN                           │
+│               BREAKDOWN COSTI MENSILI                          │
 │                                                                │
-│  COMPUTE (Agent Servers)                         $800          │
-│  • 10 instances @ $80/month each                               │
-│  • Auto-scaling between 5-15 instances                         │
+│  COMPUTE (Server Agent)                          $800          │
+│  • 10 istanze @ $80/mese ciascuna                              │
+│  • Auto-scaling tra 5-15 istanze                               │
 │                                                                │
-│  LLM APIs (Largest cost)                         $3,500        │
-│  • ~$0.18 per task avg                                         │
-│  • 10K tasks/day * 30 days * $0.18                             │
-│  • Optimized via model routing                                 │
+│  API LLM (Costo maggiore)                        $3,500        │
+│  • ~$0.18 per task media                                       │
+│  • 10K task/giorno * 30 giorni * $0.18                         │
+│  • Ottimizzato via model routing                               │
 │                                                                │
-│  DATABASES                                       $1,200        │
-│  • Vector DB: $600                                             │
-│  • Document DB: $400                                           │
-│  • Time-series DB: $200                                        │
+│  DATABASE                                        $1,200        │
+│  • DB Vettoriale: $600                                         │
+│  • DB Documentale: $400                                        │
+│  • DB Time-series: $200                                        │
 │                                                                │
 │  CACHE (Redis)                                   $300          │
-│  • 16GB cluster with replication                               │
+│  • Cluster 16GB con replicazione                               │
 │                                                                │
 │  OBJECT STORAGE                                  $150          │
-│  • S3 for logs, artifacts                                      │
+│  • S3 per log, artifact                                        │
 │                                                                │
-│  OBSERVABILITY                                   $250          │
-│  • Logs, metrics, traces storage                               │
+│  OSSERVABILITÀ                                   $250          │
+│  • Storage log, metriche, trace                                │
 │  • Grafana Cloud / Datadog                                     │
 │                                                                │
 │  NETWORKING                                      $200          │
-│  • Load balancers, data transfer                               │
+│  • Load balancer, data transfer                                │
 │                                                                │
 │  ────────────────────────────────────────────────────          │
-│  TOTAL                                           $6,400/month  │
+│  TOTALE                                          $6,400/mese   │
 │                                                                │
-│  Cost per task: $6,400 / 300K tasks = $0.021                  │
-│  (Plus LLM costs of ~$0.18 = $0.201 total per task)           │
+│  Costo per task: $6,400 / 300K task = $0.021                  │
+│  (Più costi LLM di ~$0.18 = $0.201 totale per task)           │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 6.2 Cost Optimization Strategies
+### 6.2 Strategie di Ottimizzazione Costi
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│            COST OPTIMIZATION STRATEGIES                        │
+│         STRATEGIE DI OTTIMIZZAZIONE COSTI                      │
 │                                                                │
-│  1. MODEL ROUTING (Biggest impact: ~50% LLM cost reduction)    │
-│     • Use tier-appropriate models                             │
-│     • Small models for simple tasks                            │
-│     • Monitor and adjust routing weights                       │
+│  1. MODEL ROUTING (Impatto maggiore: ~50% riduzione costi LLM)│
+│     • Usa modelli appropriati al tier                         │
+│     • Modelli piccoli per task semplici                       │
+│     • Monitora e regola pesi routing                          │
 │                                                                │
-│  2. CACHING (Impact: ~20% cost reduction)                      │
-│     • Cache pattern retrievals                                 │
-│     • Cache episodic memory queries                            │
-│     • Cache LLM responses for repeated queries                 │
+│  2. CACHING (Impatto: ~20% riduzione costi)                    │
+│     • Cache recuperi pattern                                   │
+│     • Cache query memoria episodica                            │
+│     • Cache risposte LLM per query ripetute                    │
 │                                                                │
-│  3. RESOURCE RIGHTSIZING (Impact: ~15% infrastructure cost)    │
-│     • Monitor actual usage vs provisioned                      │
-│     • Downsize over-provisioned resources                      │
-│     • Use spot instances for non-critical workloads            │
+│  3. RIGHTSIZING RISORSE (Impatto: ~15% costi infrastruttura)  │
+│     • Monitora uso effettivo vs provisionato                   │
+│     • Riduci dimensione risorse sovra-provvisionate            │
+│     • Usa spot instance per workload non critici               │
 │                                                                │
-│  4. STORAGE LIFECYCLE (Impact: ~30% storage cost)              │
-│     • Move old logs to cheaper storage                         │
-│     • Archive old episodes to cold storage                     │
-│     • Delete truly obsolete data                               │
+│  4. LIFECYCLE STORAGE (Impatto: ~30% costi storage)           │
+│     • Sposta vecchi log a storage più economico                │
+│     • Archivia vecchi episodi in cold storage                  │
+│     • Elimina dati veramente obsoleti                          │
 │                                                                │
-│  5. RESERVED CAPACITY (Impact: ~20-40% infrastructure cost)    │
-│     • Reserved instances for baseline capacity                 │
-│     • On-demand for burst                                      │
-│     • 1-year commitments safe for established workload         │
+│  5. CAPACITÀ RISERVATA (Impatto: ~20-40% costi infrastruttura)│
+│     • Istanze riservate per capacità baseline                  │
+│     • On-demand per burst                                      │
+│     • Commitment 1 anno sicuri per workload stabilizzato       │
 │                                                                │
-│  POTENTIAL TOTAL SAVINGS: ~40-50% with all optimizations       │
+│  RISPARMIO TOTALE POTENZIALE: ~40-50% con tutte ottimizzazioni│
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## 7. Security Best Practices
+## 7. Best Practice di Sicurezza
 
-### 7.1 Security Checklist
+### 7.1 Checklist Sicurezza
 
 ```
-NETWORK SECURITY:
-□ All components in private subnets
-□ Load balancer only public-facing component
-□ Security groups restrict traffic to necessary ports
-□ TLS 1.3 for all external communication
-□ Internal communication encrypted (mTLS)
+SICUREZZA RETE:
+□ Tutti componenti in subnet private
+□ Load balancer unico componente pubblico
+□ Security group limitano traffico a porte necessarie
+□ TLS 1.3 per tutta comunicazione esterna
+□ Comunicazione interna criptata (mTLS)
 
-AUTHENTICATION & AUTHORIZATION:
-□ API authentication required (API keys or OAuth)
-□ Role-based access control (RBAC) implemented
-□ Principle of least privilege enforced
-□ Service accounts for inter-component communication
-□ Regular credential rotation
+AUTENTICAZIONE E AUTORIZZAZIONE:
+□ Autenticazione API richiesta (chiavi API o OAuth)
+□ Controllo accesso basato su ruoli (RBAC) implementato
+□ Principio least privilege applicato
+□ Account servizio per comunicazione inter-componente
+□ Rotazione credenziali regolare
 
-DATA PROTECTION:
-□ Encryption at rest for all databases
-□ Encryption in transit for all communication
-□ PII detection and masking
-□ Audit logging of all data access
-□ Data retention policies enforced
+PROTEZIONE DATI:
+□ Crittografia at rest per tutti i database
+□ Crittografia in transit per tutta comunicazione
+□ Rilevamento e mascheramento PII
+□ Audit logging di tutti accessi dati
+□ Policy retention dati applicate
 
-APPLICATION SECURITY:
-□ Input validation on all endpoints
-□ Output encoding to prevent XSS
-□ SQL injection prevention (parameterized queries)
-□ Rate limiting to prevent abuse
-□ Security headers configured
+SICUREZZA APPLICATIVA:
+□ Validazione input su tutti endpoint
+□ Output encoding per prevenire XSS
+□ Prevenzione SQL injection (query parametrizzate)
+□ Rate limiting per prevenire abusi
+□ Security header configurati
 
-OPERATIONAL SECURITY:
-□ Security patching schedule (monthly)
-□ Vulnerability scanning (weekly)
-□ Penetration testing (quarterly)
-□ Security incident response plan
-□ Employee security training
+SICUREZZA OPERATIVA:
+□ Schedule patching sicurezza (mensile)
+□ Vulnerability scanning (settimanale)
+□ Penetration testing (trimestrale)
+□ Piano risposta incidenti sicurezza
+□ Training sicurezza dipendenti
 
 COMPLIANCE:
-□ SOC 2 Type II compliance (if applicable)
-□ GDPR compliance for EU customers
-□ Regular compliance audits
-□ Data processing agreements with customers
+□ Compliance SOC 2 Type II (se applicabile)
+□ Compliance GDPR per clienti EU
+□ Audit compliance regolari
+□ Accordi trattamento dati con clienti
 ```
 
-## 8. Conclusion
+## 8. Conclusione
 
-This deployment guide provides foundation for operating Reflective Adaptive Agent in production. Key takeaways:
+Questa guida al deployment fornisce le fondamenta per operare il Reflective Adaptive Agent in produzione. Punti chiave:
 
-**Start Simple**: Begin with single-tenant or small multi-tenant deployment, scale as needed.
+**Inizia Semplice**: Comincia con deployment single-tenant o small multi-tenant, scala quando necessario.
 
-**Monitor Everything**: Comprehensive observability is essential for operating ML systems.
+**Monitora Tutto**: Osservabilità comprensiva è essenziale per operare sistemi ML.
 
-**Automate Operations**: Use IaC, auto-scaling, automated backups to reduce operational burden.
+**Automatizza Operazioni**: Usa IaC, auto-scaling, backup automatizzati per ridurre carico operativo.
 
-**Plan for Failure**: HA architecture, disaster recovery, incident playbooks are not optional.
+**Pianifica per il Fallimento**: Architettura HA, disaster recovery, playbook incidenti non sono opzionali.
 
-**Optimize Continuously**: Monitor costs and performance, optimize based on actual usage patterns.
+**Ottimizza Continuamente**: Monitora costi e performance, ottimizza basandosi su pattern di uso effettivi.
 
-**Security First**: Implement security best practices from day one, not as afterthought.
+**Sicurezza Prima di Tutto**: Implementa best practice sicurezza dal primo giorno, non come ripensamento.
 
 ---
 
-**Reference Architecture Complete**
+**Architettura di Riferimento Completa**
 
-All 8 core documents now provided:
-1. ✅ System Architecture
+Tutti gli 8 documenti core ora forniti:
+1. ✅ Architettura di Sistema
 2. ✅ Cognitive Layer
-3. ✅ Memory System
+3. ✅ Sistema di Memoria
 4. ✅ Capability Layer
-5. ✅ Infrastructure
-6. ✅ Data Flows
-7. ✅ Decision Rationale
-8. ✅ Deployment Guide
+5. ✅ Infrastruttura
+6. ✅ Flussi di Dati
+7. ✅ Rationale delle Decisioni
+8. ✅ Guida al Deployment
 
-Ready for implementation.
+Pronto per l'implementazione.

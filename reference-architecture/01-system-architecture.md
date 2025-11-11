@@ -1,57 +1,57 @@
-# System Architecture - Complete Specifications
+# Architettura di Sistema - Specifiche Complete
 
-## Overview Diagram
+## Diagramma Generale
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
 │                    REFLECTIVE ADAPTIVE AGENT                            │
 │                                                                         │
-│  INPUT: Task Specification                                             │
+│  INPUT: Specifica del Task                                             │
 │    │                                                                    │
 │    ↓                                                                    │
 │  ┌─────────────────────────────────────────────────────────────────┐  │
-│  │ COGNITIVE LAYER - Reasoning & Decision Making                   │  │
+│  │ COGNITIVE LAYER - Ragionamento & Decisioni                      │  │
 │  │                                                                  │  │
 │  │   ┌──────────────┐    ┌───────────────┐    ┌──────────────┐   │  │
-│  │   │ Goal         │    │ Planning      │    │ Execution    │   │  │
-│  │   │ Analysis     │───→│ Engine        │───→│ Engine       │   │  │
+│  │   │ Analisi      │    │ Planning      │    │ Execution    │   │  │
+│  │   │ Goal         │───→│ Engine        │───→│ Engine       │   │  │
 │  │   │              │    │               │    │              │   │  │
-│  │   │ • Parse task │    │ • Decompose   │    │ • Execute    │   │  │
-│  │   │ • Extract    │    │ • Schedule    │    │ • Monitor    │   │  │
-│  │   │   goals      │    │ • Dependency  │    │ • Adapt      │   │  │
-│  │   │ • Identify   │    │   management  │    │ • Verify     │   │  │
-│  │   │   constraints│    │               │    │              │   │  │
+│  │   │ • Parse task │    │ • Decomposiz. │    │ • Esecuzione │   │  │
+│  │   │ • Estrazione │    │ • Schedule    │    │ • Monitoring │   │  │
+│  │   │   goal       │    │ • Gestione    │    │ • Adattam.   │   │  │
+│  │   │ • Identif.   │    │   dipendenze  │    │ • Verifica   │   │  │
+│  │   │   vincoli    │    │               │    │              │   │  │
 │  │   └──────┬───────┘    └───────┬───────┘    └──────┬───────┘   │  │
 │  │          │                    │                    │           │  │
 │  │          └────────────┬───────┴────────────────────┘           │  │
 │  │                       ↓                                        │  │
 │  │                 ┌────────────────┐                             │  │
+│  │                 │  Modulo        │                             │  │
 │  │                 │  Reflection    │                             │  │
-│  │                 │  Module        │                             │  │
 │  │                 │                │                             │  │
-│  │                 │ • Analyze      │                             │  │
+│  │                 │ • Analisi      │                             │  │
 │  │                 │   performance  │                             │  │
-│  │                 │ • Extract      │                             │  │
-│  │                 │   patterns     │                             │  │
-│  │                 │ • Update       │                             │  │
-│  │                 │   strategies   │                             │  │
+│  │                 │ • Estrazione   │                             │  │
+│  │                 │   pattern      │                             │  │
+│  │                 │ • Aggiornamento│                             │  │
+│  │                 │   strategie    │                             │  │
 │  │                 └────────┬───────┘                             │  │
 │  │                          │                                     │  │
 │  └──────────────────────────┼─────────────────────────────────────┘  │
 │                             ↓                                        │
 │  ┌─────────────────────────────────────────────────────────────────┐  │
-│  │ MEMORY LAYER - State Management & Knowledge                    │  │
+│  │ MEMORY LAYER - Gestione Stato & Conoscenza                     │  │
 │  │                                                                  │  │
 │  │   ┌──────────────┐    ┌───────────────┐    ┌──────────────┐   │  │
 │  │   │ Working      │    │ Episodic      │    │ Pattern      │   │  │
 │  │   │ Memory       │    │ Memory        │    │ Cache        │   │  │
 │  │   │              │    │               │    │              │   │  │
-│  │   │ • Current    │    │ • Past        │    │ • Learned    │   │  │
-│  │   │   context    │    │   episodes    │    │   strategies │   │  │
-│  │   │ • Active     │    │ • Outcomes    │    │ • Success    │   │  │
-│  │   │   variables  │    │ • Embeddings  │    │   patterns   │   │  │
-│  │   │ • Temp state │    │ • Retrieval   │    │ • Heuristics │   │  │
-│  │   │              │    │   by similar. │    │              │   │  │
+│  │   │ • Contesto   │    │ • Episodi     │    │ • Strategie  │   │  │
+│  │   │   corrente   │    │   passati     │    │   apprese    │   │  │
+│  │   │ • Variabili  │    │ • Risultati   │    │ • Pattern    │   │  │
+│  │   │   attive     │    │ • Embeddings  │    │   successo   │   │  │
+│  │   │ • Stato temp │    │ • Retrieval   │    │ • Euristiche │   │  │
+│  │   │              │    │   similitudine│    │              │   │  │
 │  │   └──────┬───────┘    └───────┬───────┘    └──────┬───────┘   │  │
 │  │          │                    │                    │           │  │
 │  │          └────────────────────┴────────────────────┘           │  │
@@ -59,17 +59,17 @@
 │  └───────────────────────────────┼────────────────────────────────┘  │
 │                                  ↓                                   │
 │  ┌─────────────────────────────────────────────────────────────────┐  │
-│  │ CAPABILITY LAYER - External Actions & Intelligence             │  │
+│  │ CAPABILITY LAYER - Azioni Esterne & Intelligenza               │  │
 │  │                                                                  │  │
 │  │   ┌──────────────┐    ┌───────────────┐    ┌──────────────┐   │  │
 │  │   │ Tool         │    │ Model         │    │ Safety       │   │  │
 │  │   │ Registry     │    │ Router        │    │ Verifier     │   │  │
 │  │   │              │    │               │    │              │   │  │
-│  │   │ • Discover   │    │ • Route to    │    │ • Validate   │   │  │
-│  │   │ • Bind       │    │   appropriate │    │   input      │   │  │
-│  │   │ • Execute    │    │   model       │    │ • Check      │   │  │
-│  │   │ • Validate   │    │ • Cost        │    │   bounds     │   │  │
-│  │   │              │    │   optimize    │    │ • Enforce    │   │  │
+│  │   │ • Discovery  │    │ • Routing al  │    │ • Validazione│   │  │
+│  │   │ • Binding    │    │   modello     │    │   input      │   │  │
+│  │   │ • Esecuzione │    │   appropriato │    │ • Controllo  │   │  │
+│  │   │ • Validazione│    │ • Ottimizz.   │    │   bounds     │   │  │
+│  │   │              │    │   costi       │    │ • Enforce    │   │  │
 │  │   │              │    │               │    │   safety     │   │  │
 │  │   └──────┬───────┘    └───────┬───────┘    └──────┬───────┘   │  │
 │  │          │                    │                    │           │  │
@@ -78,138 +78,138 @@
 │  └───────────────────────────────┼────────────────────────────────┘  │
 │                                  ↓                                   │
 │  ┌─────────────────────────────────────────────────────────────────┐  │
-│  │ INFRASTRUCTURE LAYER - Observability & Resource Management     │  │
+│  │ INFRASTRUCTURE LAYER - Observability & Gestione Risorse         │  │
 │  │                                                                  │  │
 │  │   ┌──────────────┐    ┌───────────────┐    ┌──────────────┐   │  │
 │  │   │Observability │    │ Resource      │    │ Error        │   │  │
 │  │   │ System       │    │ Manager       │    │ Handler      │   │  │
 │  │   │              │    │               │    │              │   │  │
-│  │   │ • Tracing    │    │ • Budget      │    │ • Detect     │   │  │
-│  │   │ • Metrics    │    │   tracking    │    │ • Classify   │   │  │
-│  │   │ • Logging    │    │ • Rate        │    │ • Recover    │   │  │
-│  │   │ • Monitoring │    │   limiting    │    │ • Escalate   │   │  │
+│  │   │ • Tracing    │    │ • Tracking    │    │ • Rilevazione│   │  │
+│  │   │ • Metriche   │    │   budget      │    │ • Classific. │   │  │
+│  │   │ • Logging    │    │ • Rate        │    │ • Recovery   │   │  │
+│  │   │ • Monitoring │    │   limiting    │    │ • Escalation │   │  │
 │  │   │              │    │ • Throttling  │    │              │   │  │
 │  │   └──────────────┘    └───────────────┘    └──────────────┘   │  │
 │  └─────────────────────────────────────────────────────────────────┘  │
 │                                                                         │
-│  OUTPUT: Task Result + Updated Knowledge                               │
+│  OUTPUT: Risultato Task + Conoscenza Aggiornata                        │
 └────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Execution Flow - Main Loop
+## Flusso di Esecuzione - Loop Principale
 
 ```
-START
+INIZIO
   │
-  ├─→ [1. RECEIVE TASK]
+  ├─→ [1. RICEZIONE TASK]
   │      │
   │      ├─ Parse input
-  │      ├─ Validate format
-  │      └─ Extract parameters
+  │      ├─ Validazione formato
+  │      └─ Estrazione parametri
   │      │
-  ├─→ [2. GOAL ANALYSIS]
+  ├─→ [2. ANALISI GOAL]
   │      │
-  │      ├─ Identify objectives
-  │      ├─ Extract constraints  
-  │      ├─ Define success criteria
-  │      └─ Classify complexity
+  │      ├─ Identificazione obiettivi
+  │      ├─ Estrazione vincoli
+  │      ├─ Definizione criteri successo
+  │      └─ Classificazione complessità
   │      │
-  ├─→ [3. RETRIEVE CONTEXT]
+  ├─→ [3. RECUPERO CONTESTO]
   │      │
-  │      ├─ Query episodic memory (similar past tasks)
-  │      ├─ Check pattern cache (learned strategies)
-  │      └─ Load working memory (current session)
+  │      ├─ Query episodic memory (task simili passati)
+  │      ├─ Controllo pattern cache (strategie apprese)
+  │      └─ Caricamento working memory (sessione corrente)
   │      │
-  ├─→ [4. PLANNING]
+  ├─→ [4. PIANIFICAZIONE]
   │      │
-  │      ├─ Generate high-level plan
-  │      ├─ Decompose into subtasks
-  │      ├─ Identify dependencies
-  │      ├─ Estimate resources (tokens, time, cost)
-  │      └─ Select execution strategy
+  │      ├─ Generazione piano alto livello
+  │      ├─ Decomposizione in subtask
+  │      ├─ Identificazione dipendenze
+  │      ├─ Stima risorse (token, tempo, costo)
+  │      └─ Selezione strategia esecuzione
   │      │
-  ├─→ [5. EXECUTION LOOP]
+  ├─→ [5. LOOP ESECUZIONE]
   │      │
-  │      ├─ FOR each step in plan:
+  │      ├─ PER ogni step nel piano:
   │      │   │
-  │      │   ├─→ [5a. Pre-execution]
-  │      │   │      ├─ Safety verification
-  │      │   │      ├─ Resource check
-  │      │   │      └─ Model routing decision
+  │      │   ├─→ [5a. Pre-esecuzione]
+  │      │   │      ├─ Verifica sicurezza
+  │      │   │      ├─ Controllo risorse
+  │      │   │      └─ Decisione routing modello
   │      │   │
-  │      │   ├─→ [5b. Execute]
-  │      │   │      ├─ LLM reasoning (if needed)
-  │      │   │      ├─ Tool execution (if needed)
-  │      │   │      └─ Capture output
+  │      │   ├─→ [5b. Esecuzione]
+  │      │   │      ├─ Reasoning LLM (se necessario)
+  │      │   │      ├─ Esecuzione tool (se necessario)
+  │      │   │      └─ Cattura output
   │      │   │
-  │      │   ├─→ [5c. Post-execution]
-  │      │   │      ├─ Verify result
-  │      │   │      ├─ Check success criteria
-  │      │   │      └─ Update working memory
+  │      │   ├─→ [5c. Post-esecuzione]
+  │      │   │      ├─ Verifica risultato
+  │      │   │      ├─ Controllo criteri successo
+  │      │   │      └─ Aggiornamento working memory
   │      │   │
-  │      │   └─→ [5d. Adaptation]
-  │      │          ├─ If success: Continue
-  │      │          ├─ If failure: Recovery strategy
-  │      │          └─ If blocked: Replan
+  │      │   └─→ [5d. Adattamento]
+  │      │          ├─ Se successo: Continua
+  │      │          ├─ Se fallimento: Strategia recovery
+  │      │          └─ Se bloccato: Ripianificazione
   │      │
-  ├─→ [6. VERIFICATION]
+  ├─→ [6. VERIFICA]
   │      │
-  │      ├─ Validate final output
-  │      ├─ Check against success criteria
-  │      └─ Safety final check
+  │      ├─ Validazione output finale
+  │      ├─ Controllo criteri successo
+  │      └─ Verifica sicurezza finale
   │      │
   ├─→ [7. REFLECTION]
   │      │
-  │      ├─ Analyze episode performance
-  │      ├─ Extract successful patterns
-  │      ├─ Identify improvements
-  │      ├─ Update pattern cache
-  │      └─ Store in episodic memory
+  │      ├─ Analisi performance episodio
+  │      ├─ Estrazione pattern di successo
+  │      ├─ Identificazione miglioramenti
+  │      ├─ Aggiornamento pattern cache
+  │      └─ Memorizzazione in episodic memory
   │      │
-  └─→ [8. RETURN RESULT]
+  └─→ [8. RESTITUZIONE RISULTATO]
 ```
 
-## Component Interaction - Sequence Diagram
+## Interazione tra Componenti - Diagramma di Sequenza
 
 ```
-User    Goal      Planning   Memory    Model     Tool      Safety
- │      Analysis  Engine     System    Router    Registry  Verifier
+User    Analisi   Planning   Memory    Model     Tool      Safety
+ │      Goal      Engine     System    Router    Registry  Verifier
  │        │         │          │         │          │         │
  ├──task─→│         │          │         │          │         │
  │        │         │          │         │          │         │
  │        ├─goals──→│          │         │          │         │
  │        │         │          │         │          │         │
- │        │         ├─retrieve→│         │          │         │
+ │        │         ├─recupero→│         │          │         │
  │        │         │←─context─┤         │          │         │
  │        │         │          │         │          │         │
- │        │         ├─plan─────┴─────────┤          │         │
+ │        │         ├─piano────┴─────────┤          │         │
  │        │         │                    │          │         │
- │        │         │        FOR each step:         │         │
+ │        │         │        PER ogni step:         │         │
  │        │         │                    │          │         │
- │        │         ├────────────────────┼──────────┼──verify→│
- │        │         │                    │          │←─ok─────┤
+ │        │         ├────────────────────┼──────────┼──verif→│
+ │        │         │                    │          │←─ok────┤
  │        │         │                    │          │         │
- │        │         ├────────model call──→          │         │
- │        │         │←─────response──────┤          │         │
+ │        │         ├────────chiamata modello──────→          │
+ │        │         │←─────risposta──────┤          │         │
  │        │         │                    │          │         │
- │        │         ├─────────────────────tool call→│         │
- │        │         │←────────────────────result────┤         │
+ │        │         ├─────────────────────chiamata tool──────→│
+ │        │         │←────────────────────risultato─┤         │
  │        │         │                    │          │         │
- │        │         ├──store result─────→│          │         │
+ │        │         ├──salva risultato──→│          │         │
  │        │         │                    │          │         │
- │        │         │        END LOOP    │          │         │
+ │        │         │        FINE LOOP   │          │         │
  │        │         │                    │          │         │
- │        │         ├──reflect──────────→│          │         │
- │        │         │←──updated patterns─┤          │         │
+ │        │         ├──reflection───────→│          │         │
+ │        │         │←──pattern aggiornat─┤         │         │
  │        │         │                    │          │         │
  │←result─┴─────────┴────────────────────┴──────────┴─────────┘
 ```
 
-## Data Flow Architecture
+## Architettura Flussi Dati
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                         DATA FLOWS                             │
+│                         FLUSSI DATI                            │
 │                                                                │
 │  ┌──────────┐                                                 │
 │  │  INPUT   │                                                 │
@@ -218,21 +218,21 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │       │                                                       │
 │       ↓                                                       │
 │  ┌─────────────────────┐                                     │
-│  │  VALIDATION LAYER   │                                     │
-│  │  ├─ Schema check    │                                     │
-│  │  ├─ Sanitization    │                                     │
-│  │  └─ Injection detect│                                     │
+│  │  LAYER VALIDAZIONE  │                                     │
+│  │  ├─ Check schema    │                                     │
+│  │  ├─ Sanitizzazione  │                                     │
+│  │  └─ Detect injection│                                     │
 │  └────┬────────────────┘                                     │
 │       │                                                       │
 │       ↓                                                       │
 │  ┌─────────────────────┐       ┌──────────────┐             │
-│  │  GOAL EXTRACTION    │──────→│   Working    │             │
+│  │  ESTRAZIONE GOAL    │──────→│   Working    │             │
 │  │                     │       │   Memory     │             │
 │  └────┬────────────────┘       └──────────────┘             │
 │       │                                                       │
 │       ↓                                                       │
 │  ┌─────────────────────┐       ┌──────────────┐             │
-│  │ CONTEXT RETRIEVAL   │←─────→│  Episodic    │             │
+│  │ RECUPERO CONTESTO   │←─────→│  Episodic    │             │
 │  │                     │       │   Memory     │             │
 │  └────┬────────────────┘       └──────────────┘             │
 │       │                        ┌──────────────┐             │
@@ -240,7 +240,7 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │       │                   │    │    Cache     │             │
 │       ↓                   │    └──────────────┘             │
 │  ┌─────────────────────┐ │                                  │
-│  │   PLAN GENERATION   │─┘                                  │
+│  │   GENERAZIONE PIANO │─┘                                  │
 │  │                     │                                    │
 │  └────┬────────────────┘                                    │
 │       │                                                      │
@@ -248,11 +248,11 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │  ┌─────────────────────┐       ┌──────────────┐            │
 │  │  EXECUTION ENGINE   │──────→│    Model     │            │
 │  │                     │       │    Router    │            │
-│  │  FOR each step:     │       └──────────────┘            │
+│  │  PER ogni step:     │       └──────────────┘            │
 │  │    ├─ Route model   │                                   │
-│  │    ├─ Call tools    │       ┌──────────────┐            │
-│  │    ├─ Verify output │──────→│    Tool      │            │
-│  │    └─ Update state  │       │   Registry   │            │
+│  │    ├─ Chiama tools  │       ┌──────────────┐            │
+│  │    ├─ Verif. output │──────→│    Tool      │            │
+│  │    └─ Aggiorna stato│       │   Registry   │            │
 │  └────┬────────────────┘       └──────────────┘            │
 │       │                                                      │
 │       │                        ┌──────────────┐             │
@@ -263,47 +263,47 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │  ┌─────────────────────┐                                    │
 │  │     REFLECTION      │                                    │
 │  │                     │                                    │
-│  │  ├─ Analyze         │────→ Update Pattern Cache         │
-│  │  ├─ Extract         │────→ Store Episode                │
-│  │  └─ Learn           │                                   │
+│  │  ├─ Analizza        │────→ Aggiorna Pattern Cache       │
+│  │  ├─ Estrae          │────→ Memorizza Episodio           │
+│  │  └─ Apprende        │                                   │
 │  └────┬────────────────┘                                    │
 │       │                                                      │
 │       ↓                                                      │
 │  ┌─────────────────────┐                                    │
-│  │  FINAL VALIDATION   │                                    │
+│  │  VALIDAZIONE FINALE │                                    │
 │  └────┬────────────────┘                                    │
 │       │                                                      │
 │       ↓                                                      │
 │  ┌──────────┐                                               │
 │  │  OUTPUT  │                                               │
-│  │  RESULT  │                                               │
+│  │ RISULTATO│                                               │
 │  └──────────┘                                               │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-## State Machine - Execution States
+## Macchina a Stati - Stati di Esecuzione
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    AGENT STATE MACHINE                          │
+│                    MACCHINA A STATI AGENTE                      │
 │                                                                 │
 │                     ┌──────────┐                               │
-│                     │  IDLE    │                               │
+│                     │   IDLE   │                               │
 │                     └────┬─────┘                               │
-│                          │ task received                        │
+│                          │ task ricevuto                        │
 │                          ↓                                      │
 │                   ┌─────────────┐                              │
 │          ┌────────│  ANALYZING  │────────┐                     │
 │          │        └─────────────┘        │                     │
 │          │                               │                     │
-│    validation fail                  validation success         │
+│    validazione fail                 validazione ok             │
 │          │                               │                     │
 │          ↓                               ↓                     │
 │    ┌───────────┐                  ┌────────────┐              │
 │    │  FAILED   │                  │  PLANNING  │              │
 │    └───────────┘                  └─────┬──────┘              │
 │          │                              │                     │
-│          │                         plan ready                 │
+│          │                         piano pronto               │
 │          │                              │                     │
 │          │                              ↓                     │
 │          │                       ┌─────────────┐              │
@@ -312,13 +312,13 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │          │                              │             │       │
 │          │                    ┌─────────┴────────┐    │       │
 │          │                    │                  │    │       │
-│          │              step success       step failed│       │
+│          │              step successo      step fallito│      │
 │          │                    │                  │    │       │
-│          │              next step          recoverable│       │
+│          │              step successivo    recuperabile│      │
 │          │                    │                  │    │       │
 │          │                    └─────────┬────────┘    │       │
 │          │                              │             │       │
-│          │                    all steps complete   retry      │
+│          │                    tutti step completi   retry     │
 │          │                              │             │       │
 │          │                              ↓             │       │
 │          │                       ┌─────────────┐     │       │
@@ -327,9 +327,9 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │          │                              │            │       │
 │          │                    ┌─────────┴─────────┐  │       │
 │          │                    │                   │  │       │
-│          │             verification ok    verification fail  │
+│          │             verifica ok       verifica fail│       │
 │          │                    │                   │  │       │
-│          │                    │             needs replan     │
+│          │                    │             serve replan     │
 │          │                    │                   │  │       │
 │          │                    │                   └──┘       │
 │          │                    ↓                              │
@@ -344,19 +344,19 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │                               │                              │
 │                               ↓                              │
 │                        ┌──────────┐                          │
-│                        │  IDLE    │                          │
+│                        │   IDLE   │                          │
 │                        └──────────┘                          │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Component Dependencies
+## Dipendenze tra Componenti
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                    DEPENDENCY GRAPH                              │
+│                    GRAFO DIPENDENZE                              │
 │                                                                  │
 │                    ┌─────────────────┐                          │
-│                    │  Goal Analysis  │                          │
+│                    │  Analisi Goal   │                          │
 │                    └────────┬────────┘                          │
 │                             │                                   │
 │                             ↓                                   │
@@ -390,30 +390,30 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │                         │                                       │
 │                         ↓                                       │
 │          ┌──────────────────────────────┐                      │
-│          │  (cycles back to Memory)     │                      │
+│          │  (ritorna alla Memory)       │                      │
 │          └──────────────────────────────┘                      │
 │                                                                  │
 │  Cross-cutting:                                                 │
 │  ┌─────────────────────────────────────────────────────┐       │
-│  │ Observability System (monitors all components)      │       │
+│  │ Observability System (monitora tutti i componenti)  │       │
 │  └─────────────────────────────────────────────────────┘       │
 │  ┌─────────────────────────────────────────────────────┐       │
-│  │ Resource Manager (controls all components)          │       │
+│  │ Resource Manager (controlla tutti i componenti)     │       │
 │  └─────────────────────────────────────────────────────┘       │
 │  ┌─────────────────────────────────────────────────────┐       │
-│  │ Error Handler (wraps all components)                │       │
+│  │ Error Handler (avvolge tutti i componenti)          │       │
 │  └─────────────────────────────────────────────────────┘       │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-## Deployment Architecture
+## Architettura di Deployment
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
-│                      DEPLOYMENT VIEW                               │
+│                      VISTA DEPLOYMENT                              │
 │                                                                    │
 │  ┌──────────────────────────────────────────────────────────────┐ │
-│  │  APPLICATION TIER                                            │ │
+│  │  TIER APPLICAZIONE                                           │ │
 │  │                                                              │ │
 │  │  ┌────────────┐  ┌────────────┐  ┌────────────┐            │ │
 │  │  │  Agent     │  │  Agent     │  │  Agent     │            │ │
@@ -425,30 +425,30 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │            └───────────────┴───────────────┘                     │
 │                            │                                     │
 │  ┌─────────────────────────┼──────────────────────────────────┐ │
-│  │  CACHE TIER              │                                  │ │
+│  │  TIER CACHE              │                                  │ │
 │  │                          ↓                                  │ │
 │  │  ┌─────────────────────────────────────────┐               │ │
 │  │  │         Redis / Memcached                │               │ │
-│  │  │  (Pattern Cache, Session State)          │               │ │
+│  │  │  (Pattern Cache, Stato Sessione)         │               │ │
 │  │  └───────────────────┬─────────────────────┘               │ │
 │  └────────────────────────────────────────────────────────────┘ │
 │                            │                                     │
 │  ┌─────────────────────────┼──────────────────────────────────┐ │
-│  │  DATA TIER               │                                  │ │
+│  │  TIER DATI               │                                  │ │
 │  │                          ↓                                  │ │
 │  │  ┌─────────────┐   ┌──────────────┐   ┌─────────────┐    │ │
 │  │  │  PostgreSQL │   │   Pinecone   │   │  S3/Blob    │    │ │
-│  │  │  (Metadata) │   │  (Episodic   │   │  (Logs,     │    │ │
-│  │  │             │   │   Memory)    │   │  Artifacts) │    │ │
+│  │  │  (Metadata) │   │  (Episodic   │   │  (Log,      │    │ │
+│  │  │             │   │   Memory)    │   │  Artifact)  │    │ │
 │  │  └─────────────┘   └──────────────┘   └─────────────┘    │ │
 │  └────────────────────────────────────────────────────────────┘ │
 │                                                                  │
 │  ┌──────────────────────────────────────────────────────────────┐ │
-│  │  EXTERNAL SERVICES                                           │ │
+│  │  SERVIZI ESTERNI                                             │ │
 │  │                                                              │ │
 │  │  ┌───────────┐   ┌────────────┐   ┌─────────────┐          │ │
-│  │  │  Anthropic│   │  OpenAI    │   │   Custom    │          │ │
-│  │  │  Claude   │   │  GPT-4     │   │   Tools     │          │ │
+│  │  │  Anthropic│   │  OpenAI    │   │   Tool      │          │ │
+│  │  │  Claude   │   │  GPT-4     │   │   Custom    │          │ │
 │  │  └───────────┘   └────────────┘   └─────────────┘          │ │
 │  └──────────────────────────────────────────────────────────────┘ │
 │                                                                  │
@@ -457,56 +457,56 @@ User    Goal      Planning   Memory    Model     Tool      Safety
 │  │                                                              │ │
 │  │  ┌───────────┐   ┌────────────┐   ┌─────────────┐          │ │
 │  │  │Prometheus │   │  Grafana   │   │    ELK      │          │ │
-│  │  │ (Metrics) │   │ (Dashboards│   │   (Logs)    │          │ │
+│  │  │ (Metriche)│   │ (Dashboard)│   │   (Log)     │          │ │
 │  │  └───────────┘   └────────────┘   └─────────────┘          │ │
 │  └──────────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────────┘
 ```
 
-## Performance Characteristics
+## Caratteristiche di Performance
 
-### Latency Budget Breakdown
+### Breakdown Budget Latenza
 
 ```
-Total Target: 5-30s for medium complexity task
+Target Totale: 5-30s per task complessità media
 
 ┌────────────────────────────────────────┐
-│ Component          Time      % of Total│
+│ Componente          Tempo    % Totale  │
 ├────────────────────────────────────────┤
-│ Goal Analysis      0.5s      2%        │
-│ Context Retrieval  1.0s      5%        │
-│ Planning           2.0s      10%       │
-│ Execution:                             │
-│   - Model calls    15.0s     70%       │
-│   - Tool execution 3.0s      13%       │
-│ Verification       0.5s      2%        │
-│ Reflection         1.0s      5%        │
+│ Analisi Goal        0.5s      2%       │
+│ Recupero Contesto   1.0s      5%       │
+│ Pianificazione      2.0s      10%      │
+│ Esecuzione:                            │
+│   - Chiamate model  15.0s     70%      │
+│   - Esecuzione tool 3.0s      13%      │
+│ Verifica            0.5s      2%       │
+│ Reflection          1.0s      5%       │
 ├────────────────────────────────────────┤
-│ TOTAL              ~23s      ~100%     │
+│ TOTALE              ~23s      ~100%    │
 └────────────────────────────────────────┘
 
-Optimization strategies:
-- Model routing (use fast models when sufficient)
-- Parallel tool execution
-- Cached pattern reuse
-- Streaming for perceived latency
+Strategie di ottimizzazione:
+- Routing modelli (usa modelli veloci quando sufficiente)
+- Esecuzione parallela tool
+- Riuso pattern cached
+- Streaming per latenza percepita
 ```
 
-### Scalability Characteristics
+### Caratteristiche di Scalabilità
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│ Dimension         Current    Target    Scaling Strategy  │
+│ Dimensione        Corrente  Target    Strategia Scaling  │
 ├──────────────────────────────────────────────────────────┤
-│ Concurrent Users  10-50      100-500   Horizontal        │
-│ Tasks/Hour        100-500    5K-10K    Horizontal        │
-│ Memory Episodes   10K        1M+       Vector DB scale   │
-│ Pattern Cache     1K         10K+      Distributed cache │
-│ Average Latency   5-30s      <30s      Model optimization│
-│ Success Rate      85-95%     >90%      Continuous learn  │
+│ Utenti Concurrent 10-50     100-500   Orizzontale        │
+│ Task/Ora          100-500   5K-10K    Orizzontale        │
+│ Episodi Memory    10K       1M+       Scala Vector DB    │
+│ Pattern Cache     1K        10K+      Cache distribuita  │
+│ Latenza Media     5-30s     <30s      Ottimizz. modelli │
+│ Success Rate      85-95%    >90%      Apprendimento cont│
 └──────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-**Next**: [02-cognitive-layer.md](02-cognitive-layer.md) → Detailed specifications of reasoning components
+**Prossimo**: [02-cognitive-layer.md](02-cognitive-layer.md) → Specifiche dettagliate dei componenti di ragionamento

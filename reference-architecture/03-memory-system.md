@@ -1,1406 +1,1406 @@
-# Memory System: Knowledge Storage and Retrieval
+# Sistema di Memoria: Archiviazione e Recupero della Conoscenza
 
-## Overview
+## Panoramica
 
-Il Memory System è la componente che permette all'agente di mantenere contesto, ricordare esperienze passate, e accumulare conoscenza nel tempo. È strutturato in tre sottosistemi specializzati, ciascuno con caratteristiche e scopi diversi.
+Il Sistema di Memoria è la componente che permette all'agente di mantenere contesto, ricordare esperienze passate e accumulare conoscenza nel tempo. È strutturato in tre sottosistemi specializzati, ciascuno con caratteristiche e scopi diversi.
 
 ```
 ┌───────────────────────────────────────────────────────────────┐
-│                      MEMORY SYSTEM                            │
+│                      SISTEMA DI MEMORIA                       │
 │                                                               │
 │  ┌─────────────────────────────────────────────────────────┐ │
-│  │  WORKING MEMORY                                         │ │
-│  │  • Current task context                                 │ │
-│  │  • Intermediate results                                 │ │
-│  │  • Active reasoning state                               │ │
-│  │  Storage: In-memory, ~20K tokens                        │ │
-│  │  Lifetime: Single task execution                        │ │
+│  │  MEMORIA DI LAVORO                                      │ │
+│  │  • Contesto della task corrente                         │ │
+│  │  • Risultati intermedi                                  │ │
+│  │  • Stato di reasoning attivo                            │ │
+│  │  Archiviazione: In-memory, ~20K token                   │ │
+│  │  Durata: Singola esecuzione di task                     │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                          ↕                                    │
 │  ┌─────────────────────────────────────────────────────────┐ │
-│  │  EPISODIC MEMORY                                        │ │
-│  │  • Historical task executions                           │ │
-│  │  • Complete execution traces                            │ │
-│  │  • Outcomes and learnings                               │ │
-│  │  Storage: Vector DB, millions of episodes              │ │
-│  │  Lifetime: Permanent (with aging)                       │ │
+│  │  MEMORIA EPISODICA                                      │ │
+│  │  • Esecuzioni storiche di task                          │ │
+│  │  • Tracce complete di esecuzione                        │ │
+│  │  • Risultati e apprendimenti                            │ │
+│  │  Archiviazione: Vector DB, milioni di episodi           │ │
+│  │  Durata: Permanente (con invecchiamento)                │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                          ↕                                    │
 │  ┌─────────────────────────────────────────────────────────┐ │
-│  │  PATTERN CACHE                                          │ │
-│  │  • Learned strategies                                   │ │
-│  │  • Validated heuristics                                 │ │
-│  │  • Reusable templates                                   │ │
-│  │  Storage: Structured DB, thousands of patterns         │ │
-│  │  Lifetime: Permanent (with validation)                  │ │
+│  │  CACHE DEI PATTERN                                      │ │
+│  │  • Strategie apprese                                    │ │
+│  │  • Euristiche validate                                  │ │
+│  │  • Template riusabili                                   │ │
+│  │  Archiviazione: Structured DB, migliaia di pattern      │ │
+│  │  Durata: Permanente (con validazione)                   │ │
 │  └─────────────────────────────────────────────────────────┘ │
 │                                                               │
-│  Data Flows:                                                  │
-│  • Task Start → Load context into Working Memory              │
-│  • During Execution → Query Episodic for similar cases        │
-│  • During Planning → Retrieve Patterns from Cache             │
-│  • Task End → Store episode in Episodic Memory                │
-│  • Reflection → Update Pattern Cache                          │
+│  Flussi di Dati:                                              │
+│  • Inizio Task → Carica contesto in Memoria di Lavoro         │
+│  • Durante Esecuzione → Interroga Episodica per casi simili   │
+│  • Durante Pianificazione → Recupera Pattern da Cache         │
+│  • Fine Task → Memorizza episodio in Memoria Episodica        │
+│  • Riflessione → Aggiorna Cache dei Pattern                   │
 └───────────────────────────────────────────────────────────────┘
 ```
 
-## 1. Working Memory
+## 1. Memoria di Lavoro
 
-### 1.1 Purpose & Responsibilities
+### 1.1 Scopo e Responsabilità
 
-**Core Function**: Mantenere contesto immediato necessario per reasoning e execution della task corrente.
+**Funzione Principale**: Mantenere contesto immediato necessario per reasoning ed execution della task corrente.
 
-**Characteristics**:
+**Caratteristiche**:
 - **Volatile**: Esiste solo per durata di un'esecuzione
-- **Size-Limited**: ~20K tokens max (LLM context window constraint)
-- **Fast Access**: In-memory, latenza <1ms
-- **Structured**: Organizzato per facilitare accesso
+- **Dimensione Limitata**: ~20K token max (vincolo context window LLM)
+- **Accesso Veloce**: In-memory, latenza <1ms
+- **Strutturato**: Organizzato per facilitare accesso
 
-**Responsibilities**:
-1. **Context Management**: Mantenere informazioni rilevanti per task corrente
-2. **State Tracking**: Tracciare stato di esecuzione
-3. **Result Caching**: Memorizzare output intermedi
-4. **Variable Storage**: Gestire variabili temporanee
-5. **Context Pruning**: Gestire limite di size, rimuovere info non più rilevanti
+**Responsabilità**:
+1. **Gestione Contesto**: Mantenere informazioni rilevanti per task corrente
+2. **Tracciamento Stato**: Tracciare stato di esecuzione
+3. **Caching Risultati**: Memorizzare output intermedi
+4. **Archiviazione Variabili**: Gestire variabili temporanee
+5. **Potatura Contesto**: Gestire limite di size, rimuovere info non più rilevanti
 
-### 1.2 Working Memory Structure
+### 1.2 Struttura della Memoria di Lavoro
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    WORKING MEMORY LAYOUT                       │
+│               LAYOUT DELLA MEMORIA DI LAVORO                   │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  SYSTEM CONTEXT (Static, ~2K tokens)                     │ │
-│  │  • Agent capabilities                                    │ │
-│  │  • Available tools                                       │ │
-│  │  • Configuration                                         │ │
-│  │  • Safety bounds                                         │ │
+│  │  CONTESTO DI SISTEMA (Statico, ~2K token)                │ │
+│  │  • Capacità dell'agente                                  │ │
+│  │  • Strumenti disponibili                                 │ │
+│  │  • Configurazione                                        │ │
+│  │  • Limiti di sicurezza                                   │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  TASK CONTEXT (~5K tokens, Hot)                          │ │
-│  │  • Original task description                             │ │
-│  │  • Parsed goals and constraints                          │ │
-│  │  • Success criteria                                      │ │
-│  │  • Execution plan                                        │ │
+│  │  CONTESTO TASK (~5K token, Caldo)                        │ │
+│  │  • Descrizione originale della task                      │ │
+│  │  • Obiettivi e vincoli analizzati                        │ │
+│  │  • Criteri di successo                                   │ │
+│  │  • Piano di esecuzione                                   │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  EXECUTION STATE (~3K tokens, Dynamic)                   │ │
-│  │  • Current phase (analysis, planning, execution)         │ │
-│  │  • Completed subtasks                                    │ │
-│  │  • In-progress subtasks                                  │ │
-│  │  • Failed subtasks with errors                           │ │
+│  │  STATO DI ESECUZIONE (~3K token, Dinamico)               │ │
+│  │  • Fase corrente (analisi, pianificazione, esecuzione)   │ │
+│  │  • Subtask completate                                    │ │
+│  │  • Subtask in corso                                      │ │
+│  │  • Subtask fallite con errori                            │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  INTERMEDIATE RESULTS (~8K tokens, Warm)                 │ │
-│  │  • Recent subtask outputs (last 5-7)                     │ │
-│  │  • Key computed values                                   │ │
-│  │  • Temporary files/data references                       │ │
+│  │  RISULTATI INTERMEDI (~8K token, Tiepido)                │ │
+│  │  • Output di subtask recenti (ultimi 5-7)                │ │
+│  │  • Valori calcolati chiave                               │ │
+│  │  • Riferimenti a file/dati temporanei                    │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  RETRIEVED CONTEXT (~2K tokens, Cold)                    │ │
-│  │  • Relevant episodes (summaries)                         │ │
-│  │  • Applicable patterns                                   │ │
-│  │  • Domain knowledge snippets                             │ │
+│  │  CONTESTO RECUPERATO (~2K token, Freddo)                 │ │
+│  │  • Episodi rilevanti (riassunti)                         │ │
+│  │  • Pattern applicabili                                   │ │
+│  │  • Frammenti di conoscenza di dominio                    │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  Total: ~20K tokens (fits in LLM context)                      │
+│  Totale: ~20K token (rientra in contesto LLM)                  │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 1.3 Context Management Strategies
+### 1.3 Strategie di Gestione del Contesto
 
-**Challenge**: LLM context windows sono limitati, ma task possono generare molto più contesto di quanto fittable.
+**Sfida**: Le context window degli LLM sono limitate, ma le task possono generare molto più contesto di quanto possa essere contenuto.
 
-**Solution**: Hierarchical context management con "temperature" layers.
+**Soluzione**: Gestione gerarchica del contesto con layer di "temperatura".
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│            CONTEXT TEMPERATURE LAYERS                    │
+│            LAYER DI TEMPERATURA DEL CONTESTO             │
 │                                                          │
-│  HOT (Always in context)                                 │
-│  ├─ Current subtask being executed                       │
-│  ├─ Immediately previous subtask output                  │
-│  ├─ Goal and success criteria                            │
-│  └─ Critical constraints                                 │
-│      → Total: ~5K tokens                                 │
+│  CALDO (Sempre nel contesto)                             │
+│  ├─ Subtask corrente in esecuzione                       │
+│  ├─ Output della subtask immediatamente precedente       │
+│  ├─ Obiettivo e criteri di successo                      │
+│  └─ Vincoli critici                                      │
+│      → Totale: ~5K token                                 │
 │                                                          │
-│  WARM (Included if space available)                      │
-│  ├─ Recent subtask outputs (2-5 back)                    │
-│  ├─ Execution plan structure                             │
-│  ├─ Key intermediate computations                        │
-│  └─ Retrieved patterns/episodes                          │
-│      → Total: ~10K tokens                                │
+│  TIEPIDO (Incluso se lo spazio è disponibile)            │
+│  ├─ Output di subtask recenti (da 2 a 5 indietro)        │
+│  ├─ Struttura del piano di esecuzione                    │
+│  ├─ Calcoli intermedi chiave                             │
+│  └─ Pattern/episodi recuperati                           │
+│      → Totale: ~10K token                                │
 │                                                          │
-│  COLD (Summarized or referenced)                         │
-│  ├─ Old subtask outputs (>5 back)                        │
-│  ├─ Detailed execution traces                            │
-│  ├─ Large data structures                                │
-│  └─ Full episode histories                               │
-│      → Stored externally, retrieved on demand            │
+│  FREDDO (Riassunto o referenziato)                       │
+│  ├─ Output di subtask vecchi (>5 indietro)               │
+│  ├─ Tracce di esecuzione dettagliate                     │
+│  ├─ Strutture dati grandi                                │
+│  └─ Cronologie complete di episodi                       │
+│      → Archiviato esternamente, recuperato su richiesta  │
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Context Pruning Algorithm**:
+**Algoritmo di Potatura del Contesto**:
 ```
-Function MANAGE_CONTEXT(working_memory, new_content):
+Funzione GESTISCI_CONTESTO(memoria_di_lavoro, nuovo_contenuto):
 
-  # Check if adding new content exceeds limit
-  IF working_memory.size + new_content.size > LIMIT:
+  # Controlla se aggiungere nuovo contenuto supera il limite
+  SE memoria_di_lavoro.dimensione + nuovo_contenuto.dimensione > LIMITE:
 
-    # STEP 1: Identify what can be pruned
-    prunable = []
+    # PASSO 1: Identifica ciò che può essere potato
+    potabile = []
 
-    # Candidate 1: Old intermediate results
-    old_results = working_memory.intermediate_results.older_than(5_subtasks)
-    FOR result IN old_results:
-      IF NOT result.is_referenced_by_future_tasks:
-        prunable.append(result)
+    # Candidato 1: Vecchi risultati intermedi
+    risultati_vecchi = memoria_di_lavoro.risultati_intermedi.più_vecchi_di(5_subtask)
+    PER OGNI risultato IN risultati_vecchi:
+      SE NON risultato.è_referenziato_da_task_future:
+        potabile.aggiungi(risultato)
 
-    # Candidate 2: Detailed traces (keep summaries)
-    detailed_traces = working_memory.execution_traces
-    FOR trace IN detailed_traces:
-      summary = SUMMARIZE(trace)
-      prunable.append({original: trace, replacement: summary})
+    # Candidato 2: Tracce dettagliate (mantieni riassunti)
+    tracce_dettagliate = memoria_di_lavoro.tracce_esecuzione
+    PER OGNI traccia IN tracce_dettagliate:
+      riassunto = RIASSUMI(traccia)
+      potabile.aggiungi({originale: traccia, sostituzione: riassunto})
 
-    # Candidate 3: Retrieved context not yet used
-    unused_retrieved = working_memory.retrieved_context.not_accessed
-    prunable.append(unused_retrieved)
+    # Candidato 3: Contesto recuperato non ancora usato
+    recuperato_non_usato = memoria_di_lavoro.contesto_recuperato.non_accesso
+    potabile.aggiungi(recuperato_non_usato)
 
-    # STEP 2: Move to external storage
-    FOR item IN prunable:
-      IF item.type == "intermediate_result":
-        STORE_IN_EPISODIC_MEMORY(item)
-        working_memory.add_reference(item.id, "episodic")
-      ELSE IF item.type == "trace":
-        REPLACE(item.original, item.replacement)
+    # PASSO 2: Sposta in archiviazione esterna
+    PER OGNI elemento IN potabile:
+      SE elemento.tipo == "risultato_intermedio":
+        ARCHIVIA_IN_MEMORIA_EPISODICA(elemento)
+        memoria_di_lavoro.aggiungi_riferimento(elemento.id, "episodica")
+      ALTRIMENTI SE elemento.tipo == "traccia":
+        SOSTITUISCI(elemento.originale, elemento.sostituzione)
 
-    # STEP 3: Recalculate space
-    IF working_memory.size + new_content.size <= LIMIT:
-      working_memory.add(new_content)
-    ELSE:
-      # Escalate: context truly insufficient
-      WARN("Context limit reached despite pruning")
-      APPLY_AGGRESSIVE_SUMMARIZATION()
+    # PASSO 3: Ricalcola spazio
+    SE memoria_di_lavoro.dimensione + nuovo_contenuto.dimensione <= LIMITE:
+      memoria_di_lavoro.aggiungi(nuovo_contenuto)
+    ALTRIMENTI:
+      # Escalation: contesto veramente insufficiente
+      AVVISA("Limite di contesto raggiunto nonostante la potatura")
+      APPLICA_RIASSUNTO_AGGRESSIVO()
 ```
 
-### 1.4 Variable Storage
+### 1.4 Archiviazione Variabili
 
-**Purpose**: Mantenere variabili e valori computati durante esecuzione.
+**Scopo**: Mantenere variabili e valori computati durante esecuzione.
 
-**Variable Types**:
+**Tipi di Variabili**:
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                    VARIABLE TYPES                        │
+│                    TIPI DI VARIABILI                     │
 │                                                          │
-│  1. TASK VARIABLES                                       │
-│     • Extracted from goal analysis                       │
-│     • Example: target_file = "auth.py"                   │
-│     • Lifetime: Entire task                              │
+│  1. VARIABILI TASK                                       │
+│     • Estratte dall'analisi dell'obiettivo               │
+│     • Esempio: file_target = "auth.py"                   │
+│     • Durata: Intera task                                │
 │                                                          │
-│  2. INTERMEDIATE VALUES                                  │
-│     • Results of subtasks                                │
-│     • Example: jwt_library = "PyJWT"                     │
-│     • Lifetime: Until no longer referenced               │
+│  2. VALORI INTERMEDI                                     │
+│     • Risultati di subtask                               │
+│     • Esempio: libreria_jwt = "PyJWT"                    │
+│     • Durata: Fino a quando non più referenziato         │
 │                                                          │
-│  3. ACCUMULATOR VARIABLES                                │
-│     • Aggregated across subtasks                         │
-│     • Example: files_modified = ["auth.py", "test.py"]   │
-│     • Lifetime: Entire task                              │
+│  3. VARIABILI ACCUMULATORE                               │
+│     • Aggregate attraverso subtask                       │
+│     • Esempio: file_modificati = ["auth.py", "test.py"]  │
+│     • Durata: Intera task                                │
 │                                                          │
-│  4. CONTROL FLOW VARIABLES                               │
-│     • Loop counters, retry counts                        │
-│     • Example: retry_count = 2                           │
-│     • Lifetime: Scope-limited                            │
+│  4. VARIABILI DI CONTROLLO DI FLUSSO                     │
+│     • Contatori di loop, conteggi di retry               │
+│     • Esempio: conteggio_retry = 2                       │
+│     • Durata: Limitato allo scope                        │
 │                                                          │
-│  5. METADATA VARIABLES                                   │
-│     • Execution statistics                               │
-│     • Example: tokens_used = 15420                       │
-│     • Lifetime: Entire task                              │
+│  5. VARIABILI METADATA                                   │
+│     • Statistiche di esecuzione                          │
+│     • Esempio: token_usati = 15420                       │
+│     • Durata: Intera task                                │
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Variable Binding and Scope**:
+**Binding e Scope delle Variabili**:
 ```
-Variable Storage Schema:
+Schema di Archiviazione Variabili:
 
 {
-  "global": {
-    // Available throughout task
+  "globale": {
+    // Disponibile per tutta la task
     "task_id": "task_12345",
     "user_id": "user_789",
-    "working_directory": "/project/src"
+    "directory_lavoro": "/project/src"
   },
 
-  "task_scope": {
-    // From goal analysis
-    "primary_goal": "Add JWT authentication",
-    "target_modules": ["auth.py", "middleware.py"],
-    "constraints": {...}
+  "scope_task": {
+    // Dall'analisi dell'obiettivo
+    "obiettivo_primario": "Aggiungi autenticazione JWT",
+    "moduli_target": ["auth.py", "middleware.py"],
+    "vincoli": {...}
   },
 
-  "execution_scope": {
-    // Current execution state
-    "current_phase": "implementation",
-    "current_subtask": "create_jwt_encoder",
-    "parent_task": "implement_jwt"
+  "scope_esecuzione": {
+    // Stato di esecuzione corrente
+    "fase_corrente": "implementazione",
+    "subtask_corrente": "crea_encoder_jwt",
+    "task_genitore": "implementa_jwt"
   },
 
-  "intermediate_values": {
-    // Keyed by subtask_id
+  "valori_intermedi": {
+    // Indicizzati per subtask_id
     "subtask_001": {
       "output": "PyJWT",
-      "type": "library_choice"
+      "tipo": "scelta_libreria"
     },
     "subtask_002": {
       "output": {...},
-      "type": "generated_code"
+      "tipo": "codice_generato"
     }
   },
 
   "metadata": {
-    "start_time": "2024-01-15T10:30:00Z",
-    "tokens_consumed": 15420,
-    "llm_calls": 8,
-    "cost": 0.12
+    "ora_inizio": "2024-01-15T10:30:00Z",
+    "token_consumati": 15420,
+    "chiamate_llm": 8,
+    "costo": 0.12
   }
 }
 ```
 
-### 1.5 Working Memory Operations
+### 1.5 Operazioni della Memoria di Lavoro
 
-**Core Operations**:
+**Operazioni Principali**:
 ```
-1. INIT()
-   • Initialize empty working memory for new task
-   • Load system context
-   • Allocate initial space
+1. INIZIALIZZA()
+   • Inizializza memoria di lavoro vuota per nuova task
+   • Carica contesto di sistema
+   • Alloca spazio iniziale
 
-2. LOAD_TASK_CONTEXT(task)
-   • Parse task into structured representation
-   • Store goals, constraints, context
-   • Allocate task variables
+2. CARICA_CONTESTO_TASK(task)
+   • Analizza task in rappresentazione strutturata
+   • Memorizza obiettivi, vincoli, contesto
+   • Alloca variabili task
 
-3. SET(key, value, scope)
-   • Store value in appropriate scope
-   • Update size tracking
-   • Trigger pruning if needed
+3. IMPOSTA(chiave, valore, scope)
+   • Memorizza valore nello scope appropriato
+   • Aggiorna tracciamento dimensione
+   • Attiva potatura se necessario
 
-4. GET(key, scope)
-   • Retrieve value from scope
-   • Mark as accessed (for pruning)
-   • Return value or null
+4. OTTIENI(chiave, scope)
+   • Recupera valore dallo scope
+   • Marca come accesso (per potatura)
+   • Restituisce valore o null
 
-5. PUSH_STATE(state)
-   • Save current execution state
-   • Update phase, progress
-   • Record timestamps
+5. INSERISCI_STATO(stato)
+   • Salva stato di esecuzione corrente
+   • Aggiorna fase, progressi
+   • Registra timestamp
 
-6. ADD_INTERMEDIATE(subtask_id, output)
-   • Store subtask output
-   • Update recency tracking
-   • May trigger pruning
+6. AGGIUNGI_INTERMEDIO(subtask_id, output)
+   • Memorizza output della subtask
+   • Aggiorna tracciamento recenza
+   • Può attivare potatura
 
-7. RETRIEVE_FROM_EPISODIC(query)
-   • Query episodic memory
-   • Load relevant episodes into working memory
-   • Summarize if needed to fit
+7. RECUPERA_DA_EPISODICA(query)
+   • Interroga memoria episodica
+   • Carica episodi rilevanti in memoria di lavoro
+   • Riassume se necessario per adattarsi
 
-8. PRUNE()
-   • Identify cold content
-   • Move to external storage
-   • Keep references
+8. POTA()
+   • Identifica contenuto freddo
+   • Sposta in archiviazione esterna
+   • Mantieni riferimenti
 
 9. SNAPSHOT()
-   • Create checkpoint of current state
-   • For debugging, rollback
+   • Crea checkpoint dello stato corrente
+   • Per debugging, rollback
 
-10. CLEAR()
-    • Reset working memory after task completion
-    • Keep only metadata for reflection
+10. PULISCI()
+    • Resetta memoria di lavoro dopo completamento task
+    • Mantieni solo metadata per riflessione
 ```
 
-## 2. Episodic Memory
+## 2. Memoria Episodica
 
-### 2.1 Purpose & Responsibilities
+### 2.1 Scopo e Responsabilità
 
-**Core Function**: Storagare permanente di tutti gli episodi di esecuzione per learning e retrieval futuro.
+**Funzione Principale**: Archiviazione permanente di tutti gli episodi di esecuzione per learning e recupero futuro.
 
-**Characteristics**:
-- **Persistent**: Dati sopravvivono tra sessioni
-- **Large Scale**: Millions di episodi
-- **Searchable**: Semantic e structural search
-- **Append-Only**: Episodi non modificati dopo creazione (immutable)
-- **Indexed**: Multi-dimensional indexing per fast retrieval
+**Caratteristiche**:
+- **Persistente**: Dati sopravvivono tra sessioni
+- **Larga Scala**: Milioni di episodi
+- **Ricercabile**: Ricerca semantica e strutturale
+- **Solo Aggiunte**: Episodi non modificati dopo creazione (immutabili)
+- **Indicizzato**: Indicizzazione multi-dimensionale per recupero veloce
 
-**Responsibilities**:
-1. **Episode Storage**: Persistere execution traces complete
-2. **Semantic Search**: Trovare episodi simili a query
-3. **Structured Query**: Query su attributi specifici
-4. **Aging & Archival**: Gestire lifecycle di episodi vecchi
-5. **Retrieval Optimization**: Fast access a episodi rilevanti
+**Responsabilità**:
+1. **Archiviazione Episodi**: Persistere tracce di esecuzione complete
+2. **Ricerca Semantica**: Trovare episodi simili a query
+3. **Query Strutturata**: Query su attributi specifici
+4. **Invecchiamento e Archiviazione**: Gestire lifecycle di episodi vecchi
+5. **Ottimizzazione Recupero**: Accesso veloce a episodi rilevanti
 
-### 2.2 Episode Structure
+### 2.2 Struttura dell'Episodio
 
-**Complete Episode Schema**:
+**Schema Completo dell'Episodio**:
 ```
-Episode {
-  // Identification
-  episode_id: string (UUID),
+Episodio {
+  // Identificazione
+  episodio_id: stringa (UUID),
   timestamp: datetime,
-  session_id: string,
+  sessione_id: stringa,
 
-  // Task Description
+  // Descrizione Task
   task: {
-    original_input: string,
-    parsed_goals: GoalStructure,
-    constraints: [Constraint],
-    context: Context,
-    complexity: ComplexityAssessment
+    input_originale: stringa,
+    obiettivi_analizzati: StrutturaObiettivo,
+    vincoli: [Vincolo],
+    contesto: Contesto,
+    complessità: ValutazioneComplessità
   },
 
-  // Execution Trace
-  execution: {
-    plan: ExecutionPlan,
-    trace: [TraceEntry],
-    adaptations: [Adaptation],
-    duration: float,
-    resource_usage: ResourceMetrics
+  // Traccia di Esecuzione
+  esecuzione: {
+    piano: PianoEsecuzione,
+    traccia: [VoceTraccia],
+    adattamenti: [Adattamento],
+    durata: float,
+    uso_risorse: MetricheRisorse
   },
 
-  // Outcome
-  outcome: {
-    status: "SUCCESS" | "PARTIAL" | "FAILURE",
-    primary_output: {...},
-    side_effects: [SideEffect],
-    quality_metrics: Metrics
+  // Risultato
+  risultato: {
+    stato: "SUCCESSO" | "PARZIALE" | "FALLIMENTO",
+    output_primario: {...},
+    effetti_collaterali: [EffettoCollaterale],
+    metriche_qualità: Metriche
   },
 
-  // Learning
-  reflection: {
-    insights: [Insight],
-    patterns_discovered: [Pattern],
-    failures_analyzed: [Failure],
-    performance_analysis: Analysis
+  // Apprendimento
+  riflessione: {
+    intuizioni: [Intuizione],
+    pattern_scoperti: [Pattern],
+    fallimenti_analizzati: [Fallimento],
+    analisi_performance: Analisi
   },
 
-  // Metadata for Retrieval
+  // Metadata per Recupero
   metadata: {
-    domain: string,
-    task_type: string,
-    tools_used: [string],
-    strategies_applied: [string],
-    tags: [string]
+    dominio: stringa,
+    tipo_task: stringa,
+    strumenti_usati: [stringa],
+    strategie_applicate: [stringa],
+    tag: [stringa]
   },
 
-  // Embeddings for Semantic Search
-  embeddings: {
-    task_embedding: vector(768),
-    outcome_embedding: vector(768),
-    full_episode_embedding: vector(768)
+  // Embedding per Ricerca Semantica
+  embedding: {
+    embedding_task: vettore(768),
+    embedding_risultato: vettore(768),
+    embedding_episodio_completo: vettore(768)
   },
 
   // Lifecycle
   lifecycle: {
-    access_count: int,
-    last_accessed: datetime,
-    referenced_by: [episode_id],
-    archival_status: "active" | "archived" | "deleted"
+    conteggio_accessi: int,
+    ultimo_accesso: datetime,
+    referenziato_da: [episodio_id],
+    stato_archiviazione: "attivo" | "archiviato" | "eliminato"
   }
 }
 ```
 
-### 2.3 Storage Architecture
+### 2.3 Architettura di Archiviazione
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                   EPISODIC MEMORY STORAGE                      │
+│               ARCHIVIAZIONE MEMORIA EPISODICA                  │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  VECTOR DATABASE (Semantic Search)                       │ │
-│  │  • Stores episode embeddings                             │ │
-│  │  • Fast similarity search (ANN)                          │ │
-│  │  • Technology: Pinecone, Weaviate, or Milvus            │ │
-│  │  • Index: ~768-dimensional vectors                       │ │
-│  │  • Query time: <100ms for top-K                          │ │
+│  │  VECTOR DATABASE (Ricerca Semantica)                     │ │
+│  │  • Memorizza embedding degli episodi                     │ │
+│  │  • Ricerca di similarità veloce (ANN)                    │ │
+│  │  • Tecnologia: Pinecone, Weaviate, o Milvus             │ │
+│  │  • Indice: vettori ~768-dimensionali                     │ │
+│  │  • Tempo di query: <100ms per top-K                      │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↕                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  DOCUMENT DATABASE (Structured Storage)                  │ │
-│  │  • Stores complete episode documents                     │ │
-│  │  • Indexed by episode_id                                 │ │
-│  │  • Technology: MongoDB, PostgreSQL with JSONB           │ │
-│  │  • Indices: task_type, domain, timestamp, status        │ │
-│  │  • Query time: <50ms by ID, <200ms by attributes        │ │
+│  │  DOCUMENT DATABASE (Archiviazione Strutturata)           │ │
+│  │  • Memorizza documenti episodi completi                  │ │
+│  │  • Indicizzato per episodio_id                           │ │
+│  │  • Tecnologia: MongoDB, PostgreSQL con JSONB            │ │
+│  │  • Indici: tipo_task, dominio, timestamp, stato         │ │
+│  │  • Tempo query: <50ms per ID, <200ms per attributi      │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↕                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  OBJECT STORAGE (Large Artifacts)                        │ │
-│  │  • Stores large outputs, traces                          │ │
-│  │  • Referenced by episode, not embedded                   │ │
-│  │  • Technology: S3, MinIO                                 │ │
-│  │  • Example: Large generated files, images, logs         │ │
+│  │  OBJECT STORAGE (Artefatti Grandi)                       │ │
+│  │  • Memorizza output grandi, tracce                       │ │
+│  │  • Referenziati dall'episodio, non embedded              │ │
+│  │  • Tecnologia: S3, MinIO                                 │ │
+│  │  • Esempio: File generati grandi, immagini, log         │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↕                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  CACHE LAYER (Hot Episodes)                              │ │
-│  │  • In-memory cache of frequently accessed episodes       │ │
-│  │  • Technology: Redis                                     │ │
-│  │  • Size: Last 1000 episodes or most accessed            │ │
-│  │  • Hit rate target: >70%                                 │ │
+│  │  CACHE LAYER (Episodi Caldi)                             │ │
+│  │  • Cache in-memory di episodi accessi frequentemente     │ │
+│  │  • Tecnologia: Redis                                     │ │
+│  │  • Dimensione: Ultimi 1000 episodi o più accessi         │ │
+│  │  • Tasso di hit target: >70%                             │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 2.4 Retrieval Strategies
+### 2.4 Strategie di Recupero
 
-**Multi-Modal Retrieval**: Combine different retrieval approaches per best results.
-
-```
-┌──────────────────────────────────────────────────────────┐
-│                 RETRIEVAL STRATEGIES                     │
-│                                                          │
-│  1. SEMANTIC SIMILARITY SEARCH                           │
-│     Input: Current task description                      │
-│     Method: Vector similarity (cosine, dot product)      │
-│     Output: Top-K most similar episodes                  │
-│     Use: Find similar past tasks                         │
-│                                                          │
-│  2. STRUCTURED QUERY                                     │
-│     Input: Attribute filters (domain, task_type, etc)    │
-│     Method: Database query                               │
-│     Output: Episodes matching criteria                   │
-│     Use: Find all episodes of specific type              │
-│                                                          │
-│  3. HYBRID SEARCH                                        │
-│     Input: Task description + attribute filters          │
-│     Method: Combine semantic + structured                │
-│     Output: Relevant episodes meeting criteria           │
-│     Use: "Similar to X in domain Y"                      │
-│                                                          │
-│  4. TEMPORAL SEARCH                                      │
-│     Input: Time range                                    │
-│     Method: Time-based indexing                          │
-│     Output: Recent episodes                              │
-│     Use: "What did I do this session?"                   │
-│                                                          │
-│  5. FAILURE-SPECIFIC SEARCH                              │
-│     Input: Current failure signature                     │
-│     Method: Match failure patterns                       │
-│     Output: Episodes with similar failures               │
-│     Use: Learn from past failures                        │
-└──────────────────────────────────────────────────────────┘
-```
-
-**Retrieval Algorithm**:
-```
-Function RETRIEVE_RELEVANT_EPISODES(query, context, k=5):
-
-  # STEP 1: Semantic search
-  query_embedding = EMBED(query)
-  semantic_matches = VECTOR_SEARCH(query_embedding, top_k=20)
-
-  # STEP 2: Apply contextual filters
-  filtered = []
-  FOR episode IN semantic_matches:
-    # Filter by domain if specified
-    IF context.domain AND episode.domain != context.domain:
-      CONTINUE
-
-    # Filter by recency if preferred
-    IF context.prefer_recent AND episode.age > THRESHOLD:
-      CONTINUE
-
-    # Filter by success if learning from successful episodes
-    IF context.only_successful AND episode.outcome != SUCCESS:
-      CONTINUE
-
-    filtered.append(episode)
-
-  # STEP 3: Re-rank by relevance
-  scored = []
-  FOR episode IN filtered:
-    score = COMPUTE_RELEVANCE_SCORE(episode, query, context)
-    scored.append((episode, score))
-
-  ranked = SORT_BY_SCORE(scored, descending=True)
-
-  # STEP 4: Return top-K
-  RETURN ranked[:k]
-
-Function COMPUTE_RELEVANCE_SCORE(episode, query, context):
-  score = 0
-
-  # Semantic similarity (primary)
-  score += 0.5 * COSINE_SIMILARITY(query.embedding, episode.embedding)
-
-  # Recency bonus
-  age_days = (now - episode.timestamp).days
-  recency_factor = EXP(-age_days / 30)  # Decay over ~month
-  score += 0.2 * recency_factor
-
-  # Success bonus
-  IF episode.outcome == SUCCESS:
-    score += 0.15
-
-  # Access frequency bonus (popular episodes likely useful)
-  access_factor = LOG(1 + episode.access_count) / 10
-  score += 0.1 * MIN(access_factor, 1.0)
-
-  # Domain match bonus
-  IF episode.domain == context.domain:
-    score += 0.05
-
-  RETURN score
-```
-
-### 2.5 Episode Lifecycle Management
-
-**Aging Policy**: Vecchi episodi meno rilevanti nel tempo.
+**Recupero Multi-Modale**: Combina diversi approcci di recupero per i migliori risultati.
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│                  EPISODE LIFECYCLE                       │
+│                 STRATEGIE DI RECUPERO                    │
 │                                                          │
-│  PHASE 1: ACTIVE (0-30 days)                             │
-│  • Fully indexed and searchable                          │
-│  • High retrieval priority                               │
-│  • No degradation                                        │
+│  1. RICERCA DI SIMILARITÀ SEMANTICA                      │
+│     Input: Descrizione della task corrente               │
+│     Metodo: Similarità vettoriale (coseno, prodotto dot) │
+│     Output: Top-K episodi più simili                     │
+│     Uso: Trova task passate simili                       │
 │                                                          │
-│  PHASE 2: MATURE (30-180 days)                           │
-│  • Still fully searchable                                │
-│  • Lower retrieval priority vs recent                    │
-│  • Eligible for consolidation with similar episodes      │
+│  2. QUERY STRUTTURATA                                    │
+│     Input: Filtri attributi (dominio, tipo_task, ecc)    │
+│     Metodo: Query database                               │
+│     Output: Episodi che corrispondono ai criteri         │
+│     Uso: Trova tutti gli episodi di tipo specifico       │
 │                                                          │
-│  PHASE 3: AGED (180-365 days)                            │
-│  • Detailed traces archived to cold storage              │
-│  • Summaries remain searchable                           │
-│  • Retrieved only if highly relevant                     │
+│  3. RICERCA IBRIDA                                       │
+│     Input: Descrizione task + filtri attributi           │
+│     Metodo: Combina semantica + strutturata              │
+│     Output: Episodi rilevanti che soddisfano criteri     │
+│     Uso: "Simile a X nel dominio Y"                      │
 │                                                          │
-│  PHASE 4: ARCHIVED (>365 days)                           │
-│  • Only metadata and key learnings kept                  │
-│  • Full episode in cold storage                          │
-│  • Retrieved only on explicit request                    │
+│  4. RICERCA TEMPORALE                                    │
+│     Input: Intervallo temporale                          │
+│     Metodo: Indicizzazione basata su tempo               │
+│     Output: Episodi recenti                              │
+│     Uso: "Cosa ho fatto in questa sessione?"             │
 │                                                          │
-│  PHASE 5: DELETED (Rare)                                 │
-│  • Episodes with no value (duplicates, errors)           │
-│  • Explicitly flagged for deletion                       │
-│  • Soft delete with retention period                     │
+│  5. RICERCA SPECIFICA PER FALLIMENTI                     │
+│     Input: Firma del fallimento corrente                 │
+│     Metodo: Confronta pattern di fallimento              │
+│     Output: Episodi con fallimenti simili                │
+│     Uso: Impara dai fallimenti passati                   │
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Consolidation Process**: Merge similar episodes per save storage.
+**Algoritmo di Recupero**:
+```
+Funzione RECUPERA_EPISODI_RILEVANTI(query, contesto, k=5):
+
+  # PASSO 1: Ricerca semantica
+  embedding_query = EMBEDDING(query)
+  corrispondenze_semantiche = RICERCA_VETTORIALE(embedding_query, top_k=20)
+
+  # PASSO 2: Applica filtri contestuali
+  filtrato = []
+  PER OGNI episodio IN corrispondenze_semantiche:
+    # Filtra per dominio se specificato
+    SE contesto.dominio E episodio.dominio != contesto.dominio:
+      CONTINUA
+
+    # Filtra per recenza se preferito
+    SE contesto.preferisci_recenti E episodio.età > SOGLIA:
+      CONTINUA
+
+    # Filtra per successo se impariamo da episodi riusciti
+    SE contesto.solo_riusciti E episodio.risultato != SUCCESSO:
+      CONTINUA
+
+    filtrato.aggiungi(episodio)
+
+  # PASSO 3: Ri-ordina per rilevanza
+  con_punteggio = []
+  PER OGNI episodio IN filtrato:
+    punteggio = CALCOLA_PUNTEGGIO_RILEVANZA(episodio, query, contesto)
+    con_punteggio.aggiungi((episodio, punteggio))
+
+  ordinato = ORDINA_PER_PUNTEGGIO(con_punteggio, decrescente=Vero)
+
+  # PASSO 4: Restituisci top-K
+  RESTITUISCI ordinato[:k]
+
+Funzione CALCOLA_PUNTEGGIO_RILEVANZA(episodio, query, contesto):
+  punteggio = 0
+
+  # Similarità semantica (primaria)
+  punteggio += 0.5 * SIMILARITÀ_COSENO(query.embedding, episodio.embedding)
+
+  # Bonus recenza
+  età_giorni = (ora - episodio.timestamp).giorni
+  fattore_recenza = EXP(-età_giorni / 30)  # Decadimento su ~mese
+  punteggio += 0.2 * fattore_recenza
+
+  # Bonus successo
+  SE episodio.risultato == SUCCESSO:
+    punteggio += 0.15
+
+  # Bonus frequenza accesso (episodi popolari probabilmente utili)
+  fattore_accesso = LOG(1 + episodio.conteggio_accessi) / 10
+  punteggio += 0.1 * MIN(fattore_accesso, 1.0)
+
+  # Bonus corrispondenza dominio
+  SE episodio.dominio == contesto.dominio:
+    punteggio += 0.05
+
+  RESTITUISCI punteggio
+```
+
+### 2.5 Gestione del Lifecycle degli Episodi
+
+**Politica di Invecchiamento**: Vecchi episodi meno rilevanti nel tempo.
 
 ```
-Consolidation Algorithm:
+┌──────────────────────────────────────────────────────────┐
+│                  LIFECYCLE EPISODIO                      │
+│                                                          │
+│  FASE 1: ATTIVO (0-30 giorni)                            │
+│  • Completamente indicizzato e ricercabile               │
+│  • Alta priorità di recupero                             │
+│  • Nessuna degradazione                                  │
+│                                                          │
+│  FASE 2: MATURO (30-180 giorni)                          │
+│  • Ancora completamente ricercabile                      │
+│  • Priorità di recupero più bassa vs recenti             │
+│  • Eleggibile per consolidamento con episodi simili      │
+│                                                          │
+│  FASE 3: INVECCHIATO (180-365 giorni)                    │
+│  • Tracce dettagliate archiviate in archiviazione fredda │
+│  • Riassunti rimangono ricercabili                       │
+│  • Recuperato solo se altamente rilevante                │
+│                                                          │
+│  FASE 4: ARCHIVIATO (>365 giorni)                        │
+│  • Solo metadata e apprendimenti chiave mantenuti        │
+│  • Episodio completo in archiviazione fredda             │
+│  • Recuperato solo su richiesta esplicita                │
+│                                                          │
+│  FASE 5: ELIMINATO (Raro)                                │
+│  • Episodi senza valore (duplicati, errori)              │
+│  • Esplicitamente contrassegnati per eliminazione        │
+│  • Eliminazione soft con periodo di ritenzione           │
+└──────────────────────────────────────────────────────────┘
+```
 
-1. IDENTIFY CLUSTERS
-   • Group episodes by high similarity (>0.95 cosine)
-   • Same task type, domain, outcome
-   • Within short time window
+**Processo di Consolidamento**: Unisci episodi simili per risparmiare archiviazione.
 
-2. ANALYZE CLUSTER
-   • Extract common structure
-   • Identify variations
-   • Compute aggregate statistics
+```
+Algoritmo di Consolidamento:
 
-3. CREATE CONSOLIDATED EPISODE
-   ConsolidatedEpisode {
-     representative_episode_id: string,
-     num_instances: int,
-     common_structure: {...},
-     variations: [{episode_id, diff}],
-     aggregate_stats: {
-       avg_duration: float,
-       success_rate: float,
-       common_patterns: [Pattern]
+1. IDENTIFICA CLUSTER
+   • Raggruppa episodi per alta similarità (>0.95 coseno)
+   • Stesso tipo task, dominio, risultato
+   • Entro breve finestra temporale
+
+2. ANALIZZA CLUSTER
+   • Estrai struttura comune
+   • Identifica variazioni
+   • Calcola statistiche aggregate
+
+3. CREA EPISODIO CONSOLIDATO
+   EpisodioConsolidato {
+     episodio_rappresentativo_id: stringa,
+     num_istanze: int,
+     struttura_comune: {...},
+     variazioni: [{episodio_id, diff}],
+     statistiche_aggregate: {
+       durata_media: float,
+       tasso_successo: float,
+       pattern_comuni: [Pattern]
      }
    }
 
-4. ARCHIVE ORIGINAL EPISODES
-   • Mark originals as consolidated
-   • Keep references for auditability
-   • Free up primary storage
+4. ARCHIVIA EPISODI ORIGINALI
+   • Marca originali come consolidati
+   • Mantieni riferimenti per verificabilità
+   • Libera archiviazione primaria
 
-5. UPDATE INDICES
-   • Consolidated episode gets combined embedding
-   • Maintains searchability
+5. AGGIORNA INDICI
+   • Episodio consolidato ottiene embedding combinato
+   • Mantiene ricercabilità
 ```
 
-### 2.6 Episodic Memory Operations
+### 2.6 Operazioni della Memoria Episodica
 
 ```
-1. STORE_EPISODE(episode)
-   • Validate episode structure
-   • Generate embeddings
-   • Insert into vector DB
-   • Insert into document DB
-   • Update indices
-   • Return episode_id
+1. MEMORIZZA_EPISODIO(episodio)
+   • Valida struttura episodio
+   • Genera embedding
+   • Inserisci in vector DB
+   • Inserisci in document DB
+   • Aggiorna indici
+   • Restituisci episodio_id
 
-2. RETRIEVE_BY_ID(episode_id)
-   • Check cache
-   • If miss, query document DB
-   • If archived, retrieve from cold storage
-   • Update access metadata
-   • Return episode
+2. RECUPERA_PER_ID(episodio_id)
+   • Controlla cache
+   • Se miss, interroga document DB
+   • Se archiviato, recupera da archiviazione fredda
+   • Aggiorna metadata di accesso
+   • Restituisci episodio
 
-3. SEARCH_SEMANTIC(query, k, filters)
-   • Embed query
-   • Vector search with filters
-   • Retrieve full episodes for top-K
-   • Rank by relevance
-   • Return ranked results
+3. RICERCA_SEMANTICA(query, k, filtri)
+   • Embedding della query
+   • Ricerca vettoriale con filtri
+   • Recupera episodi completi per top-K
+   • Ordina per rilevanza
+   • Restituisci risultati ordinati
 
-4. SEARCH_STRUCTURED(criteria)
-   • Build database query
-   • Execute on document DB
-   • Apply limits
-   • Return matching episodes
+4. RICERCA_STRUTTURATA(criteri)
+   • Costruisci query database
+   • Esegui su document DB
+   • Applica limiti
+   • Restituisci episodi corrispondenti
 
-5. GET_RECENT(n, filters)
-   • Query by timestamp desc
-   • Apply filters
-   • Limit to n
-   • Return episodes
+5. OTTIENI_RECENTI(n, filtri)
+   • Query per timestamp desc
+   • Applica filtri
+   • Limita a n
+   • Restituisci episodi
 
-6. GET_SIMILAR_FAILURES(failure_signature, k)
-   • Extract failure features
-   • Search for matching patterns
-   • Return episodes with similar failures
+6. OTTIENI_FALLIMENTI_SIMILI(firma_fallimento, k)
+   • Estrai caratteristiche fallimento
+   • Cerca pattern corrispondenti
+   • Restituisci episodi con fallimenti simili
 
-7. UPDATE_ACCESS_METADATA(episode_id)
-   • Increment access_count
-   • Update last_accessed
-   • Update cache
+7. AGGIORNA_METADATA_ACCESSO(episodio_id)
+   • Incrementa conteggio_accessi
+   • Aggiorna ultimo_accesso
+   • Aggiorna cache
 
-8. ARCHIVE_OLD_EPISODES(age_threshold)
-   • Identify episodes older than threshold
-   • Move detailed traces to cold storage
-   • Update archival_status
-   • Maintain searchable summaries
+8. ARCHIVIA_EPISODI_VECCHI(soglia_età)
+   • Identifica episodi più vecchi della soglia
+   • Sposta tracce dettagliate in archiviazione fredda
+   • Aggiorna stato_archiviazione
+   • Mantieni riassunti ricercabili
 
-9. CONSOLIDATE_SIMILAR(similarity_threshold)
-   • Run clustering
-   • Identify consolidation candidates
-   • Create consolidated episodes
-   • Archive originals
+9. CONSOLIDA_SIMILI(soglia_similarità)
+   • Esegui clustering
+   • Identifica candidati per consolidamento
+   • Crea episodi consolidati
+   • Archivia originali
 
-10. PURGE_DELETED(retention_period)
-    • Permanently delete episodes marked for deletion
-    • After retention period expires
+10. ELIMINA_CANCELLATI(periodo_ritenzione)
+    • Elimina permanentemente episodi marcati per eliminazione
+    • Dopo scadenza periodo di ritenzione
 ```
 
-## 3. Pattern Cache
+## 3. Cache dei Pattern
 
-### 3.1 Purpose & Responsibilities
+### 3.1 Scopo e Responsabilità
 
-**Core Function**: Storagare strategie, euristiche, e pattern validati che possono essere riusati per migliorare performance e decision-making.
+**Funzione Principale**: Archiviare strategie, euristiche e pattern validati che possono essere riusati per migliorare performance e decision-making.
 
-**Characteristics**:
-- **Curated**: Solo pattern validati con sufficiente evidenza
-- **Structured**: Organizzati per facilitare matching e application
-- **Evolvable**: Pattern aggiornati quando nuova evidenza emerge
-- **Actionable**: Direttamente applicabili in planning/execution
+**Caratteristiche**:
+- **Curato**: Solo pattern validati con sufficiente evidenza
+- **Strutturato**: Organizzati per facilitare matching e applicazione
+- **Evolvibile**: Pattern aggiornati quando nuova evidenza emerge
+- **Azionabile**: Direttamente applicabili in pianificazione/esecuzione
 
-**Difference from Episodic Memory**:
+**Differenza dalla Memoria Episodica**:
 ```
-EPISODIC MEMORY:
-  • Raw experiences (what happened)
-  • Comprehensive traces
-  • Millions of instances
-  • Immutable after creation
+MEMORIA EPISODICA:
+  • Esperienze grezze (cosa è accaduto)
+  • Tracce complete
+  • Milioni di istanze
+  • Immutabile dopo creazione
 
-PATTERN CACHE:
-  • Distilled knowledge (lessons learned)
-  • Generalized strategies
-  • Thousands of patterns
-  • Updated with new evidence
+CACHE DEI PATTERN:
+  • Conoscenza distillata (lezioni apprese)
+  • Strategie generalizzate
+  • Migliaia di pattern
+  • Aggiornato con nuova evidenza
 ```
 
-### 3.2 Pattern Taxonomy
+### 3.2 Tassonomia dei Pattern
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                     PATTERN CATEGORIES                         │
+│                     CATEGORIE DI PATTERN                       │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  1. STRATEGY PATTERNS                                    │ │
-│  │  • High-level approaches for problem classes             │ │
-│  │  • When to use which planning strategy                   │ │
-│  │  • Example: "HTN planning best for code refactoring"     │ │
-│  │  • Applicability: Problem classification → Strategy      │ │
+│  │  1. PATTERN STRATEGICI                                   │ │
+│  │  • Approcci di alto livello per classi di problemi       │ │
+│  │  • Quando usare quale strategia di pianificazione        │ │
+│  │  • Esempio: "HTN planning migliore per refactoring"      │ │
+│  │  • Applicabilità: Classificazione problema → Strategia   │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  2. DECOMPOSITION PATTERNS                               │ │
-│  │  • How to break down specific types of tasks             │ │
-│  │  • Template subtask structures                           │ │
-│  │  • Example: "API feature → design, implement, test"      │ │
-│  │  • Applicability: Task type → Decomposition template     │ │
+│  │  2. PATTERN DI DECOMPOSIZIONE                            │ │
+│  │  • Come scomporre tipi specifici di task                 │ │
+│  │  • Strutture template di subtask                         │ │
+│  │  • Esempio: "Feature API → progetta, implementa, testa"  │ │
+│  │  • Applicabilità: Tipo task → Template decomposizione    │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  3. SEQUENCE PATTERNS                                    │ │
-│  │  • Ordered steps that work well together                 │ │
-│  │  • Dependency relationships                              │ │
-│  │  • Example: "Install → Import → Verify → Test"           │ │
-│  │  • Applicability: Subtask type → Next steps              │ │
+│  │  3. PATTERN DI SEQUENZA                                  │ │
+│  │  • Passi ordinati che funzionano bene insieme            │ │
+│  │  • Relazioni di dipendenza                               │ │
+│  │  • Esempio: "Installa → Importa → Verifica → Testa"      │ │
+│  │  • Applicabilità: Tipo subtask → Passi successivi        │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  4. TOOL SELECTION PATTERNS                              │ │
-│  │  • Which tools work best for which tasks                 │ │
-│  │  • Tool combination strategies                           │ │
-│  │  • Example: "Python refactoring → use ast + black"       │ │
-│  │  • Applicability: Task features → Tool choices           │ │
+│  │  4. PATTERN DI SELEZIONE STRUMENTI                       │ │
+│  │  • Quali strumenti funzionano meglio per quali task      │ │
+│  │  • Strategie di combinazione strumenti                   │ │
+│  │  • Esempio: "Refactoring Python → usa ast + black"       │ │
+│  │  • Applicabilità: Caratteristiche task → Scelte strumenti│ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  5. FAILURE PATTERNS                                     │ │
-│  │  • Common failure modes and causes                       │ │
-│  │  • How to recognize and avoid                            │ │
-│  │  • Example: "Package install fails without pip upgrade"  │ │
-│  │  • Applicability: Failure signal → Diagnosis             │ │
+│  │  5. PATTERN DI FALLIMENTO                                │ │
+│  │  • Modalità comuni di fallimento e cause                 │ │
+│  │  • Come riconoscere ed evitare                           │ │
+│  │  • Esempio: "Install pacchetto fallisce senza pip upgrade"│
+│  │  • Applicabilità: Segnale fallimento → Diagnosi          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  6. RECOVERY PATTERNS                                    │ │
-│  │  • Effective contingency strategies                      │ │
-│  │  • Recovery sequences                                    │ │
-│  │  • Example: "API timeout → retry with backoff"           │ │
-│  │  • Applicability: Failure type → Recovery action         │ │
+│  │  6. PATTERN DI RECUPERO                                  │ │
+│  │  • Strategie di contingenza efficaci                     │ │
+│  │  • Sequenze di recupero                                  │ │
+│  │  • Esempio: "Timeout API → retry con backoff"            │ │
+│  │  • Applicabilità: Tipo fallimento → Azione recupero      │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  7. OPTIMIZATION PATTERNS                                │ │
-│  │  • Performance improvement opportunities                 │ │
-│  │  • Resource usage optimizations                          │ │
-│  │  • Example: "Independent tasks → parallelize"            │ │
-│  │  • Applicability: Code structure → Optimization          │ │
+│  │  7. PATTERN DI OTTIMIZZAZIONE                            │ │
+│  │  • Opportunità di miglioramento performance              │ │
+│  │  • Ottimizzazioni uso risorse                            │ │
+│  │  • Esempio: "Task indipendenti → parallelizza"           │ │
+│  │  • Applicabilità: Struttura codice → Ottimizzazione      │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  8. DOMAIN PATTERNS                                      │ │
-│  │  • Domain-specific best practices                        │ │
-│  │  • Conventions and idioms                                │ │
-│  │  • Example: "FastAPI → middleware for cross-cutting"     │ │
-│  │  • Applicability: Domain + goal → Approach               │ │
+│  │  8. PATTERN DI DOMINIO                                   │ │
+│  │  • Best practice specifiche del dominio                  │ │
+│  │  • Convenzioni e idiomi                                  │ │
+│  │  • Esempio: "FastAPI → middleware per cross-cutting"     │ │
+│  │  • Applicabilità: Dominio + obiettivo → Approccio        │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 3.3 Pattern Structure
+### 3.3 Struttura del Pattern
 
-**Complete Pattern Schema**:
+**Schema Completo del Pattern**:
 ```
 Pattern {
-  // Identification
-  pattern_id: string (UUID),
-  name: string,
-  category: PatternCategory,
-  version: int,
-  created_at: datetime,
-  last_updated: datetime,
+  // Identificazione
+  pattern_id: stringa (UUID),
+  nome: stringa,
+  categoria: CategoriaPattern,
+  versione: int,
+  creato_il: datetime,
+  ultimo_aggiornamento: datetime,
 
-  // Description
-  description: string,
-  summary: string (1-2 sentences),
-  detailed_explanation: string,
+  // Descrizione
+  descrizione: stringa,
+  riassunto: stringa (1-2 frasi),
+  spiegazione_dettagliata: stringa,
 
-  // Applicability
-  applicability: {
-    problem_types: [string],
-    task_features: {
-      domain: [string],
-      complexity: ComplexityRange,
-      required_capabilities: [string]
+  // Applicabilità
+  applicabilità: {
+    tipi_problema: [stringa],
+    caratteristiche_task: {
+      dominio: [stringa],
+      complessità: IntervalloComplessità,
+      capacità_richieste: [stringa]
     },
-    context_conditions: [Condition],
-    anti_conditions: [Condition]  // When NOT to apply
+    condizioni_contesto: [Condizione],
+    anti_condizioni: [Condizione]  // Quando NON applicare
   },
 
-  // Pattern Content
-  content: {
-    type: "STRATEGY" | "TEMPLATE" | "HEURISTIC" | "PROCEDURE",
+  // Contenuto Pattern
+  contenuto: {
+    tipo: "STRATEGIA" | "TEMPLATE" | "EURISTICA" | "PROCEDURA",
 
-    // For Strategy patterns
-    strategy: {
-      approach: string,
-      key_principles: [string],
-      trade_offs: string
+    // Per pattern Strategia
+    strategia: {
+      approccio: stringa,
+      principi_chiave: [stringa],
+      trade_off: stringa
     },
 
-    // For Template patterns
+    // Per pattern Template
     template: {
-      structure: {...},  // Subtask decomposition template
-      parameters: [Parameter],
-      instantiation_rules: [Rule]
+      struttura: {...},  // Template decomposizione subtask
+      parametri: [Parametro],
+      regole_instanziazione: [Regola]
     },
 
-    // For Heuristic patterns
-    heuristic: {
-      condition: Condition,
-      action: Action,
-      rationale: string
+    // Per pattern Euristica
+    euristica: {
+      condizione: Condizione,
+      azione: Azione,
+      razionale: stringa
     },
 
-    // For Procedure patterns
-    procedure: {
-      steps: [Step],
-      branching_logic: {...},
-      termination_conditions: [Condition]
+    // Per pattern Procedura
+    procedura: {
+      passi: [Passo],
+      logica_branching: {...},
+      condizioni_terminazione: [Condizione]
     }
   },
 
-  // Evidence & Validation
-  evidence: {
-    // Episodes supporting this pattern
-    supporting_episodes: [episode_id],
-    counter_episodes: [episode_id],
+  // Evidenza & Validazione
+  evidenza: {
+    // Episodi che supportano questo pattern
+    episodi_supporto: [episodio_id],
+    episodi_contrari: [episodio_id],
 
-    // Statistics
-    num_applications: int,
-    success_rate: float,
-    avg_time_saving: float,
-    avg_cost_saving: float,
-    success_rate_improvement: float,
+    // Statistiche
+    num_applicazioni: int,
+    tasso_successo: float,
+    risparmio_tempo_medio: float,
+    risparmio_costo_medio: float,
+    miglioramento_tasso_successo: float,
 
-    // Confidence
-    confidence_score: float,  // 0-1
-    statistical_significance: float,  // p-value
-    last_validated: datetime
+    // Confidenza
+    punteggio_confidenza: float,  // 0-1
+    significatività_statistica: float,  // p-value
+    ultima_validazione: datetime
   },
 
-  // Application Guidance
-  application: {
-    when_to_apply: string,
-    how_to_apply: string,
-    expected_benefits: [string],
-    potential_risks: [string],
-    alternative_patterns: [pattern_id]
+  // Guida Applicazione
+  applicazione: {
+    quando_applicare: stringa,
+    come_applicare: stringa,
+    benefici_attesi: [stringa],
+    rischi_potenziali: [stringa],
+    pattern_alternativi: [pattern_id]
   },
 
   // Lifecycle
   lifecycle: {
-    status: "CANDIDATE" | "VALIDATED" | "DEPRECATED",
-    usage_count: int,
-    last_used: datetime,
-    superseded_by: pattern_id | null,
-    deprecation_reason: string | null
+    stato: "CANDIDATO" | "VALIDATO" | "DEPRECATO",
+    conteggio_uso: int,
+    ultimo_uso: datetime,
+    sostituito_da: pattern_id | null,
+    motivo_deprecazione: stringa | null
   },
 
-  // Relationships
-  relationships: {
-    specializes: pattern_id | null,  // More specific version of
-    generalizes: [pattern_id],       // More general versions
-    contradicts: [pattern_id],       // Incompatible patterns
-    complements: [pattern_id]        // Works well with
+  // Relazioni
+  relazioni: {
+    specializza: pattern_id | null,  // Versione più specifica di
+    generalizza: [pattern_id],       // Versioni più generali
+    contraddice: [pattern_id],       // Pattern incompatibili
+    complementa: [pattern_id]        // Funziona bene con
   }
 }
 ```
 
-### 3.4 Pattern Storage and Indexing
+### 3.4 Archiviazione e Indicizzazione dei Pattern
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                   PATTERN CACHE STORAGE                        │
+│                   ARCHIVIAZIONE CACHE PATTERN                  │
 │                                                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  RELATIONAL DATABASE (Primary Storage)                   │ │
-│  │  • Structured pattern storage                            │ │
-│  │  • Complex queries on attributes                         │ │
-│  │  • Technology: PostgreSQL                                │ │
-│  │  • Indices: category, applicability, confidence          │ │
+│  │  RELATIONAL DATABASE (Archiviazione Primaria)            │ │
+│  │  • Archiviazione pattern strutturata                     │ │
+│  │  • Query complesse su attributi                          │ │
+│  │  • Tecnologia: PostgreSQL                                │ │
+│  │  • Indici: categoria, applicabilità, confidenza          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↕                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  INVERTED INDEX (Feature-based lookup)                   │ │
-│  │  • Map task features → applicable patterns               │ │
-│  │  • Fast pattern matching                                 │ │
-│  │  • Example: domain="python" → [pattern_ids]              │ │
+│  │  INVERTED INDEX (Lookup basato su caratteristiche)       │ │
+│  │  • Mappa caratteristiche task → pattern applicabili      │ │
+│  │  • Matching veloce dei pattern                           │ │
+│  │  • Esempio: dominio="python" → [pattern_ids]             │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↕                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  DECISION TREE INDEX (Conditional matching)              │ │
-│  │  • Tree structure for pattern selection                  │ │
-│  │  • Navigate by answering questions                       │ │
-│  │  • Example: Is it code task? → Yes → Python? → ...       │ │
+│  │  DECISION TREE INDEX (Matching condizionale)             │ │
+│  │  • Struttura ad albero per selezione pattern             │ │
+│  │  • Naviga rispondendo a domande                          │ │
+│  │  • Esempio: È task codice? → Sì → Python? → ...          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↕                                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  IN-MEMORY CACHE (Hot patterns)                          │ │
-│  │  • Most frequently used patterns                         │ │
-│  │  • Technology: Redis                                     │ │
-│  │  • Size: Top 100-200 patterns                            │ │
+│  │  IN-MEMORY CACHE (Pattern caldi)                         │ │
+│  │  • Pattern usati più frequentemente                      │ │
+│  │  • Tecnologia: Redis                                     │ │
+│  │  • Dimensione: Top 100-200 pattern                       │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 3.5 Pattern Matching and Selection
+### 3.5 Matching e Selezione dei Pattern
 
-**Pattern Matching Algorithm**:
+**Algoritmo di Matching dei Pattern**:
 ```
-Function FIND_APPLICABLE_PATTERNS(task, context):
+Funzione TROVA_PATTERN_APPLICABILI(task, contesto):
 
-  # STEP 1: Extract task features
-  features = EXTRACT_FEATURES(task, context)
-  # Features: {domain, task_type, complexity, required_tools, ...}
+  # PASSO 1: Estrai caratteristiche task
+  caratteristiche = ESTRAI_CARATTERISTICHE(task, contesto)
+  # Caratteristiche: {dominio, tipo_task, complessità, strumenti_richiesti, ...}
 
-  # STEP 2: Query by category (if known)
-  IF context.pattern_category_hint:
-    candidates = QUERY_PATTERNS_BY_CATEGORY(context.pattern_category_hint)
-  ELSE:
-    # Get all active patterns
-    candidates = QUERY_PATTERNS_BY_STATUS("VALIDATED")
+  # PASSO 2: Query per categoria (se nota)
+  SE contesto.suggerimento_categoria_pattern:
+    candidati = QUERY_PATTERN_PER_CATEGORIA(contesto.suggerimento_categoria_pattern)
+  ALTRIMENTI:
+    # Ottieni tutti i pattern attivi
+    candidati = QUERY_PATTERN_PER_STATO("VALIDATO")
 
-  # STEP 3: Filter by applicability
-  applicable = []
-  FOR pattern IN candidates:
+  # PASSO 3: Filtra per applicabilità
+  applicabili = []
+  PER OGNI pattern IN candidati:
 
-    # Check problem type match
-    IF task.type NOT IN pattern.applicability.problem_types:
-      CONTINUE
+    # Controlla corrispondenza tipo problema
+    SE task.tipo NON IN pattern.applicabilità.tipi_problema:
+      CONTINUA
 
-    # Check feature requirements
-    IF NOT MATCHES(features, pattern.applicability.task_features):
-      CONTINUE
+    # Controlla requisiti caratteristiche
+    SE NON CORRISPONDE(caratteristiche, pattern.applicabilità.caratteristiche_task):
+      CONTINUA
 
-    # Check context conditions
-    IF NOT EVALUATE_CONDITIONS(pattern.applicability.context_conditions, context):
-      CONTINUE
+    # Controlla condizioni contesto
+    SE NON VALUTA_CONDIZIONI(pattern.applicabilità.condizioni_contesto, contesto):
+      CONTINUA
 
-    # Check anti-conditions (when NOT to apply)
-    IF EVALUATE_CONDITIONS(pattern.applicability.anti_conditions, context):
-      CONTINUE
+    # Controlla anti-condizioni (quando NON applicare)
+    SE VALUTA_CONDIZIONI(pattern.applicabilità.anti_condizioni, contesto):
+      CONTINUA
 
-    applicable.append(pattern)
+    applicabili.aggiungi(pattern)
 
-  # STEP 4: Rank by confidence and evidence
-  ranked = RANK_PATTERNS(applicable, task, context)
+  # PASSO 4: Ordina per confidenza ed evidenza
+  ordinato = ORDINA_PATTERN(applicabili, task, contesto)
 
-  # STEP 5: Return top-K
-  RETURN ranked[:5]
+  # PASSO 5: Restituisci top-K
+  RESTITUISCI ordinato[:5]
 
-Function RANK_PATTERNS(patterns, task, context):
-  scored = []
+Funzione ORDINA_PATTERN(pattern, task, contesto):
+  con_punteggio = []
 
-  FOR pattern IN patterns:
-    score = 0
+  PER OGNI pattern IN pattern:
+    punteggio = 0
 
-    # Base score: confidence
-    score += 0.4 * pattern.evidence.confidence_score
+    # Punteggio base: confidenza
+    punteggio += 0.4 * pattern.evidenza.punteggio_confidenza
 
-    # Success rate bonus
-    score += 0.3 * pattern.evidence.success_rate
+    # Bonus tasso successo
+    punteggio += 0.3 * pattern.evidenza.tasso_successo
 
-    # Usage frequency (popular patterns likely good)
-    usage_factor = LOG(1 + pattern.lifecycle.usage_count) / 10
-    score += 0.15 * MIN(usage_factor, 1.0)
+    # Frequenza uso (pattern popolari probabilmente buoni)
+    fattore_uso = LOG(1 + pattern.lifecycle.conteggio_uso) / 10
+    punteggio += 0.15 * MIN(fattore_uso, 1.0)
 
-    # Recency bonus (recently validated patterns preferred)
-    days_since_validation = (now - pattern.evidence.last_validated).days
-    recency = EXP(-days_since_validation / 90)
-    score += 0.1 * recency
+    # Bonus recenza (pattern validati recentemente preferiti)
+    giorni_da_validazione = (ora - pattern.evidenza.ultima_validazione).giorni
+    recenza = EXP(-giorni_da_validazione / 90)
+    punteggio += 0.1 * recenza
 
-    # Feature match quality
-    match_quality = COMPUTE_FEATURE_MATCH(task, pattern.applicability)
-    score += 0.05 * match_quality
+    # Qualità corrispondenza caratteristiche
+    qualità_match = CALCOLA_MATCH_CARATTERISTICHE(task, pattern.applicabilità)
+    punteggio += 0.05 * qualità_match
 
-    scored.append((pattern, score))
+    con_punteggio.aggiungi((pattern, punteggio))
 
-  RETURN SORT_BY_SCORE(scored, descending=True)
+  RESTITUISCI ORDINA_PER_PUNTEGGIO(con_punteggio, decrescente=Vero)
 ```
 
-### 3.6 Pattern Validation and Evolution
+### 3.6 Validazione ed Evoluzione dei Pattern
 
-**Pattern Lifecycle**:
+**Lifecycle dei Pattern**:
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│                    PATTERN LIFECYCLE                           │
+│                    LIFECYCLE DEI PATTERN                       │
 │                                                                │
-│  PHASE 1: CANDIDATE                                            │
-│  • Newly discovered from reflection                            │
-│  • Insufficient evidence (<5 supporting episodes)              │
-│  • Not yet used in planning                                    │
-│  • Tracked for evidence accumulation                           │
+│  FASE 1: CANDIDATO                                             │
+│  • Appena scoperto dalla riflessione                           │
+│  • Evidenza insufficiente (<5 episodi supporto)                │
+│  • Non ancora usato nella pianificazione                       │
+│  • Tracciato per accumulo evidenza                             │
 │                                                                │
-│  ↓ (When evidence >= 5 episodes, confidence > 0.7)             │
+│  ↓ (Quando evidenza >= 5 episodi, confidenza > 0.7)            │
 │                                                                │
-│  PHASE 2: VALIDATED                                            │
-│  • Sufficient evidence gathered                                │
-│  • Statistical significance achieved                           │
-│  • Used in planning and execution                              │
-│  • Continuously monitored for performance                      │
+│  FASE 2: VALIDATO                                              │
+│  • Evidenza sufficiente raccolta                               │
+│  • Significatività statistica raggiunta                        │
+│  • Usato in pianificazione ed esecuzione                       │
+│  • Monitorato continuamente per performance                    │
 │                                                                │
-│  ↓ (If contradictory evidence emerges)                         │
+│  ↓ (Se emerge evidenza contraddittoria)                        │
 │                                                                │
-│  PHASE 3: UNDER REVIEW                                         │
-│  • New evidence contradicts pattern                            │
-│  • Success rate dropped significantly                          │
-│  • Temporarily disabled from use                               │
-│  • Re-validation process triggered                             │
+│  FASE 3: IN REVISIONE                                          │
+│  • Nuova evidenza contraddice il pattern                       │
+│  • Tasso successo calato significativamente                    │
+│  • Temporaneamente disabilitato dall'uso                       │
+│  • Processo di ri-validazione attivato                         │
 │                                                                │
-│  ↓ (Branches based on review outcome)                          │
+│  ↓ (Rami basati su esito revisione)                            │
 │                                                                │
-│  OUTCOME A: REFINED (Back to VALIDATED)                        │
-│  • Pattern updated with new insights                           │
-│  • Applicability conditions refined                            │
-│  • Evidence reset, begins re-accumulation                      │
+│  ESITO A: RAFFINATO (Torna a VALIDATO)                         │
+│  • Pattern aggiornato con nuove intuizioni                     │
+│  • Condizioni applicabilità raffinate                          │
+│  • Evidenza resettata, inizia ri-accumulazione                 │
 │                                                                │
-│  OUTCOME B: DEPRECATED                                         │
-│  • Pattern no longer valid                                     │
-│  • Superseded by better pattern                                │
-│  • Kept for historical record                                  │
-│  • Not used in new executions                                  │
+│  ESITO B: DEPRECATO                                            │
+│  • Pattern non più valido                                      │
+│  • Sostituito da pattern migliore                              │
+│  • Mantenuto per registro storico                              │
+│  • Non usato in nuove esecuzioni                               │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-**Validation Process**:
+**Processo di Validazione**:
 ```
-Function VALIDATE_PATTERN(pattern):
+Funzione VALIDA_PATTERN(pattern):
 
-  # Collect recent applications
-  recent_episodes = GET_EPISODES_USING_PATTERN(
+  # Raccogli applicazioni recenti
+  episodi_recenti = OTTIENI_EPISODI_CHE_USANO_PATTERN(
     pattern.pattern_id,
-    since=now - 90_days
+    da=ora - 90_giorni
   )
 
-  IF len(recent_episodes) < MIN_EVIDENCE_THRESHOLD:
-    RETURN "INSUFFICIENT_EVIDENCE"
+  SE lunghezza(episodi_recenti) < SOGLIA_MIN_EVIDENZA:
+    RESTITUISCI "EVIDENZA_INSUFFICIENTE"
 
-  # Compute success rate
-  successes = COUNT(episode for episode in recent_episodes
-                     if episode.outcome == SUCCESS)
-  success_rate = successes / len(recent_episodes)
+  # Calcola tasso successo
+  successi = CONTA(episodio per episodio in episodi_recenti
+                     se episodio.risultato == SUCCESSO)
+  tasso_successo = successi / lunghezza(episodi_recenti)
 
-  # Statistical significance test
-  p_value = BINOMIAL_TEST(
-    successes,
-    len(recent_episodes),
-    expected_rate=0.5  # Null hypothesis: no better than random
+  # Test significatività statistica
+  p_value = TEST_BINOMIALE(
+    successi,
+    lunghezza(episodi_recenti),
+    tasso_atteso=0.5  # Ipotesi nulla: non meglio del casuale
   )
 
-  # Update pattern evidence
-  pattern.evidence.success_rate = success_rate
-  pattern.evidence.statistical_significance = p_value
-  pattern.evidence.num_applications = len(recent_episodes)
-  pattern.evidence.last_validated = now
+  # Aggiorna evidenza pattern
+  pattern.evidenza.tasso_successo = tasso_successo
+  pattern.evidenza.significatività_statistica = p_value
+  pattern.evidenza.num_applicazioni = lunghezza(episodi_recenti)
+  pattern.evidenza.ultima_validazione = ora
 
-  # Decision
-  IF success_rate >= SUCCESS_THRESHOLD AND p_value < 0.05:
-    # Compute confidence based on evidence strength
-    confidence = COMPUTE_CONFIDENCE(success_rate, len(recent_episodes), p_value)
-    pattern.evidence.confidence_score = confidence
+  # Decisione
+  SE tasso_successo >= SOGLIA_SUCCESSO E p_value < 0.05:
+    # Calcola confidenza basata su forza evidenza
+    confidenza = CALCOLA_CONFIDENZA(tasso_successo, lunghezza(episodi_recenti), p_value)
+    pattern.evidenza.punteggio_confidenza = confidenza
 
-    IF confidence >= CONFIDENCE_THRESHOLD:
-      pattern.lifecycle.status = "VALIDATED"
-      RETURN "VALIDATED"
-    ELSE:
-      pattern.lifecycle.status = "CANDIDATE"
-      RETURN "CANDIDATE"
-  ELSE:
-    pattern.lifecycle.status = "UNDER_REVIEW"
-    RETURN "NEEDS_REVIEW"
+    SE confidenza >= SOGLIA_CONFIDENZA:
+      pattern.lifecycle.stato = "VALIDATO"
+      RESTITUISCI "VALIDATO"
+    ALTRIMENTI:
+      pattern.lifecycle.stato = "CANDIDATO"
+      RESTITUISCI "CANDIDATO"
+  ALTRIMENTI:
+    pattern.lifecycle.stato = "IN_REVISIONE"
+    RESTITUISCI "NECESSITA_REVISIONE"
 
-Function COMPUTE_CONFIDENCE(success_rate, sample_size, p_value):
-  # Confidence increases with:
-  # 1. High success rate
-  # 2. Large sample size
-  # 3. Strong statistical significance
+Funzione CALCOLA_CONFIDENZA(tasso_successo, dimensione_campione, p_value):
+  # La confidenza aumenta con:
+  # 1. Alto tasso successo
+  # 2. Grande dimensione campione
+  # 3. Forte significatività statistica
 
-  success_component = success_rate
+  componente_successo = tasso_successo
 
-  # Sample size confidence (asymptotic to 1)
-  sample_component = 1 - EXP(-sample_size / 20)
+  # Confidenza dimensione campione (asintotica a 1)
+  componente_campione = 1 - EXP(-dimensione_campione / 20)
 
-  # Statistical significance component
-  significance_component = 1 - p_value
+  # Componente significatività statistica
+  componente_significatività = 1 - p_value
 
-  # Weighted combination
-  confidence = (
-    0.5 * success_component +
-    0.3 * sample_component +
-    0.2 * significance_component
+  # Combinazione pesata
+  confidenza = (
+    0.5 * componente_successo +
+    0.3 * componente_campione +
+    0.2 * componente_significatività
   )
 
-  RETURN CLIP(confidence, 0, 1)
+  RESTITUISCI CLIP(confidenza, 0, 1)
 ```
 
-### 3.7 Pattern Cache Operations
+### 3.7 Operazioni della Cache dei Pattern
 
 ```
-1. ADD_PATTERN(pattern)
-   • Validate structure
-   • Set initial status to CANDIDATE
-   • Insert into database
-   • Create indices
-   • Return pattern_id
+1. AGGIUNGI_PATTERN(pattern)
+   • Valida struttura
+   • Imposta stato iniziale a CANDIDATO
+   • Inserisci nel database
+   • Crea indici
+   • Restituisci pattern_id
 
-2. GET_PATTERN(pattern_id)
-   • Check cache
-   • If miss, query database
-   • Return pattern
+2. OTTIENI_PATTERN(pattern_id)
+   • Controlla cache
+   • Se miss, interroga database
+   • Restituisci pattern
 
-3. FIND_APPLICABLE(task, context)
-   • Extract features
-   • Query indexed patterns
-   • Filter by applicability
-   • Rank by relevance
-   • Return top-K
+3. TROVA_APPLICABILI(task, contesto)
+   • Estrai caratteristiche
+   • Interroga pattern indicizzati
+   • Filtra per applicabilità
+   • Ordina per rilevanza
+   • Restituisci top-K
 
-4. UPDATE_PATTERN(pattern_id, updates)
-   • Retrieve current pattern
-   • Apply updates
-   • Increment version
-   • Update timestamp
-   • Persist changes
+4. AGGIORNA_PATTERN(pattern_id, aggiornamenti)
+   • Recupera pattern corrente
+   • Applica aggiornamenti
+   • Incrementa versione
+   • Aggiorna timestamp
+   • Persisti modifiche
 
-5. RECORD_APPLICATION(pattern_id, episode_id, outcome)
-   • Link pattern to episode
-   • Update usage statistics
-   • Add to evidence
-   • Update cache
+5. REGISTRA_APPLICAZIONE(pattern_id, episodio_id, risultato)
+   • Collega pattern a episodio
+   • Aggiorna statistiche uso
+   • Aggiungi a evidenza
+   • Aggiorna cache
 
-6. VALIDATE_PATTERNS()
-   • For each VALIDATED pattern:
-     - Collect recent evidence
-     - Recompute statistics
-     - Update confidence
-     - Adjust status if needed
+6. VALIDA_PATTERN()
+   • Per ogni pattern VALIDATO:
+     - Raccogli evidenza recente
+     - Ricalcola statistiche
+     - Aggiorna confidenza
+     - Aggiusta stato se necessario
 
-7. DEPRECATE_PATTERN(pattern_id, reason, superseded_by)
-   • Update status to DEPRECATED
-   • Record reason
-   • Link to superseding pattern if exists
-   • Remove from active indices
+7. DEPRECA_PATTERN(pattern_id, motivo, sostituito_da)
+   • Aggiorna stato a DEPRECATO
+   • Registra motivo
+   • Collega a pattern sostitutivo se esiste
+   • Rimuovi da indici attivi
 
-8. GET_SIMILAR_PATTERNS(pattern)
-   • Compare structure
-   • Compare applicability
-   • Return similar patterns
-   • Use for deduplication
+8. OTTIENI_PATTERN_SIMILI(pattern)
+   • Confronta struttura
+   • Confronta applicabilità
+   • Restituisci pattern simili
+   • Usa per deduplicazione
 
-9. MERGE_PATTERNS(pattern_ids)
-   • Combine evidence
-   • Generalize applicability
-   • Create merged pattern
-   • Deprecate originals
+9. UNISCI_PATTERN(pattern_ids)
+   • Combina evidenza
+   • Generalizza applicabilità
+   • Crea pattern unito
+   • Depreca originali
 
-10. PRUNE_LOW_VALUE_PATTERNS()
-    • Identify patterns with:
-      - Low confidence
-      - Low usage
-      - Contradictory evidence
-    • Mark for review or deletion
+10. POTA_PATTERN_BASSO_VALORE()
+    • Identifica pattern con:
+      - Bassa confidenza
+      - Basso uso
+      - Evidenza contraddittoria
+    • Marca per revisione o eliminazione
 ```
 
-## 4. Memory System Integration
+## 4. Integrazione del Sistema di Memoria
 
-### 4.1 Cross-Memory Operations
+### 4.1 Operazioni Cross-Memoria
 
-**Memory systems cooperate per provide comprehensive support**:
+**I sistemi di memoria cooperano per fornire supporto completo**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│              MEMORY SYSTEM COLLABORATION                       │
+│              COLLABORAZIONE SISTEMA DI MEMORIA                 │
 │                                                                │
-│  SCENARIO 1: Task Initiation                                   │
+│  SCENARIO 1: Inizio Task                                       │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  1. Goal Analysis extracts task features                 │ │
+│  │  1. Analisi Obiettivo estrae caratteristiche task        │ │
 │  │     ↓                                                     │ │
-│  │  2. Query PATTERN CACHE for applicable strategies        │ │
-│  │     → Load top-3 patterns into WORKING MEMORY            │ │
+│  │  2. Interroga CACHE PATTERN per strategie applicabili    │ │
+│  │     → Carica top-3 pattern in MEMORIA DI LAVORO          │ │
 │  │     ↓                                                     │ │
-│  │  3. Query EPISODIC MEMORY for similar past tasks         │ │
-│  │     → Load top-5 episodes (summaries) into WORKING MEM   │ │
+│  │  3. Interroga MEMORIA EPISODICA per task passate simili  │ │
+│  │     → Carica top-5 episodi (riassunti) in MEM LAVORO     │ │
 │  │     ↓                                                     │ │
-│  │  4. Planning Engine uses both patterns and episodes      │ │
+│  │  4. Motore di Pianificazione usa pattern ed episodi      │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  SCENARIO 2: During Execution (Failure)                        │
+│  SCENARIO 2: Durante Esecuzione (Fallimento)                   │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  1. Task fails with error signature                      │ │
+│  │  1. Task fallisce con firma errore                       │ │
 │  │     ↓                                                     │ │
-│  │  2. Query PATTERN CACHE for recovery patterns            │ │
-│  │     → Load into WORKING MEMORY                           │ │
+│  │  2. Interroga CACHE PATTERN per pattern recupero         │ │
+│  │     → Carica in MEMORIA DI LAVORO                        │ │
 │  │     ↓                                                     │ │
-│  │  3. Query EPISODIC MEMORY for similar failures           │ │
-│  │     → Learn how past failures were resolved              │ │
+│  │  3. Interroga MEMORIA EPISODICA per fallimenti simili    │ │
+│  │     → Impara come fallimenti passati furono risolti      │ │
 │  │     ↓                                                     │ │
-│  │  4. Adaptation Engine applies learned recovery           │ │
+│  │  4. Motore di Adattamento applica recupero appreso       │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  SCENARIO 3: Post-Execution (Reflection)                       │
+│  SCENARIO 3: Post-Esecuzione (Riflessione)                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  1. Task completes, execution trace in WORKING MEMORY    │ │
+│  │  1. Task completa, traccia esecuzione in MEM DI LAVORO   │ │
 │  │     ↓                                                     │ │
-│  │  2. Store complete episode in EPISODIC MEMORY            │ │
+│  │  2. Memorizza episodio completo in MEMORIA EPISODICA     │ │
 │  │     ↓                                                     │ │
-│  │  3. Reflection analyzes episode                          │ │
+│  │  3. Riflessione analizza episodio                        │ │
 │  │     ↓                                                     │ │
-│  │  4. Extract patterns → Update PATTERN CACHE              │ │
-│  │     • New patterns added as CANDIDATES                   │ │
-│  │     • Existing patterns updated with new evidence        │ │
+│  │  4. Estrai pattern → Aggiorna CACHE PATTERN              │ │
+│  │     • Nuovi pattern aggiunti come CANDIDATI              │ │
+│  │     • Pattern esistenti aggiornati con nuova evidenza    │ │
 │  │     ↓                                                     │ │
-│  │  5. WORKING MEMORY cleared                               │ │
+│  │  5. MEMORIA DI LAVORO pulita                             │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.2 Memory Consolidation Pipeline
+### 4.2 Pipeline di Consolidamento Memoria
 
-**Periodic background process per maintain memory quality**:
+**Processo periodico in background per mantenere qualità memoria**:
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
-│            MEMORY CONSOLIDATION PIPELINE                       │
-│            (Runs nightly or weekly)                            │
+│            PIPELINE DI CONSOLIDAMENTO MEMORIA                  │
+│            (Eseguita notturna o settimanale)                   │
 │                                                                │
-│  STAGE 1: EPISODIC MEMORY CONSOLIDATION                        │
+│  STAGE 1: CONSOLIDAMENTO MEMORIA EPISODICA                     │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  • Identify highly similar episodes (clustering)         │ │
-│  │  • Merge similar episodes into consolidated records      │ │
-│  │  • Archive old detailed traces to cold storage           │ │
-│  │  • Update episode lifecycle statuses                     │ │
+│  │  • Identifica episodi altamente simili (clustering)      │ │
+│  │  • Unisci episodi simili in record consolidati           │ │
+│  │  • Archivia vecchie tracce dettagliate in storage freddo │ │
+│  │  • Aggiorna stati lifecycle episodi                      │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
-│  STAGE 2: PATTERN EXTRACTION                                   │
+│  STAGE 2: ESTRAZIONE PATTERN                                   │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  • Analyze recent episodes for new patterns              │ │
-│  │  • Run pattern mining algorithms                         │ │
-│  │  • Create CANDIDATE patterns                             │ │
-│  │  • Add to Pattern Cache for validation                   │ │
+│  │  • Analizza episodi recenti per nuovi pattern            │ │
+│  │  • Esegui algoritmi di pattern mining                    │ │
+│  │  • Crea pattern CANDIDATI                                │ │
+│  │  • Aggiungi a Cache Pattern per validazione              │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
-│  STAGE 3: PATTERN VALIDATION                                   │
+│  STAGE 3: VALIDAZIONE PATTERN                                  │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  • For each VALIDATED pattern:                           │ │
-│  │    - Gather recent application evidence                  │ │
-│  │    - Recompute statistics                                │ │
-│  │    - Update confidence scores                            │ │
-│  │  • For each CANDIDATE pattern:                           │ │
-│  │    - Check if sufficient evidence accumulated            │ │
-│  │    - Promote to VALIDATED if criteria met                │ │
+│  │  • Per ogni pattern VALIDATO:                            │ │
+│  │    - Raccogli evidenza applicazione recente              │ │
+│  │    - Ricalcola statistiche                               │ │
+│  │    - Aggiorna punteggi confidenza                        │ │
+│  │  • Per ogni pattern CANDIDATO:                           │ │
+│  │    - Controlla se evidenza sufficiente accumulata        │ │
+│  │    - Promuovi a VALIDATO se criteri soddisfatti          │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
-│  STAGE 4: PATTERN REFINEMENT                                   │
+│  STAGE 4: RAFFINAMENTO PATTERN                                 │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  • Identify patterns with declining performance          │ │
-│  │  • Analyze failure cases                                 │ │
-│  │  • Refine applicability conditions                       │ │
-│  │  • Merge similar patterns                                │ │
-│  │  • Deprecate obsolete patterns                           │ │
+│  │  • Identifica pattern con performance in calo            │ │
+│  │  • Analizza casi fallimento                              │ │
+│  │  • Raffina condizioni applicabilità                      │ │
+│  │  • Unisci pattern simili                                 │ │
+│  │  • Depreca pattern obsoleti                              │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
-│  STAGE 5: INDEX OPTIMIZATION                                   │
+│  STAGE 5: OTTIMIZZAZIONE INDICI                                │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  • Rebuild vector indices for episodic memory            │ │
-│  │  • Update inverted indices for pattern cache             │ │
-│  │  • Optimize database query plans                         │ │
-│  │  • Refresh cache with hot items                          │ │
+│  │  • Ricostruisci indici vettoriali per memoria episodica  │ │
+│  │  • Aggiorna indici invertiti per cache pattern           │ │
+│  │  • Ottimizza piani query database                        │ │
+│  │  • Aggiorna cache con elementi caldi                     │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                          ↓                                     │
 │  STAGE 6: REPORTING                                            │
 │  ┌──────────────────────────────────────────────────────────┐ │
-│  │  • Generate memory system health report                  │ │
-│  │  • Statistics on storage usage                           │ │
-│  │  • Pattern validation summary                            │ │
-│  │  • Consolidation results                                 │ │
+│  │  • Genera report salute sistema memoria                  │ │
+│  │  • Statistiche su uso archiviazione                      │ │
+│  │  • Riepilogo validazione pattern                         │ │
+│  │  • Risultati consolidamento                              │ │
 │  └──────────────────────────────────────────────────────────┘ │
 └────────────────────────────────────────────────────────────────┘
 ```
 
-### 4.3 Performance Characteristics
+### 4.3 Caratteristiche di Performance
 
-**Memory System Metrics**:
+**Metriche del Sistema di Memoria**:
 ```
-WORKING MEMORY
-  • Capacity: ~20K tokens (~80KB text)
-  • Access time: <1ms (in-memory)
-  • Operations: 1000s per task
-  • Lifetime: Single task execution
+MEMORIA DI LAVORO
+  • Capacità: ~20K token (~80KB testo)
+  • Tempo accesso: <1ms (in-memory)
+  • Operazioni: 1000 per task
+  • Durata: Singola esecuzione task
 
-EPISODIC MEMORY
-  • Capacity: Millions of episodes
-  • Storage size: ~10KB per episode (avg)
-  • Semantic search: <100ms for top-K=10
-  • Structured query: <50ms by ID, <200ms by attributes
-  • Cache hit rate: >70% target
-  • Episodes stored per day: 100-1000 (depends on usage)
+MEMORIA EPISODICA
+  • Capacità: Milioni di episodi
+  • Dimensione archiviazione: ~10KB per episodio (media)
+  • Ricerca semantica: <100ms per top-K=10
+  • Query strutturata: <50ms per ID, <200ms per attributi
+  • Tasso hit cache: target >70%
+  • Episodi memorizzati per giorno: 100-1000 (dipende da uso)
 
-PATTERN CACHE
-  • Capacity: Thousands of patterns
-  • Storage size: ~5KB per pattern (avg)
-  • Pattern matching: <50ms
-  • Pattern retrieval: <20ms (cached)
-  • Validation cycle: Weekly
-  • Pattern discovery rate: 1-5 new patterns per day
-```
-
-**Storage Scaling**:
-```
-Year 1 (10 users, active development):
-  Episodes: ~100K episodes
-  Storage: ~1GB episodic + 50MB patterns
-  Cost: ~$10/month (cloud storage)
-
-Year 2 (100 users, production):
-  Episodes: ~1M episodes
-  Storage: ~10GB episodic + 500MB patterns
-  Cost: ~$50/month
-
-Year 5 (1000 users, mature):
-  Episodes: ~10M episodes (with consolidation)
-  Storage: ~50GB episodic + 2GB patterns
-  Cost: ~$200/month
-  Note: Older episodes archived to cheaper cold storage
+CACHE PATTERN
+  • Capacità: Migliaia di pattern
+  • Dimensione archiviazione: ~5KB per pattern (media)
+  • Matching pattern: <50ms
+  • Recupero pattern: <20ms (cached)
+  • Ciclo validazione: Settimanale
+  • Tasso scoperta pattern: 1-5 nuovi pattern per giorno
 ```
 
-### 4.4 Memory System APIs
-
-**High-Level API for Other Components**:
+**Scalabilità Archiviazione**:
 ```
-// Working Memory API
-WorkingMemory.init(task)
-WorkingMemory.set(key, value, scope)
-WorkingMemory.get(key, scope)
-WorkingMemory.push_state(state)
-WorkingMemory.add_intermediate(subtask_id, output)
-WorkingMemory.prune()
-WorkingMemory.clear()
+Anno 1 (10 utenti, sviluppo attivo):
+  Episodi: ~100K episodi
+  Archiviazione: ~1GB episodica + 50MB pattern
+  Costo: ~$10/mese (cloud storage)
 
-// Episodic Memory API
-EpisodicMemory.store_episode(episode)
-EpisodicMemory.retrieve_by_id(episode_id)
-EpisodicMemory.search_semantic(query, k, filters)
-EpisodicMemory.search_structured(criteria)
-EpisodicMemory.get_recent(n, filters)
-EpisodicMemory.get_similar_failures(failure_signature, k)
+Anno 2 (100 utenti, produzione):
+  Episodi: ~1M episodi
+  Archiviazione: ~10GB episodica + 500MB pattern
+  Costo: ~$50/mese
 
-// Pattern Cache API
-PatternCache.add_pattern(pattern)
-PatternCache.get_pattern(pattern_id)
-PatternCache.find_applicable(task, context)
-PatternCache.record_application(pattern_id, episode_id, outcome)
-PatternCache.validate_patterns()
-PatternCache.deprecate_pattern(pattern_id, reason)
+Anno 5 (1000 utenti, maturo):
+  Episodi: ~10M episodi (con consolidamento)
+  Archiviazione: ~50GB episodica + 2GB pattern
+  Costo: ~$200/mese
+  Nota: Episodi più vecchi archiviati in storage freddo più economico
+```
 
-// Integrated Queries
-Memory.get_context_for_task(task)
-  → Returns: {
-      applicable_patterns: [Pattern],
-      similar_episodes: [Episode],
-      domain_knowledge: [...]
+### 4.4 API del Sistema di Memoria
+
+**API di Alto Livello per Altre Componenti**:
+```
+// API Memoria di Lavoro
+MemoriaDiLavoro.inizializza(task)
+MemoriaDiLavoro.imposta(chiave, valore, scope)
+MemoriaDiLavoro.ottieni(chiave, scope)
+MemoriaDiLavoro.inserisci_stato(stato)
+MemoriaDiLavoro.aggiungi_intermedio(subtask_id, output)
+MemoriaDiLavoro.pota()
+MemoriaDiLavoro.pulisci()
+
+// API Memoria Episodica
+MemoriaEpisodica.memorizza_episodio(episodio)
+MemoriaEpisodica.recupera_per_id(episodio_id)
+MemoriaEpisodica.ricerca_semantica(query, k, filtri)
+MemoriaEpisodica.ricerca_strutturata(criteri)
+MemoriaEpisodica.ottieni_recenti(n, filtri)
+MemoriaEpisodica.ottieni_fallimenti_simili(firma_fallimento, k)
+
+// API Cache Pattern
+CachePattern.aggiungi_pattern(pattern)
+CachePattern.ottieni_pattern(pattern_id)
+CachePattern.trova_applicabili(task, contesto)
+CachePattern.registra_applicazione(pattern_id, episodio_id, risultato)
+CachePattern.valida_pattern()
+CachePattern.depreca_pattern(pattern_id, motivo)
+
+// Query Integrate
+Memoria.ottieni_contesto_per_task(task)
+  → Restituisce: {
+      pattern_applicabili: [Pattern],
+      episodi_simili: [Episodio],
+      conoscenza_dominio: [...]
     }
 
-Memory.learn_from_episode(episode, reflection_insights)
-  → Stores episode, updates patterns, returns learning_summary
+Memoria.impara_da_episodio(episodio, intuizioni_riflessione)
+  → Memorizza episodio, aggiorna pattern, restituisce riassunto_apprendimento
 ```
 
 ---
 
-**Next**: [04-capability-layer.md](04-capability-layer.md) → Tool Registry, Model Router, Safety Verifier specifications
+**Prossimo**: [04-capability-layer.md](04-capability-layer.md) → Specifiche Tool Registry, Model Router, Safety Verifier
