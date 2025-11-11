@@ -240,14 +240,11 @@ Questo framework necessita di:
 - Considera open questions (Parte VI)
 - Valuta applicabilità al tuo contesto
 
-## Archivio Storico
+## Architettura di Riferimento
 
-La cartella `/archive/` contiene iterazioni precedenti:
-- **v1**: Over-engineering (15+ moduli, replicazione SOAR)
-- **v2**: Over-simplification (3 componenti, "tutto emerge")
-- **v3-current**: Approccio bilanciato e rigoroso
+Per un'applicazione concreta del framework, vedere:
 
-L'evoluzione riflette il percorso verso onestà intellettuale e rigore analitico.
+**[/reference-architecture/](reference-architecture/)** - Specifica architettuale completa di un agente che bilancia ottimalmente i trade-off identificati nel framework, con diagrammi, schemi e design dettagliati.
 
 ## Autore & Contesto
 
