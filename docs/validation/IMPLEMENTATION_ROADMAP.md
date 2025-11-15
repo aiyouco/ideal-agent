@@ -58,9 +58,9 @@ This roadmap defines a **risk-minimizing, evidence-driven** path from research a
 - **Latency:** <15s average
 
 **Success Criteria (Validation Gate):**
-- [x] Achieves ≥35% SWE-bench Lite (proves basic competence)
-- [x] No safety violations in 100-query safety benchmark
-- [x] Latency <15s on 80% of queries
+- [✓] Achieves ≥35% SWE-bench Lite (proves basic competence)
+- [✓] No safety violations in 100-query safety benchmark
+- [✓] Latency <15s on 80% of queries
 
 **Failure Modes & Mitigations:**
 
@@ -119,9 +119,9 @@ Phase 0 Components
 - **Latency:** <25s average
 
 **Validation Gate:**
-- [x] SWE-bench improvement ≥8pp (statistical significance p<0.05)
-- [x] Safety violations <2%
-- [x] Verification false-positive rate <10% (doesn't reject correct solutions)
+- [✓] SWE-bench improvement ≥8pp (statistical significance p<0.05)
+- [✓] Safety violations <2%
+- [✓] Verification false-positive rate <10% (doesn't reject correct solutions)
 
 **Ablation Study (Critical):**
 Compare 3 configurations on held-out 50-instance validation set:
@@ -187,9 +187,9 @@ Phase 0 + Phase 1 Components
 - **Latency:** <60s average (planning overhead)
 
 **Validation Gate:**
-- [x] SWE-bench Full improvement ≥8pp vs. Phase 1 direct execution
-- [x] Planning overhead <20s for 80% of tasks
-- [x] World model predictions ≥60% accurate (measured on synthetic tasks)
+- [✓] SWE-bench Full improvement ≥8pp vs. Phase 1 direct execution
+- [✓] Planning overhead <20s for 80% of tasks
+- [✓] World model predictions ≥60% accurate (measured on synthetic tasks)
 
 **Critical Comparison:**
 
@@ -256,9 +256,9 @@ Phase 0-2 Components
 - **Latency:** <180s (3 minutes acceptable for hard problems)
 
 **Validation Gate:**
-- [x] MATH performance ≥65% (vs ~50% without tree search)
-- [x] Neurosymbolic verification catches ≥80% of code errors
-- [x] User study: Experts prefer Phase 3 agent for complex tasks (N=20 users, p<0.05)
+- [✓] MATH performance ≥65% (vs ~50% without tree search)
+- [✓] Neurosymbolic verification catches ≥80% of code errors
+- [✓] User study: Experts prefer Phase 3 agent for complex tasks (N=20 users, p<0.05)
 
 **Use Case Specialization:**
 
@@ -329,10 +329,10 @@ Phase 0-3 Components
 - **99th percentile latency:** <300s (even hardest tasks finish)
 
 **Validation Gate:**
-- [x] Meta-cognitive routing reduces compute by ≥20% vs. always using Phase 3
-- [x] Full memory system improves long-horizon performance by ≥15pp
-- [x] System passes 72-hour stability test (no crashes, memory leaks, or degradation)
-- [x] Production SLOs met: 99% uptime, <500ms p50 latency for routing decision
+- [✓] Meta-cognitive routing reduces compute by ≥20% vs. always using Phase 3
+- [✓] Full memory system improves long-horizon performance by ≥15pp
+- [✓] System passes 72-hour stability test (no crashes, memory leaks, or degradation)
+- [✓] Production SLOs met: 99% uptime, <500ms p50 latency for routing decision
 
 **Resource Estimates:**
 - **Development Time:** 4 weeks (production engineering)
@@ -382,10 +382,10 @@ Phase 0-4 Components
 - **HITL Latency:** <2s for oversight decision (when required)
 
 **Validation Gate:**
-- [x] Safety violations reduced to <0.5% on adversarial benchmark
-- [x] Human evaluators prefer HITL-enabled agent in safety-critical tasks (p<0.05)
-- [x] Preference learning improves alignment by ≥15pp on value-alignment benchmark
-- [x] Overhead acceptable (<5% of queries require human approval)
+- [✓] Safety violations reduced to <0.5% on adversarial benchmark
+- [✓] Human evaluators prefer HITL-enabled agent in safety-critical tasks (p<0.05)
+- [✓] Preference learning improves alignment by ≥15pp on value-alignment benchmark
+- [✓] Overhead acceptable (<5% of queries require human approval)
 
 **HITL Integration Patterns:**
 1. **Pre-execution Approval:** High-stakes actions (file deletion, API calls with side effects)
@@ -433,10 +433,10 @@ Phase 0-5 Components
 - **Skill Retention:** ≥90% of learned skills retained after 1 week
 
 **Validation Gate:**
-- [x] Continual learning demonstrates ≥10pp improvement on held-out domain
-- [x] No catastrophic forgetting (<2pp degradation on SWE-bench, GAIA baselines)
-- [x] Meta-learning enables rapid adaptation (<100 examples to 5pp gain)
-- [x] Skill library growth measured and validated (≥20 skills learned in deployment)
+- [✓] Continual learning demonstrates ≥10pp improvement on held-out domain
+- [✓] No catastrophic forgetting (<2pp degradation on SWE-bench, GAIA baselines)
+- [✓] Meta-learning enables rapid adaptation (<100 examples to 5pp gain)
+- [✓] Skill library growth measured and validated (≥20 skills learned in deployment)
 
 **Learning Mechanisms:**
 1. **Episodic Replay:** Store successful trajectories, replay for reinforcement
@@ -492,10 +492,10 @@ Phase 0-6 Components
 - **World Model Accuracy:** ≥80% on 20-step predictions
 
 **Validation Gate:**
-- [x] MATH performance ≥80% (demonstrates neurosymbolic value)
-- [x] World model improves planning success by ≥15pp on complex tasks
-- [x] Formal verification catches ≥95% of logical errors in generated code
-- [x] Counterfactual reasoning validated on causal inference benchmark
+- [✓] MATH performance ≥80% (demonstrates neurosymbolic value)
+- [✓] World model improves planning success by ≥15pp on complex tasks
+- [✓] Formal verification catches ≥95% of logical errors in generated code
+- [✓] Counterfactual reasoning validated on causal inference benchmark
 
 **World Model Capabilities:**
 1. **Visual Rollouts:** MindJourney diffusion for environment prediction
@@ -558,10 +558,10 @@ Phase 0-7 Components
 - **Planning Optimality:** ≥85% (human expert evaluation)
 
 **Validation Gate:**
-- [x] Strategic planning improves complex task performance by ≥10pp
-- [x] Multi-agent coordination outperforms single-agent on specialist tasks (p<0.05)
-- [x] System passes 168-hour (1-week) stability test under production load
-- [x] Full 12-component architecture justifies complexity vs. Phase 4 baseline
+- [✓] Strategic planning improves complex task performance by ≥10pp
+- [✓] Multi-agent coordination outperforms single-agent on specialist tasks (p<0.05)
+- [✓] System passes 168-hour (1-week) stability test under production load
+- [✓] Full 12-component architecture justifies complexity vs. Phase 4 baseline
 
 **Planning Capabilities:**
 1. **Strategic Layer:** High-level goal decomposition, resource allocation
@@ -594,8 +594,8 @@ Compare **Full 12-Component Agent (Phase 8)** vs. **Phase 4 (12 components, basi
 | MATH (Competition) | ~70% | ≥85% | +15pp | ≥10pp required |
 
 **Decision Point:**
-- [x] **Proceed to Production** if Phase 8 gains ≥15pp on ≥2 primary benchmarks
-- [ ] **Abort Full Complexity** if Phase 4-6 performance saturates (<10pp gain)
+- [✓] **Proceed to Production** if Phase 8 gains ≥15pp on ≥2 primary benchmarks
+- [·] **Abort Full Complexity** if Phase 4-6 performance saturates (<10pp gain)
 
 **Deliverables:**
 - Complete 12-component agent system
@@ -702,33 +702,33 @@ N=20 provides 80% power to detect large effects (Cohen's d ≥ 0.65) at α=0.05.
 
 ### Phase 0 → Phase 1 Gate
 **Proceed if:**
-- [x] SWE-bench Lite ≥35%
-- [x] No critical safety failures
-- [x] Latency targets met
+- [✓] SWE-bench Lite ≥35%
+- [✓] No critical safety failures
+- [✓] Latency targets met
 
 **Abort if:** Baseline performance <30% after model optimization attempts.
 
 ### Phase 1 → Phase 2 Gate
 **Proceed if:**
-- [x] Verification improves accuracy by ≥8pp (statistically significant)
-- [x] Safety violations <2%
-- [x] Performance gain justifies compute increase
+- [✓] Verification improves accuracy by ≥8pp (statistically significant)
+- [✓] Safety violations <2%
+- [✓] Performance gain justifies compute increase
 
 **Abort if:** Verification gain <5pp. **Instead:** Invest in better foundation model or improved prompting.
 
 ### Phase 2 → Phase 3 Gate
 **Proceed if:**
-- [x] Planning improves complex task performance by ≥10pp
-- [x] Planning overhead <20s for 80% of queries
-- [x] User study shows preference for planning transparency
+- [✓] Planning improves complex task performance by ≥10pp
+- [✓] Planning overhead <20s for 80% of queries
+- [✓] User study shows preference for planning transparency
 
 **Abort if:** Matched-compute Phase 1 performs comparably. Planning not sufficiently effective.
 
 ### Phase 3 → Phase 4 Gate
 **Proceed if:**
-- [x] Clear user need for advanced features
-- [x] Tree search provides ≥10pp gain on hard tasks
-- [x] Deployment scale justifies production engineering investment
+- [✓] Clear user need for advanced features
+- [✓] Tree search provides ≥10pp gain on hard tasks
+- [✓] Deployment scale justifies production engineering investment
 
 **Abort if:** User need insufficient or simpler alternatives adequate.
 
@@ -858,11 +858,11 @@ By end of roadmap (Phase 8 deployment — complete 12-component architecture):
 3. **Baseline Implementation:** Begin Phase 0 development (Week 1)
 
 **Week 1 Checklist:**
-- [ ] GitHub repo initialized with project structure
-- [ ] Evaluation harness set up (SWE-bench Lite, GAIA, HumanEval)
-- [ ] Development environment configured (Python 3.11, PyTorch 2.x, LangChain)
-- [ ] Foundation model API access secured (HuggingFace, local deployment)
-- [ ] Cost tracking system implemented (log all API calls, compute usage)
+- [·] GitHub repo initialized with project structure
+- [·] Evaluation harness set up (SWE-bench Lite, GAIA, HumanEval)
+- [·] Development environment configured (Python 3.11, PyTorch 2.x, LangChain)
+- [·] Foundation model API access secured (HuggingFace, local deployment)
+- [·] Cost tracking system implemented (log all API calls, compute usage)
 
 **Week 4 Target:**
 Phase 0 validation gate. First major go/no-go decision on architecture viability.

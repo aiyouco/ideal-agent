@@ -104,10 +104,10 @@
 
 | Option | Complexity | Completeness | Cognitive Plausibility | Decision |
 |--------|------------|--------------|----------------------|----------|
-| **1 Memory (Context only)** | ***** | ** | ** | [ ] |
-| **2 Memories (Short+Long)** | **** | *** | *** | [ ] |
-| **4 Memories (Work+Epi+Sem+Proc)** | *** | ***** | ***** | [x] |
-| **5+ Memories (Add meta, motor)** | ** | ***** | **** | [ ] |
+| **1 Memory (Context only)** | ***** | ** | ** | [·] |
+| **2 Memories (Short+Long)** | **** | *** | *** | [·] |
+| **4 Memories (Work+Epi+Sem+Proc)** | *** | ***** | ***** | [✓] |
+| **5+ Memories (Add meta, motor)** | ** | ***** | **** | [·] |
 
 **Decision: 4 Memory Types (Working, Episodic, Semantic, Procedural)**
 
@@ -227,9 +227,9 @@
 
 | Strategy | Cost | Accuracy | Granularity | Decision |
 |----------|------|----------|-------------|----------|
-| **Outcome Only** | ***** | *** | ** | [ ] |
-| **Process Only** | ** | **** | ***** | [ ] |
-| **Multi-Level (CHOSEN)** | *** | ***** | ***** | [x] |
+| **Outcome Only** | ***** | *** | ** | [·] |
+| **Process Only** | ** | **** | ***** | [·] |
+| **Multi-Level (CHOSEN)** | *** | ***** | ***** | [✓] |
 
 **Decision: Multi-Level Verification (Process + Outcome + Constitutional)**
 
@@ -261,9 +261,9 @@
 
 | Algorithm | Forgetting | Generalization | Complexity | Decision |
 |-----------|------------|----------------|------------|----------|
-| **No Forgetting** | ***** | ** | ***** | [ ] |
-| **Random Sampling** | *** | *** | ***** | [ ] |
-| **Ebbinghaus Curve (CHOSEN)** | ***** | **** | **** | [x] |
+| **No Forgetting** | ***** | ** | ***** | [·] |
+| **Random Sampling** | *** | *** | ***** | [·] |
+| **Ebbinghaus Curve (CHOSEN)** | ***** | **** | **** | [✓] |
 | **Learned Importance** | **** | ***** | ** | Future |
 
 **Decision: Ebbinghaus Forgetting Curve with Importance Weighting**
@@ -296,11 +296,11 @@ where:
 
 | Model | Reasoning | Cost | Availability | Context | Decision |
 |-------|-----------|------|--------------|---------|----------|
-| **GPT-5.1** | ***** | \$\$\$ | API | 128K | [x] Primary |
-| **Claude 4.5** | ***** | \$\$\$ | API | 200K | [x] Primary |
-| **DeepSeek-R1** | **** | \$ | Open | 64K | [x] Alternative |
-| **Qwen3** | **** | \$ | Open | 128K | [x] Alternative |
-| **Kimi-K2** | **** | \$\$ | API | 200K+ | [x] Long Context |
+| **GPT-5.1** | ***** | \$\$\$ | API | 128K | [✓] Primary |
+| **Claude 4.5** | ***** | \$\$\$ | API | 200K | [✓] Primary |
+| **DeepSeek-R1** | **** | \$ | Open | 64K | [✓] Alternative |
+| **Qwen3** | **** | \$ | Open | 128K | [✓] Alternative |
+| **Kimi-K2** | **** | \$\$ | API | 200K+ | [✓] Long Context |
 
 **Decision: Multi-Model Approach**
 
@@ -417,9 +417,9 @@ else:
 
 | Level | Description | Our Choice |
 |-------|-------------|------------|
-| **Full Human Control** | Agent only acts with approval | [ ] |
-| **Supervised Autonomy** | Agent acts, human can intervene | [x] |
-| **Full Autonomy** | Agent acts without oversight | [ ] |
+| **Full Human Control** | Agent only acts with approval | [·] |
+| **Supervised Autonomy** | Agent acts, human can intervene | [✓] |
+| **Full Autonomy** | Agent acts without oversight | [·] |
 
 **Implementation:**
 - Agent operates autonomously within episode
@@ -441,15 +441,15 @@ else:
 **Rejected in Favor of:** Hybrid (RL + Prompting + Planning)
 
 **Pros of Pure RL:**
-- [x] Learns optimal policies
-- [x] Adapts to environment
-- [x] No manual engineering
+- [✓] Learns optimal policies
+- [✓] Adapts to environment
+- [✓] No manual engineering
 
 **Cons of Pure RL:**
-- [ ] Requires massive data
-- [ ] Sample inefficient
-- [ ] Opaque decision-making
-- [ ] Catastrophic forgetting
+- [·] Requires massive data
+- [·] Sample inefficient
+- [·] Opaque decision-making
+- [·] Catastrophic forgetting
 
 **Why Hybrid:**
 - LLMs provide strong prior knowledge
@@ -464,16 +464,16 @@ else:
 **Rejected in Favor of:** Neurosymbolic Hybrid
 
 **Pros of Pure Symbolic:**
-- [x] Formal guarantees
-- [x] Interpretable
-- [x] No hallucinations
-- [x] Composable
+- [✓] Formal guarantees
+- [✓] Interpretable
+- [✓] No hallucinations
+- [✓] Composable
 
 **Cons of Pure Symbolic:**
-- [ ] Brittle (requires perfect rules)
-- [ ] Doesn't handle ambiguity
-- [ ] Hard to author rules
-- [ ] Limited by human knowledge
+- [·] Brittle (requires perfect rules)
+- [·] Doesn't handle ambiguity
+- [·] Hard to author rules
+- [·] Limited by human knowledge
 
 **Why Neurosymbolic:**
 - Neural: Handles ambiguity, learns from data
@@ -492,15 +492,15 @@ else:
 **Rejected in Favor of:** Structured Architecture
 
 **Pros of Monolithic:**
-- [x] Simple
-- [x] Fast
-- [x] Low overhead
+- [✓] Simple
+- [✓] Fast
+- [✓] Low overhead
 
 **Cons of Monolithic:**
-- [ ] Limited by context window
-- [ ] No memory consolidation
-- [ ] No learning across sessions
-- [ ] Poor on complex tasks
+- [·] Limited by context window
+- [·] No memory consolidation
+- [·] No learning across sessions
+- [·] Poor on complex tasks
 
 **Why Architecture:**
 - Memory systems enable learning
@@ -520,15 +520,15 @@ else:
 **Rejected in Favor of:** Single Agent with Optional Multi-Agent
 
 **Pros of Distributed:**
-- [x] Parallelism
-- [x] Specialization
-- [x] Robustness
+- [✓] Parallelism
+- [✓] Specialization
+- [✓] Robustness
 
 **Cons of Distributed:**
-- [ ] Coordination overhead
-- [ ] Communication complexity
-- [ ] Harder to debug
-- [ ] Inconsistency risks
+- [·] Coordination overhead
+- [·] Communication complexity
+- [·] Harder to debug
+- [·] Inconsistency risks
 
 **Why Single Agent Default:**
 - Most tasks are sequential
@@ -546,34 +546,34 @@ else:
 ## Summary: Key Design Principles
 
 ### Principle 1: Performance First
-- [x] Accuracy over speed
-- [x] Multiple verification passes
-- [x] Test-time compute scaling
-- [x] Deep reasoning traces
+- [✓] Accuracy over speed
+- [✓] Multiple verification passes
+- [✓] Test-time compute scaling
+- [✓] Deep reasoning traces
 
 ### Principle 2: Modularity
-- [x] Layered architecture
-- [x] Independent components
-- [x] Clear interfaces
-- [x] Pluggable implementations
+- [✓] Layered architecture
+- [✓] Independent components
+- [✓] Clear interfaces
+- [✓] Pluggable implementations
 
 ### Principle 3: Cognitive Plausibility
-- [x] Based on CoALA framework
-- [x] Four-memory architecture
-- [x] Hierarchical planning
-- [x] Meta-cognitive control
+- [✓] Based on CoALA framework
+- [✓] Four-memory architecture
+- [✓] Hierarchical planning
+- [✓] Meta-cognitive control
 
 ### Principle 4: Empirical Grounding
-- [x] Every decision backed by research
-- [x] Alternatives explicitly considered
-- [x] Trade-offs quantified
-- [x] Evidence cited
+- [✓] Every decision backed by research
+- [✓] Alternatives explicitly considered
+- [✓] Trade-offs quantified
+- [✓] Evidence cited
 
 ### Principle 5: Safety & Interpretability
-- [x] Constitutional AI throughout
-- [x] Multi-level verification
-- [x] Complete traceability
-- [x] Human-in-the-loop checkpoints
+- [✓] Constitutional AI throughout
+- [✓] Multi-level verification
+- [✓] Complete traceability
+- [✓] Human-in-the-loop checkpoints
 
 ---
 
