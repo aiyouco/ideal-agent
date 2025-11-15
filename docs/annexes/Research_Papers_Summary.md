@@ -7,7 +7,7 @@
 
 **⚠️ Scope Note:** This is a curated selection prioritizing depth over breadth. We provide detailed analysis of the most impactful papers that directly shaped this architecture, rather than a comprehensive survey of all agent research. Additional papers are referenced in component documents.
 
-**🆕 Version 3.0 Updates:** Added 20+ novel 2025 papers covering latent reasoning architectures, brain-inspired modular planning, formal verification platforms, A2A protocol v0.2, theoretical foundations for world models, hierarchical planning advances, and major safety breakthroughs.
+**[NEW] Version 3.0 Updates:** Added 20+ novel 2025 papers covering latent reasoning architectures, brain-inspired modular planning, formal verification platforms, A2A protocol v0.2, theoretical foundations for world models, hierarchical planning advances, and major safety breakthroughs.
 
 ---
 
@@ -407,7 +407,7 @@ The following categories were systematically excluded:
 
 ---
 
-### 1.4 Novel Agent Architectures (2025) 🆕
+### 1.4 Novel Agent Architectures (2025) [NEW]
 
 #### Brain-Inspired Modular Agentic Planner (MAP)
 **Paper:** "A brain-inspired agentic architecture to improve planning with LLMs"
@@ -553,7 +553,7 @@ The following categories were systematically excluded:
 
 ---
 
-#### Latent Reasoning with Recurrent Depth (February 2025) 🆕
+#### Latent Reasoning with Recurrent Depth (February 2025) [NEW]
 **Paper:** "Scaling up Test-Time Compute with Latent Reasoning: A Recurrent Depth Approach"
 **Release Date:** February 2025
 **arXiv:** https://arxiv.org/abs/2502.05171

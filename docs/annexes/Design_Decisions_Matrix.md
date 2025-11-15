@@ -22,13 +22,13 @@
 
 | Criterion | Layered (CHOSEN) | Flat/Monolithic |
 |-----------|------------------|-----------------|
-| **Modularity** | ⭐⭐⭐⭐⭐ High - clear separation | ⭐⭐ Low - tight coupling |
-| **Debuggability** | ⭐⭐⭐⭐⭐ Easy to trace failures | ⭐⭐ Difficult |
-| **Upgradeability** | ⭐⭐⭐⭐⭐ Independent upgrades | ⭐⭐ Must update entire system |
-| **Latency** | ⭐⭐⭐ Moderate (inter-layer comm) | ⭐⭐⭐⭐⭐ Low (direct calls) |
-| **Complexity** | ⭐⭐⭐ More components | ⭐⭐⭐⭐ Simpler structure |
-| **Cognitive Plausibility** | ⭐⭐⭐⭐⭐ Mirrors human cognition | ⭐⭐ Less realistic |
-| **Testability** | ⭐⭐⭐⭐⭐ Unit test each layer | ⭐⭐⭐ End-to-end only |
+| **Modularity** | ***** High - clear separation | ** Low - tight coupling |
+| **Debuggability** | ***** Easy to trace failures | ** Difficult |
+| **Upgradeability** | ***** Independent upgrades | ** Must update entire system |
+| **Latency** | *** Moderate (inter-layer comm) | ***** Low (direct calls) |
+| **Complexity** | *** More components | **** Simpler structure |
+| **Cognitive Plausibility** | ***** Mirrors human cognition | ** Less realistic |
+| **Testability** | ***** Unit test each layer | *** End-to-end only |
 
 **Decision: Layered (6-layer hierarchy)**
 
@@ -49,13 +49,13 @@
 
 | Criterion | Single-Agent (CHOSEN) | Multi-Agent Default |
 |-----------|----------------------|---------------------|
-| **Simplicity** | ⭐⭐⭐⭐⭐ Single control flow | ⭐⭐ Complex coordination |
-| **Coordination Overhead** | ⭐⭐⭐⭐⭐ None | ⭐⭐ High communication cost |
-| **Specialization** | ⭐⭐⭐ One generalist | ⭐⭐⭐⭐⭐ Multiple specialists |
-| **Robustness** | ⭐⭐⭐ Single point of failure | ⭐⭐⭐⭐ Redundancy |
-| **Cost** | ⭐⭐⭐⭐ Lower (one agent) | ⭐⭐ Higher (multiple agents) |
-| **Scalability** | ⭐⭐⭐ Limited parallelism | ⭐⭐⭐⭐⭐ Parallel execution |
-| **Traceability** | ⭐⭐⭐⭐⭐ Clear decision path | ⭐⭐⭐ Distributed decisions |
+| **Simplicity** | ***** Single control flow | ** Complex coordination |
+| **Coordination Overhead** | ***** None | ** High communication cost |
+| **Specialization** | *** One generalist | ***** Multiple specialists |
+| **Robustness** | *** Single point of failure | **** Redundancy |
+| **Cost** | **** Lower (one agent) | ** Higher (multiple agents) |
+| **Scalability** | *** Limited parallelism | ***** Parallel execution |
+| **Traceability** | ***** Clear decision path | *** Distributed decisions |
 
 **Decision: Single-Agent with Optional Multi-Agent Mode**
 
@@ -76,12 +76,12 @@
 
 | Criterion | Synchronous (CHOSEN) | Asynchronous |
 |-----------|---------------------|--------------|
-| **Simplicity** | ⭐⭐⭐⭐⭐ Sequential logic | ⭐⭐ Callback hell |
-| **Latency Hiding** | ⭐⭐ Must wait for each step | ⭐⭐⭐⭐⭐ Parallel execution |
-| **Debugging** | ⭐⭐⭐⭐⭐ Linear traces | ⭐⭐ Race conditions |
-| **Error Handling** | ⭐⭐⭐⭐⭐ Straightforward | ⭐⭐⭐ Complex recovery |
-| **Resource Utilization** | ⭐⭐⭐ Blocking operations | ⭐⭐⭐⭐⭐ Efficient |
-| **Reasoning Coherence** | ⭐⭐⭐⭐⭐ Clear flow | ⭐⭐⭐ Fragmented |
+| **Simplicity** | ***** Sequential logic | ** Callback hell |
+| **Latency Hiding** | ** Must wait for each step | ***** Parallel execution |
+| **Debugging** | ***** Linear traces | ** Race conditions |
+| **Error Handling** | ***** Straightforward | *** Complex recovery |
+| **Resource Utilization** | *** Blocking operations | ***** Efficient |
+| **Reasoning Coherence** | ***** Clear flow | *** Fragmented |
 
 **Decision: Synchronous (with async for I/O)**
 
@@ -104,10 +104,10 @@
 
 | Option | Complexity | Completeness | Cognitive Plausibility | Decision |
 |--------|------------|--------------|----------------------|----------|
-| **1 Memory (Context only)** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐ | ❌ |
-| **2 Memories (Short+Long)** | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐ | ❌ |
-| **4 Memories (Work+Epi+Sem+Proc)** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
-| **5+ Memories (Add meta, motor)** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ❌ |
+| **1 Memory (Context only)** | ***** | ** | ** | [ ] |
+| **2 Memories (Short+Long)** | **** | *** | *** | [ ] |
+| **4 Memories (Work+Epi+Sem+Proc)** | *** | ***** | ***** | [x] |
+| **5+ Memories (Add meta, motor)** | ** | ***** | **** | [ ] |
 
 **Decision: 4 Memory Types (Working, Episodic, Semantic, Procedural)**
 
@@ -134,12 +134,12 @@
 
 | Criterion | HTN Only | Pure Search (MCTS) | Hybrid HTN+Search (CHOSEN) |
 |-----------|----------|-------------------|---------------------------|
-| **Efficiency** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ |
-| **Optimality** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Efficiency** | ***** | ** | **** |
+| **Optimality** | ** | ***** | **** |
 | **Domain Knowledge** | Required | Not needed | Optional |
-| **Scalability** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐ |
-| **Flexibility** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Interpretability** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Scalability** | ***** | ** | **** |
+| **Flexibility** | *** | ***** | **** |
+| **Interpretability** | ***** | *** | **** |
 
 **Decision: Hybrid (HTN for decomposition + LATS for action selection)**
 
@@ -165,11 +165,11 @@
 
 | Criterion | Fixed (Always Tree Search) | Adaptive Selection (CHOSEN) |
 |-----------|---------------------------|---------------------------|
-| **Consistency** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Efficiency** | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Performance** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Complexity** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Optimality** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Consistency** | ***** | *** |
+| **Efficiency** | ** | ***** |
+| **Performance** | **** | ***** |
+| **Complexity** | ***** | *** |
+| **Optimality** | ***** | **** |
 
 **Decision: Adaptive Strategy Selection**
 
@@ -198,10 +198,10 @@
 
 | Algorithm | Exploration | Exploitation | Optimality | Complexity |
 |-----------|-------------|--------------|------------|------------|
-| **Greedy Best-First** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Beam Search** | ⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **MCTS (UCB1)** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **LATS (CHOSEN)** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
+| **Greedy Best-First** | ** | ***** | ** | ***** |
+| **Beam Search** | *** | **** | *** | **** |
+| **MCTS (UCB1)** | **** | **** | **** | *** |
+| **LATS (CHOSEN)** | ***** | **** | ***** | *** |
 
 **Decision: LATS (Language Agent Tree Search)**
 
@@ -227,9 +227,9 @@
 
 | Strategy | Cost | Accuracy | Granularity | Decision |
 |----------|------|----------|-------------|----------|
-| **Outcome Only** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐ | ❌ |
-| **Process Only** | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ❌ |
-| **Multi-Level (CHOSEN)** | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ✅ |
+| **Outcome Only** | ***** | *** | ** | [ ] |
+| **Process Only** | ** | **** | ***** | [ ] |
+| **Multi-Level (CHOSEN)** | *** | ***** | ***** | [x] |
 
 **Decision: Multi-Level Verification (Process + Outcome + Constitutional)**
 
@@ -261,10 +261,10 @@
 
 | Algorithm | Forgetting | Generalization | Complexity | Decision |
 |-----------|------------|----------------|------------|----------|
-| **No Forgetting** | ⭐⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ | ❌ |
-| **Random Sampling** | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ❌ |
-| **Ebbinghaus Curve (CHOSEN)** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ✅ |
-| **Learned Importance** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ | Future |
+| **No Forgetting** | ***** | ** | ***** | [ ] |
+| **Random Sampling** | *** | *** | ***** | [ ] |
+| **Ebbinghaus Curve (CHOSEN)** | ***** | **** | **** | [x] |
+| **Learned Importance** | **** | ***** | ** | Future |
 
 **Decision: Ebbinghaus Forgetting Curve with Importance Weighting**
 
@@ -296,11 +296,11 @@ where:
 
 | Model | Reasoning | Cost | Availability | Context | Decision |
 |-------|-----------|------|--------------|---------|----------|
-| **GPT-5.1** | ⭐⭐⭐⭐⭐ | \$\$\$ | API | 128K | ✅ Primary |
-| **Claude 4.5** | ⭐⭐⭐⭐⭐ | \$\$\$ | API | 200K | ✅ Primary |
-| **DeepSeek-R1** | ⭐⭐⭐⭐ | \$ | Open | 64K | ✅ Alternative |
-| **Qwen3** | ⭐⭐⭐⭐ | \$ | Open | 128K | ✅ Alternative |
-| **Kimi-K2** | ⭐⭐⭐⭐ | \$\$ | API | 200K+ | ✅ Long Context |
+| **GPT-5.1** | ***** | \$\$\$ | API | 128K | [x] Primary |
+| **Claude 4.5** | ***** | \$\$\$ | API | 200K | [x] Primary |
+| **DeepSeek-R1** | **** | \$ | Open | 64K | [x] Alternative |
+| **Qwen3** | **** | \$ | Open | 128K | [x] Alternative |
+| **Kimi-K2** | **** | \$\$ | API | 200K+ | [x] Long Context |
 
 **Decision: Multi-Model Approach**
 
@@ -333,10 +333,10 @@ else:
 
 | Criterion | Same Model | Different Model (CHOSEN) |
 |-----------|------------|-------------------------|
-| **Consistency** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| **Independence** | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Cost** | ⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Bias Diversity** | ⭐⭐ | ⭐⭐⭐⭐⭐ |
+| **Consistency** | ***** | *** |
+| **Independence** | ** | ***** |
+| **Cost** | *** | **** |
+| **Bias Diversity** | ** | ***** |
 
 **Decision: Use Different Model for Verification**
 
@@ -364,10 +364,10 @@ else:
 
 | Metric | Low Priority | High Priority |
 |--------|-------------|---------------|
-| **Task Success Rate** | - | ⭐⭐⭐⭐⭐ |
-| **Reasoning Depth** | - | ⭐⭐⭐⭐⭐ |
-| **Response Latency** | ⭐⭐ | - |
-| **Throughput** | ⭐⭐ | - |
+| **Task Success Rate** | - | ***** |
+| **Reasoning Depth** | - | ***** |
+| **Response Latency** | ** | - |
+| **Throughput** | ** | - |
 
 **Justification:**
 - User specified performance > speed
@@ -395,9 +395,9 @@ else:
 
 | Approach | Flexibility | Performance | Complexity |
 |----------|-------------|-------------|------------|
-| **Pure Generalist** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| **Pure Specialists** | ⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐ |
-| **General + Optional Specialist (CHOSEN)** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
+| **Pure Generalist** | ***** | *** | ***** |
+| **Pure Specialists** | ** | ***** | ** |
+| **General + Optional Specialist (CHOSEN)** | **** | **** | *** |
 
 **Decision:**
 - Single general agent for most tasks
@@ -417,9 +417,9 @@ else:
 
 | Level | Description | Our Choice |
 |-------|-------------|------------|
-| **Full Human Control** | Agent only acts with approval | ❌ |
-| **Supervised Autonomy** | Agent acts, human can intervene | ✅ |
-| **Full Autonomy** | Agent acts without oversight | ❌ |
+| **Full Human Control** | Agent only acts with approval | [ ] |
+| **Supervised Autonomy** | Agent acts, human can intervene | [x] |
+| **Full Autonomy** | Agent acts without oversight | [ ] |
 
 **Implementation:**
 - Agent operates autonomously within episode
@@ -441,15 +441,15 @@ else:
 **Rejected in Favor of:** Hybrid (RL + Prompting + Planning)
 
 **Pros of Pure RL:**
-- ✅ Learns optimal policies
-- ✅ Adapts to environment
-- ✅ No manual engineering
+- [x] Learns optimal policies
+- [x] Adapts to environment
+- [x] No manual engineering
 
 **Cons of Pure RL:**
-- ❌ Requires massive data
-- ❌ Sample inefficient
-- ❌ Opaque decision-making
-- ❌ Catastrophic forgetting
+- [ ] Requires massive data
+- [ ] Sample inefficient
+- [ ] Opaque decision-making
+- [ ] Catastrophic forgetting
 
 **Why Hybrid:**
 - LLMs provide strong prior knowledge
@@ -464,16 +464,16 @@ else:
 **Rejected in Favor of:** Neurosymbolic Hybrid
 
 **Pros of Pure Symbolic:**
-- ✅ Formal guarantees
-- ✅ Interpretable
-- ✅ No hallucinations
-- ✅ Composable
+- [x] Formal guarantees
+- [x] Interpretable
+- [x] No hallucinations
+- [x] Composable
 
 **Cons of Pure Symbolic:**
-- ❌ Brittle (requires perfect rules)
-- ❌ Doesn't handle ambiguity
-- ❌ Hard to author rules
-- ❌ Limited by human knowledge
+- [ ] Brittle (requires perfect rules)
+- [ ] Doesn't handle ambiguity
+- [ ] Hard to author rules
+- [ ] Limited by human knowledge
 
 **Why Neurosymbolic:**
 - Neural: Handles ambiguity, learns from data
@@ -492,15 +492,15 @@ else:
 **Rejected in Favor of:** Structured Architecture
 
 **Pros of Monolithic:**
-- ✅ Simple
-- ✅ Fast
-- ✅ Low overhead
+- [x] Simple
+- [x] Fast
+- [x] Low overhead
 
 **Cons of Monolithic:**
-- ❌ Limited by context window
-- ❌ No memory consolidation
-- ❌ No learning across sessions
-- ❌ Poor on complex tasks
+- [ ] Limited by context window
+- [ ] No memory consolidation
+- [ ] No learning across sessions
+- [ ] Poor on complex tasks
 
 **Why Architecture:**
 - Memory systems enable learning
@@ -520,15 +520,15 @@ else:
 **Rejected in Favor of:** Single Agent with Optional Multi-Agent
 
 **Pros of Distributed:**
-- ✅ Parallelism
-- ✅ Specialization
-- ✅ Robustness
+- [x] Parallelism
+- [x] Specialization
+- [x] Robustness
 
 **Cons of Distributed:**
-- ❌ Coordination overhead
-- ❌ Communication complexity
-- ❌ Harder to debug
-- ❌ Inconsistency risks
+- [ ] Coordination overhead
+- [ ] Communication complexity
+- [ ] Harder to debug
+- [ ] Inconsistency risks
 
 **Why Single Agent Default:**
 - Most tasks are sequential
@@ -546,34 +546,34 @@ else:
 ## Summary: Key Design Principles
 
 ### Principle 1: Performance First
-- ✅ Accuracy over speed
-- ✅ Multiple verification passes
-- ✅ Test-time compute scaling
-- ✅ Deep reasoning traces
+- [x] Accuracy over speed
+- [x] Multiple verification passes
+- [x] Test-time compute scaling
+- [x] Deep reasoning traces
 
 ### Principle 2: Modularity
-- ✅ Layered architecture
-- ✅ Independent components
-- ✅ Clear interfaces
-- ✅ Pluggable implementations
+- [x] Layered architecture
+- [x] Independent components
+- [x] Clear interfaces
+- [x] Pluggable implementations
 
 ### Principle 3: Cognitive Plausibility
-- ✅ Based on CoALA framework
-- ✅ Four-memory architecture
-- ✅ Hierarchical planning
-- ✅ Meta-cognitive control
+- [x] Based on CoALA framework
+- [x] Four-memory architecture
+- [x] Hierarchical planning
+- [x] Meta-cognitive control
 
 ### Principle 4: Empirical Grounding
-- ✅ Every decision backed by research
-- ✅ Alternatives explicitly considered
-- ✅ Trade-offs quantified
-- ✅ Evidence cited
+- [x] Every decision backed by research
+- [x] Alternatives explicitly considered
+- [x] Trade-offs quantified
+- [x] Evidence cited
 
 ### Principle 5: Safety & Interpretability
-- ✅ Constitutional AI throughout
-- ✅ Multi-level verification
-- ✅ Complete traceability
-- ✅ Human-in-the-loop checkpoints
+- [x] Constitutional AI throughout
+- [x] Multi-level verification
+- [x] Complete traceability
+- [x] Human-in-the-loop checkpoints
 
 ---
 
