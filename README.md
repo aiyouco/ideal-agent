@@ -1,261 +1,157 @@
-# Framework di Analisi per Architetture Agentiche
+# Ideal Agent Research Dossier
+## Research Architecture for Frontier Cognitive Systems
 
-> **"There is no single 'ideal' architecture—only design choices optimized for specific contexts."**
+**Date:** November 14, 2025  
+**Status:** Version Zero — Internal research specification pending release  
+**Maintainer:** YouCo (AI Team)
 
-## Motivazione
-
-Questo lavoro di ricerca nasce da un'osservazione critica: la comunità tende a oscillare tra due estremi:
-
-1. **Over-Engineering**: Replicare intera complessità di architetture cognitive (SOAR, ACT-R) in sistemi LLM-based
-2. **Over-Simplification**: "Basta un prompt" - sottovalutare necessità di struttura
-
-**La realtà è più sfumata**: diversi problemi richiedono diversi livelli di complessità architettuale.
-
-## Contributo di Questa Ricerca
-
-Invece di proporre "l'architettura ideale", questo lavoro fornisce:
-
-### 1. **Problem Space Taxonomy**
-Classificazione sistematica dei problemi agentici in base a:
-- Complessità decisionale
-- Requisiti di affidabilità
-- Vincoli temporali
-- Necessità di tracciabilità
-- Criteri di safety
-
-### 2. **Design Dimensions Framework**
-Analisi multi-dimensionale delle scelte architetturali:
-- Controllo vs Flessibilità
-- Emergenza vs Esplicitazione
-- Semplicità vs Completeness
-- Generalità vs Specializzazione
-- Performance vs Safety
-
-### 3. **Architecture Patterns (Plurale)**
-Non UNA soluzione, ma PATTERN differenziati per:
-- Task semplici e variabili
-- Task complessi con planning
-- Task safety-critical
-- Task real-time
-- Task multi-agente
-
-### 4. **Evaluation Framework**
-Metriche e metodologie per valutare architetture in base a:
-- Efficacia (task success rate)
-- Efficienza (latenza, costo, risorse)
-- Robustezza (failure handling)
-- Estensibilità (adaptability)
-- Tracciabilità (debuggability)
-
-### 5. **Bounded Emergence Theory**
-Framework teorico per quando comportamenti emergenti sono sufficienti vs quando serve controllo esplicito.
-
-## Struttura della Ricerca
-
-### Parte I: Analisi del Problema
-
-**[01-problem-taxonomy.md](01-problem-taxonomy.md)**
-- Classificazione problemi agentici
-- Caratteristiche distintive per classe
-- Requirement analysis per classe
-- Esempi concreti
-
-### Parte II: Spazio di Design
-
-**[02-design-dimensions.md](02-design-dimensions.md)**
-- Dimensioni chiave di design
-- Trade-off analysis
-- Decision trees
-- Quando scegliere cosa
-
-### Parte III: Pattern Architetturali
-
-**[03-architecture-patterns.md](03-architecture-patterns.md)**
-- Pattern 1: Minimal Loop (task semplici)
-- Pattern 2: Reflective Agent (task complessi)
-- Pattern 3: Verified Agent (safety-critical)
-- Pattern 4: Reactive Agent (real-time)
-- Pattern 5: Collaborative Multi-Agent
-- Comparative analysis
-
-### Parte IV: Valutazione
-
-**[04-evaluation-framework.md](04-evaluation-framework.md)**
-- Metriche multi-dimensionali
-- Benchmark methodology
-- Comparison protocols
-- Validation approaches
-
-### Parte V: Teoria dell'Emergenza
-
-**[05-bounded-emergence.md](05-bounded-emergence.md)**
-- Quando emergenza è sufficiente
-- Quando serve controllo esplicito
-- Hybrid approaches
-- Safety bounds per emergenza
-
-### Parte VI: Domande Aperte
-
-**[06-open-questions.md](06-open-questions.md)**
-- Limitazioni del framework
-- Aree che richiedono più ricerca
-- Controversie non risolte
-- Direzioni future
-
-## Principi di Questo Lavoro
-
-### Onestà Intellettuale
-- ✅ Riconoscere limiti e incertezze
-- ✅ Presentare alternative, non advocacy
-- ✅ Basarsi su evidenza quando possibile
-- ❌ Non claims universali senza validazione
-
-### Rigore Analitico
-- ✅ Framework sistematici
-- ✅ Classificazioni chiare
-- ✅ Trade-off espliciti
-- ✅ Metriche misurabili
-
-### Utilità Pratica
-- ✅ Guida decisioni architetturali reali
-- ✅ Comparazione oggettiva alternative
-- ✅ Identificazione pattern applicabili
-- ✅ Framework di valutazione concreti
-
-## Cosa Questo Lavoro NON È
-
-❌ **Non è**: "L'architettura agentica definitiva e ideale"
-✅ **È**: Framework per ragionare sistematicamente su architetture agentiche
-
-❌ **Non è**: Soluzione universale per ogni problema
-✅ **È**: Taxonomy di problemi e pattern appropriati
-
-❌ **Non è**: Implementation guide
-✅ **È**: Research-level architectural analysis
-
-❌ **Non è**: Validato empiricamente su larga scala
-✅ **È**: Framework concettuale che richiede validazione
-
-## Caso d'Uso di Questo Framework
-
-### Per Architetti di Sistema
-1. Classificare il problema usando taxonomy
-2. Identificare dimensioni di design rilevanti
-3. Selezionare pattern appropriato
-4. Valutare trade-off specifici
-5. Customizzare per contesto
-
-### Per Ricercatori
-1. Framework per strutturare analisi comparativa
-2. Metriche per evaluation sistematica
-3. Identificazione gap di ricerca
-4. Baseline per nuove proposte
-
-### Per Implementatori
-1. Decision tree per scelte architetturali
-2. Metriche per validazione
-3. Pattern di riferimento
-4. Awareness di trade-off
-
-## Assunzioni e Limitazioni
-
-### Assunzioni
-- LLM moderni (GPT-4, Claude 3.5 level)
-- Contesto di applicazioni generali (non ultra-specialized)
-- Risorse computazionali ragionevoli disponibili
-- Possibilità di iterazione e testing
-
-### Limitazioni Riconosciute
-- Framework concettuale non implementato end-to-end
-- Necessità di validazione empirica sistematica
-- Focus su agenti singoli (multi-agent limitato)
-- Scope non include formal verification completa
-
-### Fuori Scope
-- Architetture per sistemi embedded
-- Mission-critical safety (aviation, medical devices)
-- Formal theorem proving
-- Quantum computing integration
-
-## Metodologia di Ricerca
-
-Questo framework è stato sviluppato attraverso:
-
-1. **Analisi Sistematica**: 9 architetture esistenti analizzate
-   - Cognitive: SOAR, ACT-R, CLARION
-   - Modern: ReAct, Reflexion, Tree-of-Thoughts
-   - Frameworks: AutoGPT, LangChain, MetaGPT
-
-2. **Synthesis**: Identificazione pattern comuni e differenzianti
-
-3. **Abstraction**: Estrazione dimensioni di design fondamentali
-
-4. **Classification**: Taxonomy basata su caratteristiche problemi
-
-5. **Evaluation Design**: Framework metriche multi-dimensionali
-
-## Contributi Specifici
-
-### 1. Problem Taxonomy
-Prima classificazione sistematica di problemi agentici basata su requisiti architetturali, non solo complessità task.
-
-### 2. Multi-Dimensional Trade-off Framework
-Framework esplicito per navigare trade-off, non prescrizioni.
-
-### 3. Bounded Emergence Theory
-Formalizzazione di quando comportamenti emergenti sono sufficienti vs quando serve controllo esplicito.
-
-### 4. Architecture Pattern Catalog
-Collezione di pattern validati per classi di problemi, non soluzione monolitica.
-
-### 5. Evaluation Methodology
-Framework comparativo per valutazione oggettiva architetture alternative.
-
-## Validazione Richiesta
-
-Questo framework necessita di:
-
-- [ ] Implementation di pattern proposti
-- [ ] Benchmarking sistematico cross-pattern
-- [ ] Case studies reali in produzione
-- [ ] User studies con architetti
-- [ ] Refinement basato su feedback empirico
-
-## Come Usare Questa Ricerca
-
-### Quick Start (30 minuti)
-1. Leggi [01-problem-taxonomy.md](01-problem-taxonomy.md)
-2. Classifica il tuo problema
-3. Vai al pattern corrispondente in [03-architecture-patterns.md](03-architecture-patterns.md)
-
-### Deep Dive (3-4 ore)
-1. Completa taxonomy (Parte I)
-2. Studia dimensioni design (Parte II)
-3. Comprendi tutti i pattern (Parte III)
-4. Esamina evaluation framework (Parte IV)
-
-### Research Level (1-2 giorni)
-- Leggi tutto in ordine
-- Studia teoria emergenza (Parte V)
-- Considera open questions (Parte VI)
-- Valuta applicabilità al tuo contesto
-
-## Architettura di Riferimento
-
-Per un'applicazione concreta del framework, vedere:
-
-**[/reference-architecture/](reference-architecture/)** - Specifica architettuale completa di un agente che bilancia ottimalmente i trade-off identificati nel framework, con diagrammi, schemi e design dettagliati.
-
-## Autore & Contesto
-
-**Claude (Anthropic)** - Analisi architettuale basata su:
-- Sintesi di 50+ anni ricerca cognitive architectures
-- Comprensione profonda capacità/limitazioni LLM
-- Principi di system design e software architecture
-- Critical analysis di 9 implementazioni moderne
-
-**Disclaimer Critico**: Questo è lavoro di **ricerca esplorativa**, non soluzione validata. Claims richiedono validazione empirica. Framework è punto di partenza per discussion rigorosa, non verità definitiva.
+This dossier consolidates the research scaffolding for an ideal large-language-model agent that must deliver verifiable reasoning, safe actuation, and adaptive learning across extended horizons. The material captures the architectural intent, component contracts, reference research, and visual representations required before any production build begins. All content remains implementation-neutral by design; only conceptual pseudo code and interface sketches are used when needed.
 
 ---
 
-**Start**: [01-problem-taxonomy.md](01-problem-taxonomy.md) → Classificazione sistematica problemi agentici
+## Intent and Guardrails
+- Treat the specification as a living, unreleased artifact. Every architectural claim references published research or reproducible open-source evidence from 2023–2025.
+- Prioritize open models and tooling (DeepSeek-R1 family, Kimi K2 Thinking, Llama 4 Scout/Maverick, Qwen3-Omni, LangGraph, OpenHands, Imandra Universe, Zep Graphiti, A2A protocol v0.2, MCP).
+- Maintain end-to-end traceability from theoretical claims to design decisions; no implementation shortcuts, no speculative benchmarks.
+- Require visual reasoning aids (ASCII schematics, flow diagrams, layered stack sketches) for every multi-component interaction.
+- Keep the tone technical and professional. No marketing phrasing, no emoji, no informal “summary” callouts.
+
+---
+
+## Research Baseline — November 2025
+
+### Reasoning and Test-Time Compute
+- **Kimi K2 Thinking (2025.11)**: first open reasoning stack surpassing proprietary browse agents; integrates native tool loops and explicit logbook supervision.
+- **DeepSeek-R1 (2025.01)**: MIT-licensed reinforcement-learning-only thinker, delivering state-of-the-art AIME/GPQA while reducing inference cost by 90% versus proprietary baselines; foundation for process reward modeling.
+- **Llama 4 Scout & Maverick (2025.04)**: 10M-token multimodal context window, mixture-of-experts with <50% active parameters, and integrated thinking tokens for controllable compute. Both Apache 2.0.
+- **ThinkPRM (2025.04)**: process-level verification from 1% labeled traces, enabling lightweight critique controllers.
+
+### Planning, World Models, and Control
+- **Plan-and-Act 2025**: evidence for strategic–tactical decoupling with asynchronous verification, informing our multi-level planner.
+- **MindJourney (2025.07)**: open diffusion-based world model to reason over vision/video sequences for environment rollouts.
+- **Brain-inspired Modular Agentic Planner (MAP, Nature Communications 2025)**: neuroscience-aligned specialization for planners, demonstrating modular superiority over monoliths.
+- **ICML 2025 world-model necessity proof (arXiv:2506.01622)**: establishes predictive modeling as a requirement for general agents; drives our dedicated world-model layer.
+
+### Memory, Knowledge, and Retrieval
+- **Zep Graphiti (2025.01)** bi-temporal knowledge graphs with bounded forgetting guarantees.
+- **MemoTime (2025.10)** temporal KG alignment with inference-aware consolidation.
+- **AriGraph 2 (2025.08)** self-updating semantic graphs for RAG-intensive agents.
+
+### Safety, Alignment, and Verification
+- **Constitutional Classifiers (2025.02)**: multi-turn jailbreak defense improving robustness from 86% failure to 4.4%.
+- **RepV (2025.10)**: verifier-friendly latent spaces to isolate unsafe plans without halting reasoning depth.
+- **Imandra Universe (2025.06)**: open formal verification environment with 99% soundness on natural-language-to-proof translation.
+
+### Multi-Agent Coordination and Tooling
+- **A2A Protocol v0.2 (Linux Foundation 2025)** and **MCP (OpenAI 2024+)**: shared message fabric for secure agent invocation.
+- **AgentMaster / AgentOrchestra (2025.07)**: orchestration evidence for multi-agent ensembles on infrastructure-grade workloads.
+- **OpenHands 3.0 (2025.09)**: OSS action executor with reproducible tool safety rails.
+
+---
+
+## Architecture Corpus
+The documentation set lives under `docs/` and is partitioned into an architecture spine, twelve component monographs, and annexes. Use the following map to locate artifacts:
+
+```
+ideal_agent/
+├── README.md                           – The artifact you are reading
+├── docs/
+│   ├── INDEX.md                        – Navigation and access paths
+│   ├── architecture/
+│   │   └── 00_MAIN_ARCHITECTURE.md     – Cohesive systems blueprint
+│   ├── components/
+│   │   ├── 01_META_COGNITIVE_SYSTEM.md
+│   │   ├── 02_PLANNING_ENGINE.md
+│   │   ├── 03_REASONING_CORE.md
+│   │   ├── 04_MEMORY_SYSTEM.md
+│   │   ├── 05_CRITIQUE_AND_VERIFICATION.md
+│   │   ├── 06_ACTION_EXECUTION.md
+│   │   ├── 07_WORLD_MODELS.md
+│   │   ├── 08_SAFETY_AND_ALIGNMENT.md
+│   │   ├── 09_NEUROSYMBOLIC_INTEGRATION.md
+│   │   ├── 10_MULTI_AGENT_COORDINATION.md
+│   │   ├── 11_HUMAN_IN_THE_LOOP.md
+│   │   └── 12_LEARNING_AND_ADAPTATION.md
+│   ├── annexes/
+│   │   ├── Research_Papers_Summary.md
+│   │   ├── Research_Synthesis_2025.md
+│   │   ├── Component_Diagrams.md
+│   │   └── Design_Decisions_Matrix.md
+│   └── validation/
+│       └── IMPLEMENTATION_ROADMAP.md
+```
+
+Each document remains tightly scoped: architecture-level considerations live in `00_MAIN_ARCHITECTURE.md`, while every component file lists research rationale, pseudo code sketches, interface contracts, visual flows, and references. Annexes provide research context, diagrams, and the quantitative trade-off register.
+
+---
+
+## Component-to-Stack Reference
+
+| Component | Research Emphasis | Primary Open-Source Stack (2025) |
+|-----------|------------------|----------------------------------|
+| Meta-Cognitive System | Strategy self-selection, compute budgeting, governance | Kimi K2 Thinking control loop, Reflexion-2025 derivatives, ThinkGuard constitutional monitors |
+| Planning Engine | Strategic/tactical decomposition, HTN + LATS search | Plan-and-Act 2025 planner, LangGraph 0.3 orchestration, MAP neuro-modular templates |
+| Reasoning Core | Test-time compute scaling, neurosymbolic traces | DeepSeek-R1 reasoning kernels, Llama 4 Maverick deliberate heads, SymCode verifiers |
+| Memory System | Four-memory regime, temporal knowledge graphs | Zep Graphiti store, MemoTime temporal consolidator, AriGraph 2 retrieval adapters |
+| Critique & Verification | Process reward modeling, multi-level auditing | ThinkPRM, RepV latent inspectors, Imandra Universe proof harness |
+| Action Execution | Tool routing, A2A adapters, grounding | OpenHands 3.0 executor, MCP bridge, Structured Toolformer runtime |
+| World Models | Counterfactual simulation, environment prediction | MindJourney diffusion rollouts, Llama 4 Scout predictive heads, WorldTree ensembles |
+| Safety & Alignment | Constitutional policy enforcement, anomaly detection | Constitutional Classifiers, RepV + ThinkGuard fusion, OpenSafe telemetry stack |
+| Neurosymbolic Integration | Differentiable logic, formal proof synthesis | Scallop 2.1 differentiable logic, SymCode compilers, Imandra Universe connectors |
+| Multi-Agent Coordination | Protocol compliance, ensemble arbitration | A2A v0.2 registry, AgentMaster orchestration, LangGraph multi-actor patterns |
+| Human-in-the-Loop | Preference incorporation, oversight surfaces | RLHF 2025 datasets, DPO-Next optimization, TransparentUI oversight consoles |
+| Learning & Adaptation | Continual fine-tuning, online skill acquisition | Meta-optimizer (PEFT+) pipelines, REMAX replay buffers, Continual LoRA schedulers |
+
+All stacks above are open-source and documented within the respective component specification files along with integration diagrams and validation heuristics.
+
+---
+
+## Layered System Blueprint
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                           META-COGNITIVE LAYER                           │
+│ Governance ▸ Difficulty Estimation ▸ Compute Budgeting ▸ Strategy Mixer  │
+└───────────────┬──────────────────────────────────────────────────────────┘
+                │ supervision + policies
+┌───────────────▼──────────────────────────────────────────────────────────┐
+│                      EXECUTIVE CONTROL LAYER                             │
+│ Planning Engine ▸ Critique/Verification ▸ Safety Monitor ▸ HITL Router   │
+└───────────────┬──────────────────────────────────────────────────────────┘
+                │ structured plans + constraints
+┌───────────────▼──────────────────────────────────────────────────────────┐
+│                    REASONING & WORLD-MODEL LAYER                          │
+│ Reasoning Core ▸ World Models ▸ Neurosymbolic Couplers                    │
+└───────────────┬──────────────────────────────────────────────────────────┘
+                │ annotated traces
+┌───────────────▼──────────────────────────────────────────────────────────┐
+│                      MEMORY & KNOWLEDGE LAYER                             │
+│ Working ▸ Episodic ▸ Semantic ▸ Procedural Memory                         │
+└───────────────┬──────────────────────────────────────────────────────────┘
+                │ context + datasets
+┌───────────────▼──────────────────────────────────────────────────────────┐
+│                  ACTION & TOOL LAYER (A2A/MCP)                            │
+│ Action Execution ▸ Tool Plugins ▸ Observers ▸ Telemetry                   │
+└───────────────┬──────────────────────────────────────────────────────────┘
+                │ perception + results
+┌───────────────▼──────────────────────────────────────────────────────────┐
+│                     FOUNDATION MODEL LAYER                                │
+│ Multimodal LLM Backbones (DeepSeek-R1, Llama 4 Scout, Qwen3-Omni)         │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+This diagram is mirrored in `docs/annexes/Component_Diagrams.md`, where each layer is elaborated with sequence diagrams and data-flow tables.
+
+---
+
+## Research Workstreams and Document Pointers
+- **Architecture Spine:** `docs/architecture/00_MAIN_ARCHITECTURE.md` establishes formal definitions, theoretical proofs, integration contracts, and coordination flows.
+- **Component Monographs:** `docs/components/*.md` files specify inputs/outputs, research lineage, pseudo code for orchestration logic, and ASCII diagrams for data and control paths.
+- **Annexes:**
+  - `docs/annexes/Research_Papers_Summary.md` catalogs 110+ primary papers with thematic organization and complete citations.
+  - `docs/annexes/Research_Synthesis_2025.md` provides chronological analysis of 2025 breakthroughs including DeepSeek-R1, Kimi K2, and Llama 4 developments.
+  - `docs/annexes/Component_Diagrams.md` contains the visual library required by the intent statement.
+  - `docs/annexes/Design_Decisions_Matrix.md` captures every trade-off (models, toolchains, verification choices) with quantitative scoring.
+- **Validation & Implementation:** `docs/validation/IMPLEMENTATION_ROADMAP.md` defines the incremental build strategy from 3-component MVP to complete 12-component architecture across 8 phases (32-40 weeks).
+
+Ensure all future edits propagate updated research references and diagrams through both the component files and annexes to maintain internal consistency.
