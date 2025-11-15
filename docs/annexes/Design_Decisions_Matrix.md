@@ -296,11 +296,11 @@ where:
 
 | Model | Reasoning | Cost | Availability | Context | Decision |
 |-------|-----------|------|--------------|---------|----------|
-| **GPT-5.1** | ⭐⭐⭐⭐⭐ | $$$ | API | 128K | ✅ Primary |
-| **Claude 4.5** | ⭐⭐⭐⭐⭐ | $$$ | API | 200K | ✅ Primary |
-| **DeepSeek-R1** | ⭐⭐⭐⭐ | $ | Open | 64K | ✅ Alternative |
-| **Qwen3** | ⭐⭐⭐⭐ | $ | Open | 128K | ✅ Alternative |
-| **Kimi-K2** | ⭐⭐⭐⭐ | $$ | API | 200K+ | ✅ Long Context |
+| **GPT-5.1** | ⭐⭐⭐⭐⭐ | \$\$\$ | API | 128K | ✅ Primary |
+| **Claude 4.5** | ⭐⭐⭐⭐⭐ | \$\$\$ | API | 200K | ✅ Primary |
+| **DeepSeek-R1** | ⭐⭐⭐⭐ | \$ | Open | 64K | ✅ Alternative |
+| **Qwen3** | ⭐⭐⭐⭐ | \$ | Open | 128K | ✅ Alternative |
+| **Kimi-K2** | ⭐⭐⭐⭐ | \$\$ | API | 200K+ | ✅ Long Context |
 
 **Decision: Multi-Model Approach**
 
